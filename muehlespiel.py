@@ -5,10 +5,6 @@ def farbe2name(farbe):
     conversions = {1:"Weiss", 2:"Schwarz", 0:"Unbesetzt"}
     return conversions[farbe]
 
-def name2farbe(name):
-    conversions = {"Weiss":1, "Schwarz":2, "Unbesetzt":0}
-    return conversions[name]
-
 class feld():
     def __init__(self):
         self.besetzung = 0
@@ -77,6 +73,6 @@ for i in range(20):
 
     print("{}-------{}-------{}".format(spielfeld[0][0].besetzung, spielfeld[0][1].besetzung, spielfeld[0][2].besetzung))
     print("        |         ")
-    print("| {}-----{}-----{}  |".format(spielfeld[1][0].besetzung, spielfeld[1][1].besetzung, spielfeld[1][2].besetzung))
-    print("|       |            |")
+    print("| {}-----{}-----{} |".format(spielfeld[1][0].besetzung, spielfeld[1][1].besetzung, spielfeld[1][2].besetzung))
+    print("|       |          |")
     print("    {}---{}---{}    ".format(spielfeld[2][0].besetzung, spielfeld[2][1].besetzung, spielfeld[2][2].besetzung))
