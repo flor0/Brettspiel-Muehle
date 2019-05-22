@@ -70,9 +70,3 @@ for i in range(20):
         zug = 1
 
     checkmuehle()
-
-    print("{}-------{}-------{}".format(spielfeld[0][0].besetzung, spielfeld[0][1].besetzung, spielfeld[0][2].besetzung))
-    print("        |         ")
-    print("| {}-----{}-----{} |".format(spielfeld[1][0].besetzung, spielfeld[1][1].besetzung, spielfeld[1][2].besetzung))
-    print("|       |          |")
-    print("    {}---{}---{}    ".format(spielfeld[2][0].besetzung, spielfeld[2][1].besetzung, spielfeld[2][2].besetzung))
