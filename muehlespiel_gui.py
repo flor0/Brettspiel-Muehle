@@ -21,7 +21,6 @@ conversions = {(0,0):(50,50), (0,1):(250, 50), (0,2):(450,50), (0,3):(450,250), 
 # Functions for the game
 def checkmuhle(ringPos, stellePos):
     mancolor = 1 if turn else 2
-    print("checking: {}".format(mancolor))
     if stellePos%2 == 0:  # Men on the edge
         if spielfeld[ringPos][(stellePos+1)%8] == mancolor and spielfeld[ringPos][(stellePos+2)%8] == mancolor:
             return True
@@ -113,23 +112,29 @@ while not done:
                             spielfeld[index[0]][index[1]] = 2
                             textsurface = myfont.render('Weiss', False, (255, 255, 255))
 
+                        # Show the fresh man
+                        drawBoard()
+                        drawState()
+                        pygame.display.flip()
+
                         if checkmuhle(index[0], index[1]):  # Check if a Mill has been created and remove a man
                             print("Mühle! Wähle einen Stein zum entfernen aus:")
                             temp_done = False
                             while not temp_done:
                                 for event1 in pygame.event.get():
-                                    if event.type == pygame.MOUSEBUTTONDOWN:
+                                    if event1.type == pygame.MOUSEBUTTONDOWN:
                                         temp_position = pygame.mouse.get_pos()
+                                        print("mousepos gotten: ".format(temp_position))
                                         for index1 in conversions:
                                             if conversions[index1][0] + 10 >= temp_position[0] >= conversions[index1][0] - 10\
-                                                    and conversions[index1][1] + 10 >= temp_position[1] >= conversions[index]\
+                                                    and conversions[index1][1] + 10 >= temp_position[1] >= conversions[index1]\
                                                     [1] - 10:  # Get the selected position to remove a man
                                                 if removeman(index1[0], index1[1]):
                                                     temp_done = True
-                                                    print("REMOVED")
                                                     break
-                                drawBoard()
-                                drawState()
+                                                else:
+                                                    print("Dieser Stein kann von dir nicht entfernt werden")
+
 
 
                         turn = not turn
