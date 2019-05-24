@@ -4,10 +4,10 @@ import numpy as np
 # Variables for the game
 spielphase = 1
 phase1_remaining = 18
-remaining_white = 9
-remaining_black = 9
-turn = False # iterate white/black
-spielfeld = [[0 for i in range(8)] for j in range(3)]  # Besetzung: 0=Unbesetzt, 1=Weiss, 2=Schwarz
+remaining = {1:9, 2:9}  # White, Black
+turn = False # iterate white/black; white begins
+spielfeld = [[0 for i in range(8)] for j in range(3)]  # Occupation: 0=Unoccupied, 1=White, 2=Black
+spielfeld_muhlen = [[0 for i1 in range(8)] for j1 in range(3)]  # Mills on board are marked with 1's ij this projection
 
 # Variables for the GUI
 BACKGROUND = (190,150,90)
@@ -23,13 +23,29 @@ def checkmuhle(ringPos, stellePos):
     mancolor = 1 if turn else 2
     if stellePos%2 == 0:  # Men on the edge
         if spielfeld[ringPos][(stellePos+1)%8] == mancolor and spielfeld[ringPos][(stellePos+2)%8] == mancolor:
+            spielfeld_muhlen[ringPos][(stellePos + 1) % 8] = 1  # Set mill in projection
+            spielfeld_muhlen[ringPos][(stellePos + 2) % 8] = 1
+            spielfeld_muhlen[ringPos][stellePos] = 1
             return True
         if spielfeld[ringPos][(stellePos-1)%8] == mancolor and spielfeld[ringPos][(stellePos-2)%8] == mancolor:
+            spielfeld_muhlen[ringPos][(stellePos - 1) % 8] = 1  # Set mill in projection
+            spielfeld_muhlen[ringPos][(stellePos - 2) % 8] = 1
+            spielfeld_muhlen[ringPos][stellePos] = 1
             return True
     else:  # Men in the centre lines
         if spielfeld[(ringPos+1)%3][stellePos] == mancolor and spielfeld[(ringPos+2)%3][stellePos] == mancolor:
+            spielfeld_muhlen[(ringPos + 1) % 3][stellePos] = 1  # Set mill in projection
+            spielfeld_muhlen[(ringPos + 2) % 3][stellePos] = 1
+            spielfeld_muhlen[ringPos][stellePos] = 1
             return True
     return False
+
+
+def clearmuhlen():  # Clear out any destroyed mills from the projection matrix
+    for ring_pos in range(len(spielfeld)):
+        for stelle_pos in range(len(spielfeld[ring_pos])):
+
+
 
 def removeman(ringpos, stellepos):
     myteam = 1 if turn else 2
@@ -37,6 +53,7 @@ def removeman(ringpos, stellepos):
         return False
     else:
         spielfeld[ringpos][stellepos] = 0
+        remaining[myteam] -= 1
         return True
 
 
@@ -129,16 +146,14 @@ while not done:
                                             if conversions[index1][0] + 10 >= temp_position[0] >= conversions[index1][0] - 10\
                                                     and conversions[index1][1] + 10 >= temp_position[1] >= conversions[index1]\
                                                     [1] - 10:  # Get the selected position to remove a man
-                                                if removeman(index1[0], index1[1]):
+                                                if removeman(index1[0], index1[1]):  # Try to remove the selected man
                                                     temp_done = True
                                                     break
                                                 else:
                                                     print("Dieser Stein kann von dir nicht entfernt werden")
 
-
-
                         turn = not turn
-
+                        print(remaining)
                         # Standard rendering done every round
                         drawBoard()
                         drawState()
