@@ -58,6 +58,25 @@ def removeman(ringpos, stellepos):
         return True
 
 
+def canmove(ringpos, stellepos):
+    if stellepos % 2 == 0:  # Men on the edges
+        if spielfeld[ringpos][(stellepos+1) % 8] == 0 or spielfeld[ringpos][(stellepos-1) % 8] == 0:  # Sideways
+            return True
+    else:  # Men on the center fields
+        if spielfeld[ringpos][(stellepos+1) % 8] == 0 or spielfeld[ringpos][(stellepos-1) % 8] == 0:  # Sideways
+            return True
+        if ringpos == 0:  # Outer ring
+            if spielfeld[1][stellepos] == 0:
+                return True
+        if ringpos == 1:  # Center ring
+            if spielfeld[0][stellepos] == 0 or spielfeld[2][stellepos] == 0:
+                return True
+        if ringpos == 2:  # Inner ring
+            if spielfeld[1][stellepos] == 0:
+                return True
+    return False
+
+
 # Functions for the GUI
 def drawPlayer(ring, stelle, color):
     pygame.draw.circle(screen, color, conversions[(ring,stelle)], 15)
@@ -142,14 +161,12 @@ while not done:
                                 for event1 in pygame.event.get():
                                     if event1.type == pygame.MOUSEBUTTONDOWN:
                                         temp_position = pygame.mouse.get_pos()
-                                        print("mousepos gotten: ".format(temp_position))
                                         for index1 in conversions:
                                             if conversions[index1][0] + 10 >= temp_position[0] >= conversions[index1][0] - 10\
                                                     and conversions[index1][1] + 10 >= temp_position[1] >= conversions[index1]\
                                                     [1] - 10:  # Get the selected position to remove a man
                                                 if removeman(index1[0], index1[1]):  # Try to remove the selected man
                                                     temp_done = True
-                                                    turn = not turn
                                                     break
                                                 else:
                                                     print("Dieser Stein kann von dir nicht entfernt werden")
@@ -182,34 +199,56 @@ while not done:
                 done = True
             elif event.type == pygame.MOUSEBUTTONDOWN:  # If the user presses a mouse button
                 position = pygame.mouse.get_pos()
-                print("mousepos gotten: ".format(position))
                 for index1 in conversions:
                     if conversions[index1][0] + 10 >= position[0] >= conversions[index1][0] - 10 \
                             and conversions[index1][1] + 10 >= position[1] >= conversions[index1] \
                             [1] - 10:  # Get the selected man
                         myteam = 1 if turn else 2
                         if spielfeld[index1[0]][index1[1]] == myteam:  # Man has to be yours
-                            # Conditions if man is movable:
-                            # TODO: Finish these conditions 'if man is movable'
-                            temp_done = False
-                            while not temp_done:
-                                for event1 in pygame.event.get():
-                                    if event1.type == pygame.MOUSEBUTTONDOWN:
-                                        temp_pos = pygame.mouse.get_pos()
-                                        for index in conversions:
-                                            if conversions[index][0] + 10 >= temp_pos[0] >= conversions[index][0] - 10 and \
-                                                    conversions[index][1] + 10 >= temp_pos[1] >= conversions[index][1] - 10:  # Get the selected position to move the man to
-                                                if spielfeld[index[0]][index[1]] == 0:
-                                                    #  Execute move
-                                                    print("DEBUG")
-                                                    temp_done = True
-                                                    turn = not turn
-                                                else:
-                                                    print("Hierhin kannst du deinen Stein nicht bewegen.")
 
+                            if remaining[myteam] > 3:  # When the player has more than 3 men left -> moving, not jumping
+                                if canmove(index1[0], index1[1]):  # Man has to be movable
+                                    # Select destination location
+                                    temp_done = False
+                                    while not temp_done:
+                                        for event1 in pygame.event.get():
+                                            if event1.type == pygame.MOUSEBUTTONDOWN:
+                                                temp_pos = pygame.mouse.get_pos()
+                                                for index in conversions:
+                                                    if conversions[index][0] + 10 >= temp_pos[0] >= conversions[index][0] - 10 and \
+                                                            conversions[index][1] + 10 >= temp_pos[1] >= conversions[index][1] - 10:  # Get the selected position to move the man to
+                                                        if spielfeld[index[0]][index[1]] == 0:
+                                                            #  Execute move
+                                                            spielfeld[index[0]][index[1]] = myteam
+                                                            spielfeld[index1[0]][index1[1]] = 0
+                                                            temp_done = True
+                                                            if checkmuhle(index[0], index[1]):
+                                                                print("Mühle! Wähle einen Stein zum entfernen aus:")
+                                                                temp_done = False
+                                                                drawBoard()
+                                                                drawState()
+                                                                pygame.display.flip()
+                                                                while not temp_done:
+                                                                    for event1 in pygame.event.get():
+                                                                        if event1.type == pygame.MOUSEBUTTONDOWN:
+                                                                            temp_position = pygame.mouse.get_pos()
+                                                                            for index1 in conversions:
+                                                                                if conversions[index1][0] + 10 >= temp_position[0] >= conversions[index1][0] - 10\
+                                                                                        and conversions[index1][1] + 10 >= temp_position[1] >= conversions[index1]\
+                                                                                        [1] - 10:  # Get the selected position to remove a man
+                                                                                    if removeman(index1[0], index1[1]):  # Try to remove the selected man
+                                                                                        temp_done = True
+                                                                                        break
+                                                                                    else:
+                                                                                        print("Dieser Stein kann von dir nicht entfernt werden")
 
-
-
+                                                        else:
+                                                            print("Hierhin kannst du deinen Stein nicht bewegen.")
+                                    turn = not turn
+                            else:  # Jumping, not moving
+                                # TODO: Implement when only 3 men remain, jumping mode
+                                print("Jumping!")
+                                pass
 
                         else:
                             print("Waehle einen deiner Steine aus.")
@@ -218,6 +257,10 @@ while not done:
                     drawState()
                     pygame.display.flip()
 
+    if remaining[1] == 0:
+        print("Schwarz gewinnt!")
+    elif remaining[2] == 0:
+        print("Weiss gewinnt!")
     #  Not yet implemented
     drawBoard()
     drawState()
