@@ -41,15 +41,16 @@ def checkmuhle(ringPos, stellePos):
     return False
 
 
-def clearmuhlen():  # Clear out any destroyed mills from the projection matrix
+def clearmuhlen(origin_ring, origin_stelle):  # Clear out any destroyed mills from the projection matrix
     for ring_pos in range(len(spielfeld)):
         for stelle_pos in range(len(spielfeld[ring_pos])):
-
+            pass
 
 
 def removeman(ringpos, stellepos):
     myteam = 1 if turn else 2
-    if spielfeld[ringpos][stellepos] == myteam or spielfeld[ringpos][stellepos] == 0:
+    if spielfeld[ringpos][stellepos] == myteam or spielfeld[ringpos][stellepos] == 0 or spielfeld_muhlen[ringpos]\
+            [stellepos] == 1:
         return False
     else:
         spielfeld[ringpos][stellepos] = 0
@@ -148,6 +149,7 @@ while not done:
                                                     [1] - 10:  # Get the selected position to remove a man
                                                 if removeman(index1[0], index1[1]):  # Try to remove the selected man
                                                     temp_done = True
+                                                    turn = not turn
                                                     break
                                                 else:
                                                     print("Dieser Stein kann von dir nicht entfernt werden")
@@ -163,8 +165,60 @@ while not done:
 
         screen.blit(textsurface, (0, 0))
         pygame.display.flip()
+    spielphase = 2
+    print("Keine Steine zum setzen übrig.")
 
-    # Not yet implemented
+    if turn:
+        textsurface = myfont.render('Weiss', False, (255, 255, 255))
+    else:
+        textsurface = myfont.render('Schwarz', False, (0, 0, 0))
+    screen.blit(textsurface, (0, 0))
+    pygame.display.flip()
+
+    #  Second phase: moving men around the board
+    while remaining[1] > 0 and remaining[2] > 0 and spielphase == 2 and not done:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                done = True
+            elif event.type == pygame.MOUSEBUTTONDOWN:  # If the user presses a mouse button
+                position = pygame.mouse.get_pos()
+                print("mousepos gotten: ".format(position))
+                for index1 in conversions:
+                    if conversions[index1][0] + 10 >= position[0] >= conversions[index1][0] - 10 \
+                            and conversions[index1][1] + 10 >= position[1] >= conversions[index1] \
+                            [1] - 10:  # Get the selected man
+                        myteam = 1 if turn else 2
+                        if spielfeld[index1[0]][index1[1]] == myteam:  # Man has to be yours
+                            # Conditions if man is movable:
+                            # TODO: Finish these conditions 'if man is movable'
+                            temp_done = False
+                            while not temp_done:
+                                for event1 in pygame.event.get():
+                                    if event1.type == pygame.MOUSEBUTTONDOWN:
+                                        temp_pos = pygame.mouse.get_pos()
+                                        for index in conversions:
+                                            if conversions[index][0] + 10 >= temp_pos[0] >= conversions[index][0] - 10 and \
+                                                    conversions[index][1] + 10 >= temp_pos[1] >= conversions[index][1] - 10:  # Get the selected position to move the man to
+                                                if spielfeld[index[0]][index[1]] == 0:
+                                                    #  Execute move
+                                                    print("DEBUG")
+                                                    temp_done = True
+                                                    turn = not turn
+                                                else:
+                                                    print("Hierhin kannst du deinen Stein nicht bewegen.")
+
+
+
+
+
+                        else:
+                            print("Waehle einen deiner Steine aus.")
+                    #  Standard rendering done every round
+                    drawBoard()
+                    drawState()
+                    pygame.display.flip()
+
+    #  Not yet implemented
     drawBoard()
     drawState()
     pygame.display.flip()
