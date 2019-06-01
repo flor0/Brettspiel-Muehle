@@ -40,11 +40,17 @@ def checkmuhle(ringPos, stellePos):
             return True
     return False
 
-
+# TODO: Finish clearmuhlen
 def clearmuhlen(origin_ring, origin_stelle):  # Clear out any destroyed mills from the projection matrix
     for ring_pos in range(len(spielfeld)):
         for stelle_pos in range(len(spielfeld[ring_pos])):
-            pass
+            temp_team = spielfeld[ring_pos][stelle_pos]
+            if stelle_pos%2 == 0:  # Edge case
+                if spielfeld[ring_pos][(stelle_pos+1) % 8] != temp_team or spielfeld[ring_pos][(stelle_pos+2) % 8] != temp_team or \
+                        spielfeld[ring_pos][(stelle_pos-1) % 8] != temp_team and spielfeld[ring_pos][(stelle_pos-2) % 8] != temp_team:
+                    spielfeld_muhlen[ring_pos][stelle_pos] = 0
+
+
 
 
 def removeman(ringpos, stellepos):
@@ -77,6 +83,21 @@ def canmove(ringpos, stellepos):
     return False
 
 
+def checkremaining(player):
+    if remaining[player] < 3:
+        return True
+    return False
+
+
+def canmoveatall(player):
+    for ring in range(len(spielfeld)):
+        for stelle in range(len(spielfeld[ring])):
+            if spielfeld[ring][stelle] == player:
+                if canmove(ring, stelle):
+                    return True
+    return False
+
+
 # Functions for the GUI
 def drawPlayer(ring, stelle, color):
     pygame.draw.circle(screen, color, conversions[(ring,stelle)], 15)
@@ -106,6 +127,8 @@ def drawBoard():
     pygame.draw.line(screen, BLACK, (250, 50), (250, 150))
     pygame.draw.line(screen, BLACK, (250, 448), (250, 350))
 
+
+# ----------------------------------------------------------------------------------------------------------------------
 
 pygame.init()
 pygame.font.init()
@@ -192,6 +215,8 @@ while not done:
     screen.blit(textsurface, (0, 0))
     pygame.display.flip()
 
+# ----------------------------------------------------------------------------------------------------------------------
+
     #  Second phase: moving men around the board
     while remaining[1] > 0 and remaining[2] > 0 and spielphase == 2 and not done:
         for event in pygame.event.get():
@@ -221,6 +246,7 @@ while not done:
                                                             #  Execute move
                                                             spielfeld[index[0]][index[1]] = myteam
                                                             spielfeld[index1[0]][index1[1]] = 0
+                                                            # TODO: Insert canmoveatall to check if enemy can move now
                                                             temp_done = True
                                                             if checkmuhle(index[0], index[1]):
                                                                 print("Mühle! Wähle einen Stein zum entfernen aus:")
@@ -238,6 +264,7 @@ while not done:
                                                                                         [1] - 10:  # Get the selected position to remove a man
                                                                                     if removeman(index1[0], index1[1]):  # Try to remove the selected man
                                                                                         temp_done = True
+                                                                                        # TODO: Check if game is over, insert checkremaining
                                                                                         break
                                                                                     else:
                                                                                         print("Dieser Stein kann von dir nicht entfernt werden")
