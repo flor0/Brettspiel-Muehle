@@ -40,7 +40,7 @@ def checkmuhle(ringPos, stellePos):
             return True
     return False
 
-# TODO: Finish clearmuhlen
+# TODO: Test clearmuhlen
 def clearmuhlen(origin_ring, origin_stelle):  # Clear out any destroyed mills from the projection matrix
     for ring_pos in range(len(spielfeld)):
         for stelle_pos in range(len(spielfeld[ring_pos])):
@@ -49,6 +49,11 @@ def clearmuhlen(origin_ring, origin_stelle):  # Clear out any destroyed mills fr
                 if spielfeld[ring_pos][(stelle_pos+1) % 8] != temp_team or spielfeld[ring_pos][(stelle_pos+2) % 8] != temp_team or \
                         spielfeld[ring_pos][(stelle_pos-1) % 8] != temp_team and spielfeld[ring_pos][(stelle_pos-2) % 8] != temp_team:
                     spielfeld_muhlen[ring_pos][stelle_pos] = 0
+            else:  # Center case
+                if (spielfeld[(ring_pos+1)%3][stelle_pos] != temp_team or spielfeld[(ring_pos+2)%3][stelle_pos] != temp_team) and \
+                        (spielfeld[ring_pos][(stelle_pos+1)%8] != temp_team or spielfeld[ring_pos][(stelle_pos-1)%8] != temp_team):
+                    spielfeld_muhlen[ring_pos][stelle_pos] = 0
+
 
 
 
@@ -246,7 +251,6 @@ while not done:
                                                             #  Execute move
                                                             spielfeld[index[0]][index[1]] = myteam
                                                             spielfeld[index1[0]][index1[1]] = 0
-                                                            # TODO: Insert canmoveatall to check if enemy can move now
                                                             temp_done = True
                                                             if checkmuhle(index[0], index[1]):
                                                                 print("Mühle! Wähle einen Stein zum entfernen aus:")
@@ -268,7 +272,9 @@ while not done:
                                                                                         break
                                                                                     else:
                                                                                         print("Dieser Stein kann von dir nicht entfernt werden")
-
+                                                            # TODO: Check if this works
+                                                            if not canmoveatall(1 if myteam == 2 else 2):
+                                                                print("{} kann keine Züge mehr machen, {} gewinnt!".format("Weiss" if myteam == 2 else "Schwarz", "Schwarz" if myteam == 2 else "Weiss"))
                                                         else:
                                                             print("Hierhin kannst du deinen Stein nicht bewegen.")
                                     turn = not turn
