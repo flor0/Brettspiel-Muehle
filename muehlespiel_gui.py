@@ -1,11 +1,12 @@
 import pygame
 import numpy as np
 
+
 # Variables for the game
 spielphase = 1
 phase1_remaining = 18
-remaining = {1:9, 2:9}  # White, Black
-turn = False # iterate white/black; white begins
+remaining = {1: 9, 2: 9}  # White, Black
+turn = False  # iterate white/black; white begins
 spielfeld = [[0 for i in range(8)] for j in range(3)]  # Occupation: 0=Unoccupied, 1=White, 2=Black
 spielfeld_muhlen = [[0 for i1 in range(8)] for j1 in range(3)]  # Mills on board are marked with 1's ij this projection
 
@@ -38,30 +39,38 @@ def checkmuhle(ringPos, stellePos):
             spielfeld_muhlen[(ringPos + 2) % 3][stellePos] = 1
             spielfeld_muhlen[ringPos][stellePos] = 1
             return True
+        if spielfeld[ringPos][(stellePos + 1) % 8] == mancolor and spielfeld[ringPos][(stellePos - 1) % 8] == mancolor:
+            spielfeld_muhlen[ringPos][(stellePos + 1) % 8] = 1
+            spielfeld_muhlen[ringPos][(stellePos - 1) % 8] = 1
+            spielfeld_muhlen[ringPos][stellePos] = 1
+            return True
     return False
 
-# TODO: Test clearmuhlen
-def clearmuhlen(origin_ring, origin_stelle):  # Clear out any destroyed mills from the projection matrix
+# TODO: Test clearmuhlen, DOESNT WORK
+def clearmuhlen():  # Clear out any destroyed mills from the projection matrix
+    tobecleared = []
     for ring_pos in range(len(spielfeld)):
         for stelle_pos in range(len(spielfeld[ring_pos])):
             temp_team = spielfeld[ring_pos][stelle_pos]
             if stelle_pos%2 == 0:  # Edge case
                 if spielfeld[ring_pos][(stelle_pos+1) % 8] != temp_team or spielfeld[ring_pos][(stelle_pos+2) % 8] != temp_team or \
                         spielfeld[ring_pos][(stelle_pos-1) % 8] != temp_team and spielfeld[ring_pos][(stelle_pos-2) % 8] != temp_team:
-                    spielfeld_muhlen[ring_pos][stelle_pos] = 0
+                    tobecleared.append((ring_pos, stelle_pos))
             else:  # Center case
                 if (spielfeld[(ring_pos+1)%3][stelle_pos] != temp_team or spielfeld[(ring_pos+2)%3][stelle_pos] != temp_team) and \
                         (spielfeld[ring_pos][(stelle_pos+1)%8] != temp_team or spielfeld[ring_pos][(stelle_pos-1)%8] != temp_team):
-                    spielfeld_muhlen[ring_pos][stelle_pos] = 0
-
-
-
-
+                    tobecleared.append((ring_pos, stelle_pos))
+    for clear in tobecleared:
+        spielfeld_muhlen[clear[0]][clear[1]] = 0
 
 def removeman(ringpos, stellepos):
     myteam = 1 if turn else 2
     if spielfeld[ringpos][stellepos] == myteam or spielfeld[ringpos][stellepos] == 0 or spielfeld_muhlen[ringpos]\
             [stellepos] == 1:
+        if not hasnotonlymills(1 if myteam == 2 else 2):
+            spielfeld[ringpos][stellepos] = 0
+            remaining[myteam] -= 1
+            return True
         return False
     else:
         spielfeld[ringpos][stellepos] = 0
@@ -100,6 +109,30 @@ def canmoveatall(player):
             if spielfeld[ring][stelle] == player:
                 if canmove(ring, stelle):
                     return True
+    return False
+
+def hasnotonlymills(player):
+    for i in range(len(spielfeld_muhlen)):
+        for j in range(len(spielfeld_muhlen[i])):
+            if spielfeld_muhlen[i][j] == 0:
+                if spielfeld[i][j] == player:
+                    return True
+    return False
+
+# TODO: implement
+def isneighbor(select_ring, select_stelle, origin_ring, origin_stelle):
+    if (origin_stelle + 1) % 8 == select_stelle or (origin_stelle - 1) % 8 == select_stelle:
+        return True  # Left/Right
+    if origin_stelle % 2 != 0:  # Center positions
+        if origin_ring == 0:
+            if select_ring == origin_ring + 1:
+                return True
+        if origin_ring == 1:
+            if origin_ring + 1 == select_ring or origin_ring - 1 == select_ring:
+                return True
+        if origin_ring == 2:
+            if origin_ring - 1 == select_ring:
+                return True
     return False
 
 
@@ -198,7 +231,7 @@ while not done:
                                                     break
                                                 else:
                                                     print("Dieser Stein kann von dir nicht entfernt werden")
-
+                        clearmuhlen()
                         turn = not turn
                         print(remaining)
                         # Standard rendering done every round
@@ -247,11 +280,12 @@ while not done:
                                                 for index in conversions:
                                                     if conversions[index][0] + 10 >= temp_pos[0] >= conversions[index][0] - 10 and \
                                                             conversions[index][1] + 10 >= temp_pos[1] >= conversions[index][1] - 10:  # Get the selected position to move the man to
-                                                        if spielfeld[index[0]][index[1]] == 0:
+                                                        if spielfeld[index[0]][index[1]] == 0 and isneighbor(index[0], index[1], index1[0], index1[1]):
                                                             #  Execute move
                                                             spielfeld[index[0]][index[1]] = myteam
                                                             spielfeld[index1[0]][index1[1]] = 0
                                                             temp_done = True
+                                                            print(spielfeld_muhlen)
                                                             if checkmuhle(index[0], index[1]):
                                                                 print("Mühle! Wähle einen Stein zum entfernen aus:")
                                                                 temp_done = False
