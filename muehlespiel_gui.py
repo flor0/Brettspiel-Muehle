@@ -1,5 +1,6 @@
 import pygame
 import numpy as np
+import sys
 
 
 # Variables for the game
@@ -130,7 +131,7 @@ def hasnotonlymills(player):
                     return True
     return False
 
-# TODO: implement
+
 def isneighbor(select_ring, select_stelle, origin_ring, origin_stelle):
     if ((origin_stelle + 1) % 8 == select_stelle or (origin_stelle - 1) % 8 == select_stelle) and origin_ring == select_ring:
         print("1isneighbor true")
@@ -185,11 +186,25 @@ def drawBoard():
     pygame.draw.line(screen, BLACK, (250, 448), (250, 350))
 
 
+
+def drawwinner(winner_player):
+    winner_textsurface = myfont.render("{} gewinnt!".format("Weiss" if winner_player == 1 else "Schwarz"), False, (255,215,0))
+    screen.blit(winner_textsurface, (150, 0))
+    pygame.display.flip()
+
+
+def endgameloop():
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT or event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.KEYDOWN:
+                sys.exit(0)
+
+
 # ----------------------------------------------------------------------------------------------------------------------
 
 pygame.init()
 pygame.font.init()
-myfont = pygame.font.SysFont('Comic Sans MS', 30)
+myfont = pygame.font.SysFont('Cambria', 30)
 
 screen = pygame.display.set_mode((500, 500))
 done = False
@@ -243,9 +258,9 @@ while not done:
                                     if event1.type == pygame.MOUSEBUTTONDOWN:
                                         temp_position = pygame.mouse.get_pos()  # Clicked position
                                         for index1 in conversions:
-                                            if conversions[index1][0] + 10 >= temp_position[0] >= conversions[index1][0] - 10\
-                                                    and conversions[index1][1] + 10 >= temp_position[1] >= conversions[index1]\
-                                                    [1] - 10:  # Get the selected position to remove a man
+                                            if conversions[index1][0] + 20 >= temp_position[0] >= conversions[index1][0] - 20\
+                                                    and conversions[index1][1] + 20 >= temp_position[1] >= conversions[index1]\
+                                                    [1] - 20:  # Get the selected position to remove a man
                                                 if removeman(index1[0], index1[1]):  # Try to remove the selected man
                                                     temp_done = True
                                                     break
@@ -270,9 +285,9 @@ while not done:
 
     # Making sure the right turn gets displayed
     if turn:
-        textsurface = myfont.render('Weiss', False, (255, 255, 255))
-    else:
         textsurface = myfont.render('Schwarz', False, (0, 0, 0))
+    else:
+        textsurface = myfont.render('Weiss', False, (255, 255, 255))
 
     screen.blit(textsurface, (0, 0))
     pygame.display.flip()
@@ -305,7 +320,6 @@ while not done:
                                                     if conversions[index][0] + 10 >= temp_pos[0] >= conversions[index][0] - 10 and \
                                                             conversions[index][1] + 10 >= temp_pos[1] >= conversions[index][1] - 10:  # Get the selected position to move the man to
                                                         if spielfeld[index[0]][index[1]] == 0 and isneighbor(index[0], index[1], index1[0], index1[1]):
-
                                                             #  Execute move
                                                             spielfeld[index[0]][index[1]] = myteam
                                                             spielfeld[index1[0]][index1[1]] = 0
@@ -322,23 +336,24 @@ while not done:
                                                                         if event1.type == pygame.MOUSEBUTTONDOWN:
                                                                             temp_position = pygame.mouse.get_pos()
                                                                             for index1 in conversions:
-                                                                                if conversions[index1][0] + 10 >= temp_position[0] >= conversions[index1][0] - 10\
-                                                                                        and conversions[index1][1] + 10 >= temp_position[1] >= conversions[index1]\
-                                                                                        [1] - 10:  # Get the selected position to remove a man
+                                                                                if conversions[index1][0] + 20 >= temp_position[0] >= conversions[index1][0] - 20\
+                                                                                        and conversions[index1][1] + 20 >= temp_position[1] >= conversions[index1]\
+                                                                                        [1] - 20:  # Get the selected position to remove a man
                                                                                     if removeman(index1[0], index1[1]):  # Try to remove the selected man
                                                                                         temp_done = True
-                                                                                        # TODO: Check if game is over, insert checkremaining
+                                                                                        # No need to check for remaining men
                                                                                         break
                                                                                     else:
                                                                                         print("Dieser Stein kann von dir nicht entfernt werden")
-                                                            # TODO: Check if this works
                                                             if not canmoveatall(1 if myteam == 2 else 2):
                                                                 print("{} kann keine Züge mehr machen, {} gewinnt!".format("Weiss" if myteam == 2 else "Schwarz", "Schwarz" if myteam == 2 else "Weiss"))
+                                                                drawwinner(1 if myteam == 2 else 2)
+                                                                endgameloop()
                                                                 done = True
                                                         else:
                                                             print("Hierhin kannst du deinen Stein nicht bewegen.")
                                     clearmuhlen()
-                                    turn = not turn
+                                    turn = not turn  # Switch turn
                                     pygame.display.flip()
                             else:  # Jumping, not moving
                                 print("Enabled jumping mode, things could break!")
@@ -381,6 +396,8 @@ while not done:
                                                                                     # TODO: Check if game is over, insert checkremaining
                                                                                     if checkremaining(1 if myteam == 2 else 2):
                                                                                         print("{} gewinnt weil {} keine Steine hat!".format("Weiss" if myteam == 1 else "Schwarz", "Schwarz" if myteam == 2 else "Weiss"))
+                                                                                        drawwinner(myteam)
+                                                                                        endgameloop()
                                                                                 else:
                                                                                     print(
                                                                                         "Dieser Stein kann von dir nicht entfernt werden")
@@ -390,6 +407,8 @@ while not done:
                                                                 "Weiss" if myteam == 2 else "Schwarz",
                                                                 "Schwarz" if myteam == 2 else "Weiss"))
                                                             done = True
+                                                            drawwinner(myteam)
+                                                            endgameloop()
                                                     else:
                                                         print("Hierhin kannst du deinen Stein nicht bewegen.")
                                 turn = not turn
