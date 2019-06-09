@@ -285,9 +285,9 @@ while not done:
 
     # Making sure the right turn gets displayed
     if turn:
-        textsurface = myfont.render('Schwarz', False, (0, 0, 0))
-    else:
         textsurface = myfont.render('Weiss', False, (255, 255, 255))
+    else:
+        textsurface = myfont.render('Schwarz', False, (0, 0, 0))
 
     screen.blit(textsurface, (0, 0))
     pygame.display.flip()
@@ -347,7 +347,7 @@ while not done:
                                                                                         print("Dieser Stein kann von dir nicht entfernt werden")
                                                             if not canmoveatall(1 if myteam == 2 else 2):
                                                                 print("{} kann keine Züge mehr machen, {} gewinnt!".format("Weiss" if myteam == 2 else "Schwarz", "Schwarz" if myteam == 2 else "Weiss"))
-                                                                drawwinner(1 if myteam == 2 else 2)
+                                                                drawwinner(myteam)
                                                                 endgameloop()
                                                                 done = True
                                                         else:
