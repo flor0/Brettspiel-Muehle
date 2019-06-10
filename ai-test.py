@@ -85,25 +85,18 @@ class Morris:
         for i in range(len(boards_to_evaluate)):
             data.append(self.minimax(boards_to_evaluate[i], boards_muhlen_to_evaluate[i], opponent, remaining_new, remaining_to_set-1, depth-1))
 
-        for i in range(len(data)):
-            if player != self.player:
-                score -= data[i][0]
-            else:
-                score += data[i][0]
         # End Rekursion
-
         # Max Zug
         recursion_scores = []
         recursion_zuge = []
         for i in range(len(data)):
             recursion_scores.append(data[i][0])
             recursion_zuge.append((data[i][1], data[i][2]))
-        print(len(data))
         try:
             max_score = max(recursion_scores) if player == self.player else min(recursion_scores)
             max_score_index = recursion_scores.index(max_score)
-
-            return (score, recursion_zuge[max_score_index][0], recursion_zuge[max_score_index][1])
+            print(recursion_zuge[max_score_index][0])
+            return (score, moves_to_evaluate[max_score_index][0], moves_to_evaluate[max_score_index][1])
         except:
             return (score, 69, 69)
         # End max zug
