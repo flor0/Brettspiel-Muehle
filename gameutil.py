@@ -26,7 +26,7 @@ def checkmuhle(ringPos, stellePos, spielfeld):
     return False
 
 # TODO: Test clearmuhlen, DOESNT WORK
-def clearmuhlen():  # Clear out any destroyed mills from the projection matrix
+def clearmuhlen(spielfeld, spielfeld_muhlen):  # Clear out any destroyed mills from the projection matrix
     tobecleared = []
     for ring_pos in range(len(spielfeld)):
         for stelle_pos in range(len(spielfeld[ring_pos])):
@@ -45,7 +45,7 @@ def clearmuhlen():  # Clear out any destroyed mills from the projection matrix
         spielfeld_muhlen[clear[0]][clear[1]] = 0
     print(spielfeld_muhlen)
 
-def removeman(ringpos, stellepos):
+def removeman(ringpos, stellepos, spielfeld):
     myteam = 1 if turn else 2
     if spielfeld[ringpos][stellepos] == myteam or spielfeld[ringpos][stellepos] == 0 or spielfeld_muhlen[ringpos]\
             [stellepos] == 1:
@@ -60,7 +60,7 @@ def removeman(ringpos, stellepos):
         return True
 
 
-def canmove(ringpos, stellepos):
+def canmove(ringpos, stellepos, spielfeld):
     if stellepos % 2 == 0:  # Men on the edges
         if spielfeld[ringpos][(stellepos+1) % 8] == 0 or spielfeld[ringpos][(stellepos-1) % 8] == 0:  # Sideways
             return True
@@ -79,7 +79,7 @@ def canmove(ringpos, stellepos):
     return False
 
 
-def canjump():
+def canjump(spielfeld):
     for reihe in spielfeld:
         for stelle in reihe:
             if stelle == 0:
@@ -93,13 +93,14 @@ def checkremaining(player):
     return False
 
 
-def canmoveatall(player):
+def canmoveatall(player, spielfeld):
     for ring in range(len(spielfeld)):
         for stelle in range(len(spielfeld[ring])):
             if spielfeld[ring][stelle] == player:
-                if canmove(ring, stelle):
+                if canmove(ring, stelle, spielfeld):
                     return True
     return False
+
 
 def hasnotonlymills(player, spielfeld, spielfeld_muhlen):
     for i in range(len(spielfeld_muhlen)):
@@ -112,23 +113,17 @@ def hasnotonlymills(player, spielfeld, spielfeld_muhlen):
 
 def isneighbor(select_ring, select_stelle, origin_ring, origin_stelle):
     if ((origin_stelle + 1) % 8 == select_stelle or (origin_stelle - 1) % 8 == select_stelle) and origin_ring == select_ring:
-        print("1isneighbor true")
         return True  # Left/Right
     if origin_stelle % 2 != 0:  # Center positions
         if ((origin_stelle + 1) % 8 == select_stelle or (origin_stelle - 1) % 8 == select_stelle) and origin_ring == select_ring:
-            print("2isneightbor true")
             return True
         if origin_ring == 0:
             if select_ring == origin_ring + 1 and select_stelle == origin_stelle:
-                print("3isneighbor true")
                 return True
         if origin_ring == 1:
             if origin_ring + 1 == select_ring or origin_ring - 1 == select_ring and select_stelle == origin_stelle:
-                print("4isneighbor true")
                 return True
         if origin_ring == 2:
             if origin_ring - 1 == select_ring and select_stelle == origin_stelle:
-                print("5isneighbor true")
                 return True
-    print("isneighbor false")
     return False

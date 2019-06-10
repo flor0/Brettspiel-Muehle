@@ -292,7 +292,7 @@ while not done:
     print("Keine Steine zum setzen übrig.")
 
     # Making sure the right turn gets displayed
-    if turn:
+    if not turn:
         textsurface = myfont.render('Weiss', False, (255, 255, 255))
     else:
         textsurface = myfont.render('Schwarz', False, (0, 0, 0))
@@ -304,6 +304,9 @@ while not done:
 
     # Second phase: moving men around the board
     while remaining[1] > 0 and remaining[2] > 0 and spielphase == 2 and not done:  # While loop phase 2
+        myteam = 1 if turn else 2
+        textsurface = myfont.render('Schwarz', False, (0, 0, 0)) if myteam == 2 else myfont.render("Weiss", False,
+                                                                                                   (255, 255, 255))
         for event in pygame.event.get():
             if event.type == pygame.QUIT:  # If the user presses esc
                 done = True
@@ -313,8 +316,7 @@ while not done:
                     if conversions[index1][0] + 10 >= position[0] >= conversions[index1][0] - 10 \
                             and conversions[index1][1] + 10 >= position[1] >= conversions[index1] \
                             [1] - 10:  # Get the selected man/index
-                        myteam = 1 if turn else 2
-                        textsurface = myfont.render('Schwarz', False, (0, 0, 0)) if myteam == 1 else myfont.render("Weiss", False, (255, 255, 255))
+
                         if spielfeld[index1[0]][index1[1]] == myteam:  # Man has to be yours
                             if remaining[2 if myteam == 1 else 1] > 3:  # When the player has more than 3 men left -> moving, not jumping
                                 if canmove(index1[0], index1[1]):  # Man has to be movable
@@ -423,11 +425,11 @@ while not done:
 
                         else:
                             print("Waehle einen deiner Steine aus.")
-                    #  Standard rendering done every round
-                    drawBoard()
-                    drawState()
-                    screen.blit(textsurface, (0,0))
-                    pygame.display.flip()
+        #  Standard rendering done every round
+        drawBoard()
+        drawState()
+        screen.blit(textsurface, (0,0))
+        pygame.display.flip()
 
     if remaining[1] == 0:
         print("Schwarz gewinnt!")
