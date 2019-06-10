@@ -199,6 +199,11 @@ def endgameloop():
             if event.type == pygame.QUIT or event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.KEYDOWN:
                 sys.exit(0)
 
+def drawremove():
+    textscreen = myfont.render("Entferne einen Stein", False, (51, 25, 0))
+    screen.blit(textscreen, (0, 500-40))
+    pygame.display.flip()
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -252,9 +257,12 @@ while not done:
                         # Check if a Mill has been created and remove a man
                         if checkmuhle(index[0], index[1]):
                             print("Mühle! Wähle einen Stein zum entfernen aus:")
+                            drawremove()
                             temp_done = False
                             while not temp_done:  # Wait for user input
                                 for event1 in pygame.event.get():
+                                    if event1.type == pygame.QUIT:
+                                        sys.exit(0)
                                     if event1.type == pygame.MOUSEBUTTONDOWN:
                                         temp_position = pygame.mouse.get_pos()  # Clicked position
                                         for index1 in conversions:
