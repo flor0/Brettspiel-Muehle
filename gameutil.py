@@ -1,6 +1,5 @@
 # Functions for the game
-def checkmuhle(ringPos, stellePos, spielfeld):
-    mancolor = 1 if turn else 2
+def checkmuhle(ringPos, stellePos, spielfeld, spielfeld_muhlen, mancolor):
     if stellePos%2 == 0:  # Men on the edge
         if spielfeld[ringPos][(stellePos+1)%8] == mancolor and spielfeld[ringPos][(stellePos+2)%8] == mancolor:
             spielfeld_muhlen[ringPos][(stellePos + 1) % 8] = 1  # Set mill in projection
