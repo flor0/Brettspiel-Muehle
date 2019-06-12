@@ -1,6 +1,5 @@
 import copy
 import gameutil
-import numpy as np
 import random
 
 
@@ -31,10 +30,11 @@ class Morris:
                         score_opponent += 3
                     if gameutil.checkmuhle(i, j, board, board_muhlen, self.player) and \
                             board[i][j] == self.player:
-                        score_player += 2
+                        score_player += 2.5
+                        print("MUHLE")
                     elif gameutil.checkmuhle(i, j, board, board_muhlen, self.opponent) and \
                             board[i][j] == self.opponent:
-                        score_opponent += 2
+                        score_opponent += 2.5
             score = score_player - score_opponent
 
             static_evaluation = (score, move[0], move[1])
@@ -60,9 +60,13 @@ class Morris:
                                 for j in range(8):
                                     if board[i][j] == opponent:
                                         toremoves.append((i, j))
-                            toremove = random.choice(toremoves)
-                            board[toremove[0]][toremove[1]] = 0
-                        evaluation = self.minimax(child, child_muhlen, opponent, (ring, stelle), depth-1)
+                            for toremove in toremoves:
+                                board_new = copy.deepcopy(board)
+                                board_new[toremove[0]][toremove[1]] = 0
+                                evaluation = self.minimax(board_new, child_muhlen, opponent, (ring, stelle), depth-1)
+                                if evaluation[0] > maxEval[0]:
+                                    maxEval = evaluation
+                        evaluation = self.minimax(child, child_muhlen, opponent, (ring, stelle), depth - 1)
                         if evaluation[0] > maxEval[0]:
                             maxEval = evaluation
             return maxEval
