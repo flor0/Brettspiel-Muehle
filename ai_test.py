@@ -25,16 +25,19 @@ class Morris:
             for i in range(3):
                 for j in range(8):
                     if board[i][j] == self.player:
-                        score_player += 3
+                        score_player += 1
                     elif board[i][j] == self.opponent:
-                        score_opponent += 3
+                        score_opponent += 1
                     if gameutil.checkmuhle(i, j, board, board_muhlen, self.player) and \
                             board[i][j] == self.player:
-                        score_player += 2.5
-                        print("MUHLE")
+                        print("ai muhle")
+                        score_player += 10
                     elif gameutil.checkmuhle(i, j, board, board_muhlen, self.opponent) and \
                             board[i][j] == self.opponent:
-                        score_opponent += 2.5
+                        print("player muhle")
+                        score_opponent += 100
+                    #score_player += self.number_possible_moves(board, self.player)*0.1
+                    #score_opponent += self.number_possible_moves(board, self.opponent)*0.1
             score = score_player - score_opponent
 
             static_evaluation = (score, move[0], move[1])
@@ -94,6 +97,28 @@ class Morris:
                         if evaluation[0] < minEval[0]:
                             minEval = evaluation
             return minEval
+
+    # Functions for the AI
+    def number_possible_moves(self, board, player):
+        n = 0
+        for i in range(3):
+            for j in range(8):
+                if board[i][j] == player:
+                    # Left/Right you can go anytime, anywhere
+                    if board[i][(j + 1) % 8] == 0 or board[i][(j - 1) % 8] == 0:
+                        n += 1
+                    # Up/Down you cna only go in center positions
+                    if j % 2 != 0:
+                        if i == 0 and board[i + 1][j] == 0:
+                            n += 1
+                        if i == 1 and board[i + 1][j] == 0:
+                            n += 1
+                        if i == 1 and board[i - 1][j] == 0:
+                            n += 1
+                        if i == 2 and board[i - 1][j] == 0:
+                            n += 1
+        return n
+
 
 
 '''
