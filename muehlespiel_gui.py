@@ -6,7 +6,7 @@ import sys
 # Variables for the game
 spielphase = 1
 phase1_remaining = 18
-remaining = {1: 9, 2: 9}  # White, Black
+remaining = {1: 9, 2: 9}  # White, Black WARNING INVERTED!
 turn = False  # iterate white/black; white begins
 spielfeld = [[0 for i in range(8)] for j in range(3)]  # Occupation: 0=Unoccupied, 1=White, 2=Black
 spielfeld_muhlen = [[0 for i1 in range(8)] for j1 in range(3)]  # Mills on board are marked with 1's ij this projection
@@ -134,25 +134,19 @@ def hasnotonlymills(player):
 
 def isneighbor(select_ring, select_stelle, origin_ring, origin_stelle):
     if ((origin_stelle + 1) % 8 == select_stelle or (origin_stelle - 1) % 8 == select_stelle) and origin_ring == select_ring:
-        print("1isneighbor true")
         return True  # Left/Right
     if origin_stelle % 2 != 0:  # Center positions
         if ((origin_stelle + 1) % 8 == select_stelle or (origin_stelle - 1) % 8 == select_stelle) and origin_ring == select_ring:
-            print("2isneightbor true")
             return True
         if origin_ring == 0:
             if select_ring == origin_ring + 1 and select_stelle == origin_stelle:
-                print("3isneighbor true")
                 return True
         if origin_ring == 1:
             if origin_ring + 1 == select_ring or origin_ring - 1 == select_ring and select_stelle == origin_stelle:
-                print("4isneighbor true")
                 return True
         if origin_ring == 2:
             if origin_ring - 1 == select_ring and select_stelle == origin_stelle:
-                print("5isneighbor true")
                 return True
-    print("isneighbor false")
     return False
 
 
@@ -191,6 +185,10 @@ def drawwinner(winner_player):
     winner_textsurface = myfont.render("{} gewinnt!".format("Weiss" if winner_player == 1 else "Schwarz"), False, (255,215,0))
     screen.blit(winner_textsurface, (150, 0))
     pygame.display.flip()
+    if winner_player == myteam:
+        audio_victory()
+    else:
+        audio_lose()
 
 
 def endgameloop():
@@ -204,6 +202,17 @@ def drawremove():
     screen.blit(textscreen, (0, 500-40))
     pygame.display.flip()
 
+def audio_error():
+    pygame.mixer.music.load("Error.mp3")
+    pygame.mixer.music.play()
+
+def audio_victory():
+    pygame.mixer.music.load("Victory.mp3")
+    pygame.mixer.music.play()
+
+def audio_lose():
+    pygame.mixer.music.load("Lose.mp3")
+    pygame.mixer.music.play()
 
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -238,7 +247,8 @@ while not done:
                             >= position[1] >= conversions[index][1]-10:  # Get the selected position to place the man
                         # Check if the move is valid
                         if spielfeld[index[0]][index[1]] != 0:
-                            print("Invalid Move! Men can't be place on top of others.")
+                            audio_error()
+                            print("Steine können nicht auf anderen plaziert werden!")
                             break
 
                         elif turn:  # Whites turn
@@ -273,6 +283,7 @@ while not done:
                                                     temp_done = True
                                                     break
                                                 else:
+                                                    audio_error()
                                                     print("Dieser Stein kann von dir nicht entfernt werden")
 
                         clearmuhlen()  # Remove mills that have been destroyed this turn
@@ -351,9 +362,13 @@ while not done:
                                                                                         [1] - 20:  # Get the selected position to remove a man
                                                                                     if removeman(index1[0], index1[1]):  # Try to remove the selected man
                                                                                         temp_done = True
-                                                                                        # No need to check for remaining men
+                                                                                        if remaining[myteam] < 3:
+                                                                                            drawwinner(myteam)
+                                                                                            endgameloop()
+                                                                                            done = True
                                                                                         break
                                                                                     else:
+                                                                                        audio_error()
                                                                                         print("Dieser Stein kann von dir nicht entfernt werden")
                                                             if not canmoveatall(1 if myteam == 2 else 2):
                                                                 print("{} kann keine Züge mehr machen, {} gewinnt!".format("Weiss" if myteam == 2 else "Schwarz", "Schwarz" if myteam == 2 else "Weiss"))
@@ -361,6 +376,7 @@ while not done:
                                                                 endgameloop()
                                                                 done = True
                                                         else:
+                                                            audio_error()
                                                             print("Hierhin kannst du deinen Stein nicht bewegen.")
                                     clearmuhlen()
                                     turn = not turn  # Switch turn
@@ -383,7 +399,6 @@ while not done:
                                                         spielfeld[index[0]][index[1]] = myteam
                                                         spielfeld[index1[0]][index1[1]] = 0
                                                         temp_done = True
-                                                        print(spielfeld_muhlen)
                                                         if checkmuhle(index[0], index[1]):
                                                             print("Mühle! Wähle einen Stein zum entfernen aus:")
                                                             temp_done = False
@@ -404,7 +419,9 @@ while not done:
                                                                                 if removeman(index1[0], index1[1]):  # Try to remove the selected man
                                                                                     temp_done = True
                                                                                     # TODO: Check if game is over, insert checkremaining
-                                                                                    if checkremaining(1 if myteam == 2 else 2):
+                                                                                    print(remaining)
+                                                                                    print("BEGUG")
+                                                                                    if remaining[myteam] < 3:
                                                                                         print("{} gewinnt weil {} keine Steine hat!".format("Weiss" if myteam == 1 else "Schwarz", "Schwarz" if myteam == 2 else "Weiss"))
                                                                                         drawwinner(myteam)
                                                                                         endgameloop()
@@ -420,10 +437,12 @@ while not done:
                                                             drawwinner(myteam)
                                                             endgameloop()
                                                     else:
+                                                        audio_error()
                                                         print("Hierhin kannst du deinen Stein nicht bewegen.")
                                 turn = not turn
 
                         else:
+                            audio_error()
                             print("Waehle einen deiner Steine aus.")
         #  Standard rendering done every round
         drawBoard()
