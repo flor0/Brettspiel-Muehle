@@ -231,7 +231,7 @@ while not done:
     # 1. Game phase: Place men
     while phase1_remaining and not done:
         if not turn:
-            ki = ai_test.Morris(copy.deepcopy(spielfeld), copy.deepcopy(spielfeld_muhlen), 2, remaining.copy())
+            ki = ai_test.Morris(copy.deepcopy(spielfeld), copy.deepcopy(spielfeld_muhlen), 1, remaining.copy())
             ai_move = (ki.ring, ki.stelle)
             ai_score = ki.score
             print("AI SCORE: "+str(ai_score))
