@@ -11,15 +11,22 @@ class Morris:
         self.opponent = 1 if self.player == 2 else 2
         self.board = spielbrett
         self.board_muhlen = spielbrett_muhlen
-        self.score, self.ring, self.stelle = self.minimax(self.board, self.board_muhlen, self.player, self.remaining)
+        self.score, self.ring, self.stelle = self.minimax(self.board, self.board_muhlen, self.player, self.remaining, -10000000000000, 100000000000000)
 
-    def minimax(self, board, board_muhlen, player, move, depth=3):
+    def minimax(self, board, board_muhlen, player, move, alpha, beta, depth=4):
 
         opponent = 1 if player == 2 else 2
 
         if depth <= 0:  # Return the static evaluation
             # Generate static evaluation
-            # Each piece gives 3 points, each mill gives one point, each possible move gives 0.1 points
+            """
+            Evaluation depends on the state of the game
+            1st state:  Mills are valued high but preventing the enemy from having mills is more important
+                        Adjacent free spaces are a priority, so you have more options to move and are not trapped by the enemy
+            2nd state:  Mills are a priority but so is not getting trapped
+                        Having a man is now valued
+            3rd state:  Preventing mills is most important                        
+            """
             score_player = 0
             score_opponent = 0
             for i in range(3):
@@ -33,12 +40,10 @@ class Morris:
                     if gameutil.checkmuhle(i, j, board, board_muhlen, self.player) and \
                             board[i][j] == self.player:
                         score_player += 10
-                        print("KI MUHLE")
 
                     elif gameutil.checkmuhle(i, j, board, board_muhlen, self.opponent) and \
                             board[i][j] == self.opponent:
-                        score_opponent += 10
-                        print("GEGENR MUHLE")
+                        score_opponent += 15
                     score_player += self.number_possible_moves(board, self.player)
                     score_opponent += self.number_possible_moves(board, self.opponent)
             score = score_player - score_opponent
@@ -51,7 +56,7 @@ class Morris:
 
         # If maximizing Player
         if player == self.player:
-            maxEval = (-100000000000000000000000000000000000, 69, 69)
+            maxEval = (alpha, 69, 69)
             # For each child in position:
             for ring in range(3):
                 for stelle in range(8):
@@ -69,17 +74,23 @@ class Morris:
                             for toremove in toremoves:
                                 board_new = copy.deepcopy(board)
                                 board_new[toremove[0]][toremove[1]] = 0
-                                evaluation = self.minimax(board_new, child_muhlen, opponent, (ring, stelle), depth-1)
+                                evaluation = self.minimax(board_new, child_muhlen, opponent, (ring, stelle), maxEval[0], beta, depth-1)
                                 if evaluation[0] > maxEval[0]:
                                     maxEval = evaluation
-                        evaluation = self.minimax(child, child_muhlen, opponent, (ring, stelle), depth - 1)
+                                    if maxEval[0] >= beta:
+                                        break
+                        evaluation = self.minimax(child, child_muhlen, opponent, (ring, stelle), maxEval[0], beta, depth - 1)
                         if evaluation[0] > maxEval[0]:
                             maxEval = evaluation
+                            if maxEval[0] >= beta:
+                                break
+                if maxEval[0] >= beta:
+                    break
             return maxEval
 
         # If minimizing Player
         else:
-            minEval = (100000000000000000000000000000000000, 69, 69)
+            minEval = (beta, 69, 69)
             # For each child in position:
             for ring in range(3):
                 for stelle in range(8):
@@ -96,9 +107,13 @@ class Morris:
                                         toremoves.append((i, j))
                             toremove = random.choice(toremoves)
                             board[toremove[0]][toremove[1]] = 0
-                        evaluation = self.minimax(child, child_muhlen, opponent, (ring, stelle), depth-1)
+                        evaluation = self.minimax(child, child_muhlen, opponent, (ring, stelle), alpha, minEval[0], depth-1)
                         if evaluation[0] < minEval[0]:
                             minEval = evaluation
+                            if minEval[0] <= alpha:
+                                break
+                if minEval[0] <= alpha:
+                    break
             return minEval
 
     # Functions for the AI
