@@ -39,11 +39,11 @@ class Morris:
                         pass
                     if gameutil.checkmuhle(i, j, board, board_muhlen, self.player) and \
                             board[i][j] == self.player:
-                        score_player += 10
+                        score_player += 100
 
                     elif gameutil.checkmuhle(i, j, board, board_muhlen, self.opponent) and \
                             board[i][j] == self.opponent:
-                        score_opponent += 15
+                        score_opponent += 100
                     score_player += self.number_possible_moves(board, self.player)
                     score_opponent += self.number_possible_moves(board, self.opponent)
             score = score_player - score_opponent
@@ -61,6 +61,10 @@ class Morris:
             for ring in range(3):
                 for stelle in range(8):
                     if board[ring][stelle] == 0:
+                        # Debug
+                        if depth == 4:
+                            print("MOVE", ring, stelle, board[ring][stelle])
+                        # end debug
                         child = copy.deepcopy(board)
                         child[ring][stelle] = player
                         child_muhlen = copy.deepcopy(board_muhlen)
@@ -70,16 +74,19 @@ class Morris:
                             for i in range(3):
                                 for j in range(8):
                                     if board[i][j] == opponent:
+                                        print("REMOVE", i, j, board[i][j], opponent)
                                         toremoves.append((i, j))
                             for toremove in toremoves:
                                 board_new = copy.deepcopy(board)
                                 board_new[toremove[0]][toremove[1]] = 0
+                                #TODO: Update child_muhlen with new mill before passing it on
                                 evaluation = self.minimax(board_new, child_muhlen, opponent, (ring, stelle), maxEval[0], beta, depth-1)
                                 if evaluation[0] > maxEval[0]:
                                     maxEval = evaluation
                                     if maxEval[0] >= beta:
                                         break
-                        evaluation = self.minimax(child, child_muhlen, opponent, (ring, stelle), maxEval[0], beta, depth - 1)
+
+                        evaluation = self.minimax(child, child_muhlen, opponent, (ring, stelle), maxEval[0], beta, depth-1)
                         if evaluation[0] > maxEval[0]:
                             maxEval = evaluation
                             if maxEval[0] >= beta:

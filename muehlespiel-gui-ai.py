@@ -1,7 +1,7 @@
 import pygame
 import numpy as np
 import sys
-import ai_test
+import ai_test_
 import copy
 
 
@@ -232,7 +232,10 @@ while not done:
     while phase1_remaining and not done:
         if not turn:
             print("denke...")
-            ki = ai_test.Morris(copy.deepcopy(spielfeld), copy.deepcopy(spielfeld_muhlen), 1, remaining.copy())
+            print("DEBUG")
+            print(copy.deepcopy(spielfeld))
+            print("END DEBUG")
+            ki = ai_test_.Morris(copy.deepcopy(spielfeld), copy.deepcopy(spielfeld_muhlen), 1)
             ai_move = (ki.ring, ki.stelle)
             ai_score = ki.score
             print("denken fertig")
