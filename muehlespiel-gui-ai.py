@@ -235,7 +235,7 @@ while not done:
             print("DEBUG")
             print(copy.deepcopy(spielfeld))
             print("END DEBUG")
-            ki = ai_test_.Morris(copy.deepcopy(spielfeld), copy.deepcopy(spielfeld_muhlen), 1)
+            ki = ai_test_.Morris(copy.deepcopy(spielfeld), copy.deepcopy(spielfeld_muhlen), 1, phase1_remaining)
             ai_move = (ki.ring, ki.stelle)
             ai_score = ki.score
             print("denken fertig")

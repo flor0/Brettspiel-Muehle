@@ -42,7 +42,6 @@ def clearmuhlen(spielfeld, spielfeld_muhlen):  # Clear out any destroyed mills f
                     tobecleared.append((ring_pos, stelle_pos))
     for clear in tobecleared:
         spielfeld_muhlen[clear[0]][clear[1]] = 0
-    print(spielfeld_muhlen)
 
 def removeman(ringpos, stellepos, spielfeld):
     myteam = 1 if turn else 2
