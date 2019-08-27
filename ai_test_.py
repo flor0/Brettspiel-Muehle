@@ -7,7 +7,7 @@ class Morris:
         self.player = real_player
         self.opponent = 1 if self.player == 2 else 2
         self.remaining_set = remaining_set
-        self.score, self.ring, self.stelle = self.make_score(board, board_muhlen, real_player, -1000000000000000,
+        self.out = self.make_score(board, board_muhlen, real_player, -1000000000000000,
                                                              100000000000000)
     ###
     # First function being called, remembers moves to return them
@@ -15,20 +15,47 @@ class Morris:
     def make_score(self, board, board_muhlen, player, alpha, beta):
         maxEval = alpha
         best_move = False
-        for ring in range(3):
-            for stelle in range(8):
-                if board[ring][stelle] == 0:
-                    move = (ring, stelle)
-                    board_continue = copy.deepcopy(board)
-                    board_continue[ring][stelle] = self.player
-                    evaluation = self.minimax(board_continue, copy.deepcopy(board_muhlen), 1 if player == 2 else 2
-                                              , alpha, beta, self.remaining_set, 3)
-                    # TODO: Evaluation is always 0 !?
-                    print(move, evaluation)
-                    if evaluation > maxEval:
-                        maxEval = evaluation
-                        best_move = move
-        return maxEval, best_move[0], best_move[1]
+        # If phase 1
+        if self.remaining_set > 0:
+            for ring in range(3):
+                for stelle in range(8):
+                    if board[ring][stelle] == 0:
+                        move = (ring, stelle)
+                        board_continue = copy.deepcopy(board)
+                        board_continue[ring][stelle] = self.player
+                        evaluation = self.minimax(board_continue, copy.deepcopy(board_muhlen), 1 if player == 2 else 2
+                                                  , alpha, beta, self.remaining_set, 3)
+                        # TODO: Evaluation is always 0 !?
+                        print(move, evaluation)
+                        if evaluation > maxEval:
+                            maxEval = evaluation
+                            best_move = move
+            return best_move[0], best_move[1]
+        # If phase 2
+        else:
+            for ring in range(3):
+                for stelle in range(8):
+                    if board[ring][stelle] == self.player:
+                        possiblemoves = self.possiblemoves(ring, stelle, board)
+                        if possiblemoves:
+                            for move in possiblemoves:
+                                board_ = copy.deepcopy(board)
+                                muhlen_ = copy.deepcopy(board_muhlen)
+                                board_[ring][stelle] = 0
+                                try:
+                                    board_[move[0]][move[1]] = self.player
+                                except:
+                                    print("ERROR"+str(move))
+                                score_add = 0
+                                if self.checkmuhle(move[0], move[1], board_, self.player):
+                                    score_add += 100
+                                evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, alpha, beta, 0, 3)
+                                # TODO: Evaluation is always 0 !?
+                                print(move, evaluation)
+                                if evaluation > maxEval:
+                                    maxEval = evaluation
+                                    best_move = move[0], move[1], ring, stelle
+                            return best_move[0], best_move[1], best_move[2], best_move[3]
 
 
     ###
@@ -36,29 +63,48 @@ class Morris:
     ###
     def minimax(self, board, board_muhlen, player, alpha, beta, remaining_set, depth):
         if depth <= 1:
-            score_player = 0
-            score_opponent = 0
-            for i in range(3):
-                for j in range(8):
-                    if board[i][j] == self.player:
-                        score_player += 1
-                        pass
-                    elif board[i][j] == self.opponent:
-                        score_opponent += 1
-                        pass
-                    if gameutil.checkmuhle(i, j, board, board_muhlen, self.player) and \
-                            board[i][j] == self.player:
-                        score_player += 100
+            # Static evaluation for gamemode 1
+            if remaining_set >= 1:
+                score_player = 0
+                score_opponent = 0
+                for i in range(3):
+                    for j in range(8):
+                        if board[i][j] == self.player:
+                            score_player += 1
+                            pass
+                        elif board[i][j] == self.opponent:
+                            score_opponent += 1
+                        if gameutil.checkmuhle(i, j, board, board_muhlen, self.player) and \
+                                board[i][j] == self.player:
+                            score_player += 100
 
-                    elif gameutil.checkmuhle(i, j, board, board_muhlen, self.opponent) and \
-                            board[i][j] == self.opponent:
-                        score_opponent += 110
-                    score_player += self.number_possible_moves(board, self.player)
-                    score_opponent += self.number_possible_moves(board, self.opponent)
-            score = score_player - score_opponent
-            # print(score)
-            # End generate static evaluation
-            return score
+                        elif gameutil.checkmuhle(i, j, board, board_muhlen, self.opponent) and \
+                                board[i][j] == self.opponent:
+                            score_opponent += 110
+                        score_player += self.number_possible_moves(board, self.player)
+                        score_opponent += self.number_possible_moves(board, self.opponent)
+                score = score_player - score_opponent
+                return score
+
+            # Static evaluation for gamemode 2
+            else:
+                score_player = 0
+                score_opponent = 0
+                for i in range(3):
+                    for j in range(8):
+                        if board[i][j] == self.player:
+                            score_player += 1
+                        elif board[i][j] == self.opponent:
+                            score_opponent += 1
+
+                        if gameutil.checkmuhle(i, j, board, board_muhlen, self.player) and \
+                                board[i][j] == self.player:
+                            score_player += 11
+                        elif gameutil.checkmuhle(i, j, board, board_muhlen, self.opponent) and \
+                                board[i][j] == self.opponent:
+                            score_opponent += 10
+                return score_player - score_opponent
+                        # Making a mill also generates points but is checked in the minimax function, not here
 
         # MAX
         if player == self.player:
@@ -75,11 +121,16 @@ class Morris:
                             if gameutil.checkmuhle(ring, stelle, board_, muhlen_, player):
                                 for ring_ in range(3):
                                     for stelle_ in range(8):
+                                        # TODO: Consider all possible men being removed
+                                        # Take the first enemy man and remove it
                                         if board_[ring_][stelle_] == (1 if player == 2 else 2) and muhlen_[ring_][stelle_] == 0:
                                             board_[ring_][stelle_] = 0
+                                            # break stelle
                                             break
                                     else:
+                                        # continue if stelle wasnt broken
                                         continue
+                                    # break ring if stelle was broken
                                     break
 
                             evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, alpha, beta, remaining_set - 1, depth-1)
@@ -101,14 +152,42 @@ class Morris:
                     for stelle in range(8):
                         if board[ring][stelle] == player:
                             possiblemoves = self.possiblemoves(ring, stelle, board)
+                            if not possiblemoves:
+                                continue
                             for move in possiblemoves:
                                 board_ = copy.deepcopy(board)
                                 muhlen_ = copy.deepcopy(board_muhlen)
                                 board_[ring][stelle] = 0
-                                board[move[0]][move[1]] = player
-                                evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, alpha, beta, remaining_set, depth-1)
+                                try:
+                                    board_[move[0]][move[1]] = player
+                                except:
+                                    print("ERROR"+str(move))
+                                # check if new mill has been generated / zwickmuehle
+                                # TODO: kinda whack
+                                score_addition = 0
+                                if self.checkmuhle(move[0], move[1], board_, player):
+                                    # New mill generated
+                                    score_addition += 20
+                                    if self.checkmuhle(ring, stelle, board, player):
+                                        # Zwickmuehle
+                                        score_addition += 60
+
+                                    # Finally, remove one random enemy man
+                                    for ring_ in range(3):
+                                        for stelle_ in range(8):
+                                            if board_[ring_][stelle_] == (1 if player == 2 else 2) and muhlen_[ring_][stelle_] == 0:
+                                                board_[ring_][stelle_] = 0
+                                                break
+                                        else:
+                                            continue
+                                        break
+
+                                evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, alpha, beta,
+                                                          remaining_set, depth - 1)
+                                evaluation += score_addition
                                 if evaluation > best_score:
                                     best_score = evaluation
+
                 return best_score
 
 
@@ -124,7 +203,7 @@ class Morris:
                             board_[ring][stelle] = player
                             muhlen_ = copy.deepcopy(board_muhlen)
 
-                            if gameutil.checkmuhle(ring, stelle, board_, muhlen_, player):
+                            if self.checkmuhle(ring, stelle, board_, player):
                                 for ring_ in range(3):
                                     for stelle_ in range(8):
                                         if board_[ring_][stelle_] == (1 if player == 2 else 2) and muhlen_[ring_][stelle_] == 0:
@@ -153,13 +232,39 @@ class Morris:
                     for stelle in range(8):
                         if board[ring][stelle] == player:
                             possiblemoves = self.possiblemoves(ring, stelle, board)
+                            if not possiblemoves:
+                                continue
                             for move in possiblemoves:
                                 board_ = copy.deepcopy(board)
                                 muhlen_ = copy.deepcopy(board_muhlen)
                                 board_[ring][stelle] = 0
-                                board[move[0]][move[1]] = player
+                                try:
+                                    board_[move[0]][move[1]] = player
+                                except:
+                                    print("ERROR"+str(move))
+                                # check if new mill has been generated / zwickmuehle
+                                # TODO: kinda whack
+                                score_addition = 0
+                                if self.checkmuhle(move[0], move[1], board_, player):
+                                    # New mill generated
+                                    score_addition += 20
+                                    if self.checkmuhle(ring, stelle, board, player):
+                                        # Zwickmuehle
+                                        score_addition += 60
+
+                                    # Finally, remove one enemy man
+                                    for ring_ in range(3):
+                                        for stelle_ in range(8):
+                                            if board_[ring_][stelle_] == (1 if player == 2 else 2) and muhlen_[ring_][stelle_] == 0:
+                                                board_[ring_][stelle_] = 0
+                                                break
+                                        else:
+                                            continue
+                                        break
+
                                 evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, alpha, beta,
                                                           remaining_set, depth - 1)
+                                evaluation += score_addition
                                 if evaluation < best_score:
                                     best_score = evaluation
                 return best_score
@@ -277,3 +382,31 @@ class Morris:
         if len(possiblemoves) == 0:
             return False
         return possiblemoves
+
+    def checkmuhle(self, ringPos, stellePos, spielfeld, mancolor):
+        if stellePos % 2 == 0:  # Men on the edge
+            if spielfeld[ringPos][(stellePos + 1) % 8] == mancolor and spielfeld[ringPos][
+                                    (stellePos + 2) % 8] == mancolor:
+                return True
+            if spielfeld[ringPos][(stellePos - 1) % 8] == mancolor and spielfeld[ringPos][
+                (stellePos - 2) % 8] == mancolor:
+                return True
+        else:  # Men in the centre lines
+            if spielfeld[(ringPos + 1) % 3][stellePos] == mancolor and spielfeld[(ringPos + 2) % 3][
+                                    stellePos] == mancolor:
+                return True
+            if spielfeld[ringPos][(stellePos + 1) % 8] == mancolor and spielfeld[ringPos][
+                                    (stellePos - 1) % 8] == mancolor:
+                return True
+        return False
+
+    def clearmuhlen(self, board, board_muhlen):
+        tobecleared = []
+        for ring in range(3):
+            for stelle in range(8):
+                if (not self.checkmuhle(ring, stelle, board, board[ring][stelle])) and (board_muhlen[ring][stelle] != 0):
+                    tobecleared.append((ring, stelle))
+        if len(tobecleared) == 0:
+            return False
+        else:
+            return tobecleared

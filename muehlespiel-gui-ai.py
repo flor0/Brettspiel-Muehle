@@ -49,25 +49,11 @@ def checkmuhle(ringPos, stellePos):
             return True
     return False
 
-# TODO: Test clearmuhlen, DOESNT WORK
-def clearmuhlen():  # Clear out any destroyed mills from the projection matrix
-    tobecleared = []
-    for ring_pos in range(len(spielfeld)):
-        for stelle_pos in range(len(spielfeld[ring_pos])):
-            temp_team = spielfeld[ring_pos][stelle_pos]
-            if temp_team == 0:
-                tobecleared.append((ring_pos, stelle_pos))
-            elif stelle_pos % 2 == 0:  # Edge case
-                if (spielfeld[ring_pos][(stelle_pos+1) % 8] != temp_team or spielfeld[ring_pos][(stelle_pos+2) % 8] != temp_team) and \
-                        (spielfeld[ring_pos][(stelle_pos-1) % 8] != temp_team or spielfeld[ring_pos][(stelle_pos-2) % 8] != temp_team):
-                    tobecleared.append((ring_pos, stelle_pos))
-            else:  # Center case
-                if (spielfeld[(ring_pos+1)%3][stelle_pos] != temp_team or spielfeld[(ring_pos+2)%3][stelle_pos] != temp_team) and \
-                        (spielfeld[ring_pos][(stelle_pos+1)%8] != temp_team or spielfeld[ring_pos][(stelle_pos-1)%8] != temp_team):
-                    tobecleared.append((ring_pos, stelle_pos))
-    for clear in tobecleared:
-        spielfeld_muhlen[clear[0]][clear[1]] = 0
-    print(spielfeld_muhlen)
+def clearmuhlen():
+    for ring in range(3):
+        for stelle in range(8):
+            if (not checkmuhle(ring, stelle)) and (spielfeld_muhlen[ring][stelle] != 0):
+                spielfeld_muhlen[ring][stelle] = 0
 
 def removeman(ringpos, stellepos):
     myteam = 1 if turn else 2
@@ -235,14 +221,13 @@ while not done:
             print("DEBUG")
             print(copy.deepcopy(spielfeld))
             print("END DEBUG")
-            ki = ai_test_.Morris(copy.deepcopy(spielfeld), copy.deepcopy(spielfeld_muhlen), 1, phase1_remaining)
-            ai_move = (ki.ring, ki.stelle)
-            ai_score = ki.score
+            ki = ai_test_.Morris(copy.deepcopy(spielfeld), copy.deepcopy(spielfeld_muhlen), 2, phase1_remaining)
+            ai_move = ki.out
             print("denken fertig")
-            print("AI SCORE: "+str(ai_score))
             print("AI MOVE: "+str(ai_move))
             spielfeld[ai_move[0]][ai_move[1]] = 2
             turn = not turn
+            phase1_remaining -= 1
             drawBoard()
             drawState()
             pygame.display.flip()
@@ -294,6 +279,7 @@ while not done:
                                                     break
                                                 else:
                                                     print("Dieser Stein kann von dir nicht entfernt werden")
+                                                    print(spielfeld_muhlen)
 
                         clearmuhlen()  # Remove mills that have been destroyed this turn
                         turn = not turn  # Switch turn
@@ -306,6 +292,7 @@ while not done:
         # Standard rendering done in while loop
         screen.blit(textsurface, (0, 0))
         pygame.display.flip()
+        print("ph", phase1_remaining)
 
     # Once the first phase is over, switch to the next
     spielphase = 2
@@ -324,6 +311,21 @@ while not done:
 
     # Second phase: moving men around the board
     while remaining[1] > 0 and remaining[2] > 0 and spielphase == 2 and not done:  # While loop phase 2
+        if not turn:
+            print("denke...")
+            print("DEBUG")
+            print(copy.deepcopy(spielfeld))
+            print("END DEBUG")
+            ki = ai_test_.Morris(copy.deepcopy(spielfeld), copy.deepcopy(spielfeld_muhlen), 2, phase1_remaining)
+            ai_move = ki.out
+            print("denken fertig")
+            print("AI MOVE: "+str(ai_move))
+            spielfeld[ai_move[2]][ai_move[3]] = 0
+            spielfeld[ai_move[0]][ai_move[1]] = 2
+            turn = not turn
+            drawBoard()
+            drawState()
+            pygame.display.flip()
         myteam = 1 if turn else 2
         textsurface = myfont.render('Schwarz', False, (0, 0, 0)) if myteam == 2 else myfont.render("Weiss", False,
                                                                                                    (255, 255, 255))
@@ -375,6 +377,7 @@ while not done:
                                                                                         break
                                                                                     else:
                                                                                         print("Dieser Stein kann von dir nicht entfernt werden")
+                                                                                        print(spielfeld_muhlen)
                                                             if not canmoveatall(1 if myteam == 2 else 2):
                                                                 print("{} kann keine Züge mehr machen, {} gewinnt!".format("Weiss" if myteam == 2 else "Schwarz", "Schwarz" if myteam == 2 else "Weiss"))
                                                                 drawwinner(myteam)
@@ -429,8 +432,8 @@ while not done:
                                                                                         drawwinner(myteam)
                                                                                         endgameloop()
                                                                                 else:
-                                                                                    print(
-                                                                                        "Dieser Stein kann von dir nicht entfernt werden")
+                                                                                    print("Dieser Stein kann von dir nicht entfernt werden")
+                                                                                    print(spielfeld_muhlen)
                                                         # TODO: Check if this works
                                                         if not canmoveatall(1 if myteam == 2 else 2):
                                                             print("{} kann keine Züge mehr machen, {} gewinnt!".format(
