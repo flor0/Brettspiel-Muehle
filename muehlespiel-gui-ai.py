@@ -54,6 +54,8 @@ def clearmuhlen():
         for stelle in range(8):
             if (not checkmuhle(ring, stelle)) and (spielfeld_muhlen[ring][stelle] != 0):
                 spielfeld_muhlen[ring][stelle] = 0
+    print("BRETT MUHLEN")
+    print(spielfeld_muhlen)
 
 def removeman(ringpos, stellepos):
     myteam = 1 if turn else 2
@@ -462,5 +464,3 @@ while not done:
     drawBoard()
     drawState()
     pygame.display.flip()
-
-

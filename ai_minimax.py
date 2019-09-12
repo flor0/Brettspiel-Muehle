@@ -1,4 +1,4 @@
-import copy, gameutil
+import copy, gameutil,multiprocessing, ctypes
 
 class Morris:
     def __init__(self, board, board_muhlen, real_player, remaining_set):
@@ -13,6 +13,7 @@ class Morris:
     # First function being called, remembers moves to return them
     ###
     def make_score(self, board, board_muhlen, player, alpha, beta):
+        procs = []
         maxEval = alpha
         best_move = False
         # If phase 1
@@ -24,9 +25,7 @@ class Morris:
                         board_continue = copy.deepcopy(board)
                         board_continue[ring][stelle] = self.player
                         evaluation = self.minimax(board_continue, copy.deepcopy(board_muhlen), 1 if player == 2 else 2
-                                                  , alpha, beta, self.remaining_set, 3)
-                        # TODO: Evaluation is always 0 !?
-                        print(move, evaluation)
+                                                  , alpha, beta, self.remaining_set, 4)
                         if evaluation > maxEval:
                             maxEval = evaluation
                             best_move = move
@@ -94,15 +93,19 @@ class Morris:
                     for j in range(8):
                         if board[i][j] == self.player:
                             score_player += 1
+                            if not self.possiblemoves(i, j, board):
+                                score_opponent += 5
                         elif board[i][j] == self.opponent:
                             score_opponent += 1
+                            if not self.possiblemoves(i, j, board):
+                                score_player += 5
 
                         if gameutil.checkmuhle(i, j, board, board_muhlen, self.player) and \
                                 board[i][j] == self.player:
-                            score_player += 11
+                            score_player += 10
                         elif gameutil.checkmuhle(i, j, board, board_muhlen, self.opponent) and \
                                 board[i][j] == self.opponent:
-                            score_opponent += 10
+                            score_opponent += 100
                 return score_player - score_opponent
                         # Making a mill also generates points but is checked in the minimax function, not here
 
