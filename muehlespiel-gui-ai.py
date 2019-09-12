@@ -1,8 +1,9 @@
 import pygame
 import numpy as np
 import sys
-import ai_test_
+import ai_minimax
 import copy
+import keyboard # Debugging only
 
 
 # Variables for the game
@@ -209,6 +210,8 @@ textsurface = myfont.render('Schwarz', False, (0, 0, 0))
 
 # Main game loop
 while not done:
+    if keyboard.is_pressed("b"):
+        print(spielfeld_muhlen)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
              done = True
@@ -219,11 +222,12 @@ while not done:
     # 1. Game phase: Place men
     while phase1_remaining and not done:
         if not turn:
+            clearmuhlen()
             print("denke...")
             print("DEBUG")
             print(copy.deepcopy(spielfeld))
             print("END DEBUG")
-            ki = ai_test_.Morris(copy.deepcopy(spielfeld), copy.deepcopy(spielfeld_muhlen), 2, phase1_remaining)
+            ki = ai_minimax.Morris(copy.deepcopy(spielfeld), copy.deepcopy(spielfeld_muhlen), 2, phase1_remaining)
             ai_move = ki.out
             print("denken fertig")
             print("AI MOVE: "+str(ai_move))
@@ -239,6 +243,7 @@ while not done:
                 done = True
                 break
             elif event.type == pygame.MOUSEBUTTONDOWN:  # If a position has been clicked
+                clearmuhlen()
                 position = pygame.mouse.get_pos()
                 for index in conversions:
                     if conversions[index][0]+10 >= position[0] >= conversions[index][0]-10 and conversions[index][1]+10\
@@ -314,11 +319,12 @@ while not done:
     # Second phase: moving men around the board
     while remaining[1] > 0 and remaining[2] > 0 and spielphase == 2 and not done:  # While loop phase 2
         if not turn:
+            clearmuhlen()
             print("denke...")
             print("DEBUG")
             print(copy.deepcopy(spielfeld))
             print("END DEBUG")
-            ki = ai_test_.Morris(copy.deepcopy(spielfeld), copy.deepcopy(spielfeld_muhlen), 2, phase1_remaining)
+            ki = ai_minimax.Morris(copy.deepcopy(spielfeld), copy.deepcopy(spielfeld_muhlen), 2, phase1_remaining)
             ai_move = ki.out
             print("denken fertig")
             print("AI MOVE: "+str(ai_move))
@@ -335,6 +341,7 @@ while not done:
             if event.type == pygame.QUIT:  # If the user presses esc
                 done = True
             elif event.type == pygame.MOUSEBUTTONDOWN:  # If the user presses a mouse button
+                clearmuhlen()
                 position = pygame.mouse.get_pos()  # Get position of the mouse click
                 for index1 in conversions:
                     if conversions[index1][0] + 10 >= position[0] >= conversions[index1][0] - 10 \

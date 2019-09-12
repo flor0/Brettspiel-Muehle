@@ -1,0 +1,9 @@
+TODO:
+
+12.09.2019
+1: Repariere Bug im Mühlespiel in der clearmuhlen-Funktion
+2: Füge Alpha-Beta-Pruning stabil hinzu
+3: Vorkompiliere die Libraries für schnellere Ausführung
+
+4: Benutze Datasets aus dem Internet oder selber hergestellte für trainieren
+  von einem KNN

@@ -1,4 +1,4 @@
-import copy, gameutil,multiprocessing, ctypes
+import copy, gameutil, multiprocessing, ctypes
 
 class Morris:
     def __init__(self, board, board_muhlen, real_player, remaining_set):
@@ -25,7 +25,7 @@ class Morris:
                         board_continue = copy.deepcopy(board)
                         board_continue[ring][stelle] = self.player
                         evaluation = self.minimax(board_continue, copy.deepcopy(board_muhlen), 1 if player == 2 else 2
-                                                  , alpha, beta, self.remaining_set, 4)
+                                                  , alpha, beta, self.remaining_set, 3)
                         if evaluation > maxEval:
                             maxEval = evaluation
                             best_move = move
