@@ -1,9 +1,11 @@
 import pygame
 import numpy as np
 import sys
-import ai_minimax
+import ai_minimax_alpha_beta_multiprocessing as ai_minimax_alpha_beta
 import copy
-import keyboard # Debugging only
+from multiprocessing import freeze_support
+if __name__ == "__main__":
+    freeze_support()
 
 
 # Variables for the game
@@ -210,8 +212,6 @@ textsurface = myfont.render('Schwarz', False, (0, 0, 0))
 
 # Main game loop
 while not done:
-    if keyboard.is_pressed("b"):
-        print(spielfeld_muhlen)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
              done = True
@@ -227,7 +227,7 @@ while not done:
             print("DEBUG")
             print(copy.deepcopy(spielfeld))
             print("END DEBUG")
-            ki = ai_minimax.Morris(copy.deepcopy(spielfeld), copy.deepcopy(spielfeld_muhlen), 2, phase1_remaining)
+            ki = ai_minimax_alpha_beta.Morris(copy.deepcopy(spielfeld), copy.deepcopy(spielfeld_muhlen), 2, phase1_remaining)
             ai_move = ki.out
             print("denken fertig")
             print("AI MOVE: "+str(ai_move))
@@ -299,7 +299,7 @@ while not done:
         # Standard rendering done in while loop
         screen.blit(textsurface, (0, 0))
         pygame.display.flip()
-        print("ph", phase1_remaining)
+
 
     # Once the first phase is over, switch to the next
     spielphase = 2
@@ -324,7 +324,7 @@ while not done:
             print("DEBUG")
             print(copy.deepcopy(spielfeld))
             print("END DEBUG")
-            ki = ai_minimax.Morris(copy.deepcopy(spielfeld), copy.deepcopy(spielfeld_muhlen), 2, phase1_remaining)
+            ki = ai_minimax_alpha_beta.Morris(copy.deepcopy(spielfeld), copy.deepcopy(spielfeld_muhlen), 2, phase1_remaining)
             ai_move = ki.out
             print("denken fertig")
             print("AI MOVE: "+str(ai_move))
