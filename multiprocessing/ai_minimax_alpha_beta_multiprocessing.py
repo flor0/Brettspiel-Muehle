@@ -1,7 +1,7 @@
 import copy, gameutil, multiprocessing, ctypes, time
 from multiprocessing import freeze_support
-if __name__ == "__main__":
-    freeze_support()
+
+
 
 class Morris:
     def __init__(self, board, board_muhlen, real_player, remaining_set):
@@ -14,6 +14,7 @@ class Morris:
         t = time.time()
         self.out = self.make_score(board, board_muhlen, real_player, -1000000000000000,
                                                              100000000000000)
+
         print("AI time: %s sec" % str(time.time() - t))
     ###
     # First function being called, remembers moves to return them
@@ -74,18 +75,18 @@ class Morris:
                                 score_add = 0
                                 if self.checkmuhle(move[0], move[1], board_, self.player):
                                     score_add += 100
-                                proc = multiprocessing.Process(target=self.minimax, args=(board_continue, copy.deepcopy(board_muhlen), 1 if player == 2 else 2
+                                proc = multiprocessing.Process(target=self.minimax, args=(board_, muhlen_, 1 if player == 2 else 2
                                                           , maxEval, beta, self.remaining_set, self.max_depth, evaluations, n,))
                                 procs.append(proc)
                                 proc.start()
                                 n += 1
-                                print(move, evaluation)
 
             for proc in procs:
                 proc.join()
                 print("joined")
             print(evaluations)
-            for evaluation in range(n):
+            print("hahaha")
+            for evaluation in range(len(evaluations)):
                 if evaluations[evaluation] > maxEval:
                     maxEval = evaluations[evaluation]
                     best_move = moves[evaluation]
@@ -173,7 +174,7 @@ class Morris:
                                     # break ring if stelle was broken
                                     break
 
-                            evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, best_score, beta, remaining_set - 1, depth-1)
+                            evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, best_score, beta, remaining_set - 1, depth-1, upper_eval, upper_key)
                             if evaluation > best_score:
                                 best_score = evaluation
                                 if best_score >= beta:
@@ -182,7 +183,7 @@ class Morris:
                         continue
                     break
                 if depth == self.max_depth:
-                    upper_eval[upper_key] = score
+                    upper_eval[upper_key] = best_score
                 return best_score
             else:
                 # Phase 2
@@ -230,7 +231,7 @@ class Morris:
                                         break
 
                                 evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, best_score, beta,
-                                                          remaining_set, depth - 1)
+                                                          remaining_set, depth - 1, upper_eval, upper_key)
                                 evaluation += score_addition
                                 if evaluation > best_score:
                                     best_score = evaluation
@@ -240,7 +241,7 @@ class Morris:
                             continue
                         break
                 if depth == self.max_depth:
-                    upper_eval[upper_key] = score
+                    upper_eval[upper_key] = best_score
                 return best_score
 
 
@@ -266,7 +267,7 @@ class Morris:
                                         continue
                                     break
 
-                            evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, alpha, best_score, remaining_set - 1, depth - 1)
+                            evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, alpha, best_score, remaining_set - 1, depth - 1, upper_eval, upper_key)
                             if evaluation < best_score:
                                 best_score = evaluation
                                 if best_score <= alpha:
@@ -275,7 +276,7 @@ class Morris:
                         continue
                     break
                 if depth == self.max_depth:
-                    upper_eval[upper_key] = score
+                    upper_eval[upper_key] = best_score
                 return best_score
             else:
                 # Phase 2
@@ -323,7 +324,7 @@ class Morris:
                                         break
 
                                 evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, alpha, best_score,
-                                                          remaining_set, depth - 1)
+                                                          remaining_set, depth - 1, upper_eval, upper_key)
                                 evaluation += score_addition
                                 if evaluation < best_score:
                                     best_score = evaluation
@@ -333,7 +334,7 @@ class Morris:
                             continue
                         break
                 if depth == self.max_depth:
-                    upper_eval[upper_key] = score
+                    upper_eval[upper_key] = best_score
                 return best_score
 
 
@@ -417,3 +418,21 @@ class Morris:
             return False
         else:
             return tobecleared
+
+
+if __name__ == "__main__":
+    freeze_support()
+    input_file = open("ai_in.txt", "r")
+    input_file_data = input_file.readlines()
+    print(eval(input_file_data[3]))
+    morris = Morris(eval(input_file_data[0]), eval(input_file_data[1]), eval(input_file_data[2]),
+                    eval(input_file_data[3]))
+    print("hahahaha, writing out!")
+    file_out = open("ai_out.txt", "w")
+    file_out.write("("+str(morris.out[0])+", "+str(morris.out[1])+")"+"\n")
+    try:
+        if morris.out[2] and morris.out[3]:
+            file_out.write("("+str(morris.out[2])+", "+str(morris.out[3])+")")
+    except:
+        pass
+    file_out.close()
