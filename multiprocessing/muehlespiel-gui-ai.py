@@ -232,9 +232,12 @@ while not done:
             ai_in.write(str(spielfeld)+"\n"+str(spielfeld_muhlen)+"\n"+"2"+"\n"+str(phase1_remaining))
             ai_in.close()
             os.system("ai_minimax_alpha_beta_multiprocessing.py")
-            time.sleep(20)
+            while not os.path.exists("ai_out.txt"):
+                time.sleep(1)
             ai_out = open("ai_out.txt", "r")
             ai_out_data = ai_out.readlines()
+            ai_out.close()
+            os.remove("ai_out.txt")
             ai_move = eval(ai_out_data[0])
             try:
                 ai_remove = eval(ai_out_data[1])
