@@ -1,11 +1,8 @@
 import pygame
 import numpy as np
 import sys
-import ai_minimax_alpha_beta_multiprocessing as ai_minimax_alpha_beta
+import ai_minimax_alpha_beta
 import copy
-from multiprocessing import freeze_support
-if __name__ == "__main__":
-    freeze_support()
 
 
 # Variables for the game
@@ -225,7 +222,6 @@ while not done:
             clearmuhlen()
             print("denke...")
             print("DEBUG")
-            print(copy.deepcopy(spielfeld))
             print("END DEBUG")
             ki = ai_minimax_alpha_beta.Morris(copy.deepcopy(spielfeld), copy.deepcopy(spielfeld_muhlen), 2, phase1_remaining)
             ai_move = ki.out

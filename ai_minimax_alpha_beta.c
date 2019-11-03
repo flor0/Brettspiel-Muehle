@@ -1050,6 +1050,14 @@ static int __Pyx_SetItemInt_Generic(PyObject *o, PyObject *j, PyObject *v);
 static CYTHON_INLINE int __Pyx_SetItemInt_Fast(PyObject *o, Py_ssize_t i, PyObject *v,
                                                int is_list, int wraparound, int boundscheck);
 
+/* PyIntBinop.proto */
+#if !CYTHON_COMPILING_IN_PYPY
+static PyObject* __Pyx_PyInt_AddObjC(PyObject *op1, PyObject *op2, long intval, int inplace, int zerodivision_check);
+#else
+#define __Pyx_PyInt_AddObjC(op1, op2, intval, inplace, zerodivision_check)\
+    (inplace ? PyNumber_InPlaceAdd(op1, op2) : PyNumber_Add(op1, op2))
+#endif
+
 /* ObjectGetItem.proto */
 #if CYTHON_USE_TYPE_SLOTS
 static CYTHON_INLINE PyObject *__Pyx_PyObject_GetItem(PyObject *obj, PyObject* key);
@@ -1094,14 +1102,6 @@ static int __Pyx_GetException(PyObject **type, PyObject **value, PyObject **tb);
 
 /* PyIntBinop.proto */
 #if !CYTHON_COMPILING_IN_PYPY
-static PyObject* __Pyx_PyInt_AddObjC(PyObject *op1, PyObject *op2, long intval, int inplace, int zerodivision_check);
-#else
-#define __Pyx_PyInt_AddObjC(op1, op2, intval, inplace, zerodivision_check)\
-    (inplace ? PyNumber_InPlaceAdd(op1, op2) : PyNumber_Add(op1, op2))
-#endif
-
-/* PyIntBinop.proto */
-#if !CYTHON_COMPILING_IN_PYPY
 static PyObject* __Pyx_PyInt_SubtractObjC(PyObject *op1, PyObject *op2, long intval, int inplace, int zerodivision_check);
 #else
 #define __Pyx_PyInt_SubtractObjC(op1, op2, intval, inplace, zerodivision_check)\
@@ -1134,6 +1134,26 @@ static CYTHON_INLINE int __Pyx_PyList_Append(PyObject* list, PyObject* x) {
 }
 #else
 #define __Pyx_PyList_Append(L,x) PyList_Append(L,x)
+#endif
+
+/* None.proto */
+static CYTHON_INLINE void __Pyx_RaiseUnboundLocalError(const char *varname);
+
+/* UnpackUnboundCMethod.proto */
+typedef struct {
+    PyObject *type;
+    PyObject **method_name;
+    PyCFunction func;
+    PyObject *method;
+    int flag;
+} __Pyx_CachedCFunction;
+
+/* CallUnboundCMethod1.proto */
+static PyObject* __Pyx__CallUnboundCMethod1(__Pyx_CachedCFunction* cfunc, PyObject* self, PyObject* arg);
+#if CYTHON_COMPILING_IN_CPYTHON
+static CYTHON_INLINE PyObject* __Pyx_CallUnboundCMethod1(__Pyx_CachedCFunction* cfunc, PyObject* self, PyObject* arg);
+#else
+#define __Pyx_CallUnboundCMethod1(cfunc, self, arg)  __Pyx__CallUnboundCMethod1(cfunc, self, arg)
 #endif
 
 /* Import.proto */
@@ -1313,14 +1333,14 @@ int __pyx_module_is_main_ai_minimax_alpha_beta = 0;
 
 /* Implementation of 'ai_minimax_alpha_beta' */
 static PyObject *__pyx_builtin_range;
+static PyObject *__pyx_builtin_max;
 static const char __pyx_k_i[] = "i";
 static const char __pyx_k_j[] = "j";
 static const char __pyx_k_n[] = "n";
 static const char __pyx_k_t[] = "t";
-static const char __pyx_k_MAX[] = "MAX";
-static const char __pyx_k_MIN[] = "MIN";
 static const char __pyx_k_doc[] = "__doc__";
 static const char __pyx_k_end[] = "end";
+static const char __pyx_k_max[] = "max";
 static const char __pyx_k_out[] = "out";
 static const char __pyx_k_beta[] = "beta";
 static const char __pyx_k_copy[] = "copy";
@@ -1337,22 +1357,22 @@ static const char __pyx_k_ERROR[] = "ERROR";
 static const char __pyx_k_alpha[] = "alpha";
 static const char __pyx_k_board[] = "board";
 static const char __pyx_k_depth[] = "depth";
+static const char __pyx_k_enemy[] = "enemy";
+static const char __pyx_k_index[] = "index";
 static const char __pyx_k_mymen[] = "mymen";
 static const char __pyx_k_print[] = "print";
-static const char __pyx_k_procs[] = "procs";
 static const char __pyx_k_range[] = "range";
 static const char __pyx_k_score[] = "score";
 static const char __pyx_k_Morris[] = "Morris";
-static const char __pyx_k_ctypes[] = "ctypes";
 static const char __pyx_k_import[] = "__import__";
 static const char __pyx_k_module[] = "__module__";
 static const char __pyx_k_muhlen[] = "muhlen_";
 static const char __pyx_k_player[] = "player";
-static const char __pyx_k_ring_2[] = "ring_";
+static const char __pyx_k_scores[] = "scores";
 static const char __pyx_k_stelle[] = "stelle";
 static const char __pyx_k_board_2[] = "board_";
+static const char __pyx_k_enemies[] = "enemies";
 static const char __pyx_k_maxEval[] = "maxEval";
-static const char __pyx_k_minEval[] = "minEval";
 static const char __pyx_k_minimax[] = "minimax";
 static const char __pyx_k_prepare[] = "__prepare__";
 static const char __pyx_k_ringPos[] = "ringPos";
@@ -1362,24 +1382,27 @@ static const char __pyx_k_gameutil[] = "gameutil";
 static const char __pyx_k_mancolor[] = "mancolor";
 static const char __pyx_k_opponent[] = "opponent";
 static const char __pyx_k_qualname[] = "__qualname__";
-static const char __pyx_k_stelle_2[] = "stelle_";
 static const char __pyx_k_theirmen[] = "theirmen";
+static const char __pyx_k_toremove[] = "toremove";
 static const char __pyx_k_best_move[] = "best_move";
-static const char __pyx_k_board_new[] = "board_new";
+static const char __pyx_k_max_depth[] = "max_depth";
+static const char __pyx_k_max_score[] = "max_score";
 static const char __pyx_k_metaclass[] = "__metaclass__";
-static const char __pyx_k_minimax_2[] = "minimax_";
 static const char __pyx_k_score_add[] = "score_add";
 static const char __pyx_k_spielfeld[] = "spielfeld";
 static const char __pyx_k_stellePos[] = "stellePos";
 static const char __pyx_k_stellepos[] = "stellepos";
+static const char __pyx_k_to_remove[] = "to_remove";
 static const char __pyx_k_best_score[] = "best_score";
 static const char __pyx_k_checkmuhle[] = "checkmuhle";
 static const char __pyx_k_evaluation[] = "evaluation";
+static const char __pyx_k_evil_score[] = "evil_score";
 static const char __pyx_k_make_score[] = "make_score";
 static const char __pyx_k_clearmuhlen[] = "clearmuhlen";
 static const char __pyx_k_real_player[] = "real_player";
 static const char __pyx_k_tobecleared[] = "tobecleared";
 static const char __pyx_k_board_muhlen[] = "board_muhlen";
+static const char __pyx_k_myscript_run[] = "myscript run";
 static const char __pyx_k_score_player[] = "score_player";
 static const char __pyx_k_AI_time_s_sec[] = "AI time: %s sec";
 static const char __pyx_k_Morris___init[] = "Morris.__init__";
@@ -1389,32 +1412,32 @@ static const char __pyx_k_Morris_minimax[] = "Morris.minimax";
 static const char __pyx_k_board_continue[] = "board_continue";
 static const char __pyx_k_score_addition[] = "score_addition";
 static const char __pyx_k_score_opponent[] = "score_opponent";
-static const char __pyx_k_multiprocessing[] = "multiprocessing";
-static const char __pyx_k_Morris_minimax_2[] = "Morris.minimax_";
-static const char __pyx_k_board_new_muhlen[] = "board_new_muhlen";
+static const char __pyx_k_Morris_toremove[] = "Morris.toremove";
+static const char __pyx_k_board_muhlen_new[] = "board_muhlen_new";
+static const char __pyx_k_board_muhlen_old[] = "board_muhlen_old";
 static const char __pyx_k_Morris_checkmuhle[] = "Morris.checkmuhle";
 static const char __pyx_k_Morris_make_score[] = "Morris.make_score";
-static const char __pyx_k_static_evaluation[] = "static_evaluation";
 static const char __pyx_k_Morris_clearmuhlen[] = "Morris.clearmuhlen";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
+static const char __pyx_k_update_board_muhlen[] = "update_board_muhlen";
 static const char __pyx_k_Morris_possiblemoves[] = "Morris.possiblemoves";
 static const char __pyx_k_ai_minimax_alpha_beta[] = "ai_minimax_alpha_beta";
 static const char __pyx_k_number_possible_moves[] = "number_possible_moves";
 static const char __pyx_k_ai_minimax_alpha_beta_py[] = "ai_minimax_alpha_beta.py";
+static const char __pyx_k_Morris_update_board_muhlen[] = "Morris.update_board_muhlen";
 static const char __pyx_k_Morris_number_possible_moves[] = "Morris.number_possible_moves";
 static PyObject *__pyx_kp_s_AI_time_s_sec;
 static PyObject *__pyx_n_s_ERROR;
-static PyObject *__pyx_n_s_MAX;
-static PyObject *__pyx_n_s_MIN;
 static PyObject *__pyx_n_s_Morris;
 static PyObject *__pyx_n_s_Morris___init;
 static PyObject *__pyx_n_s_Morris_checkmuhle;
 static PyObject *__pyx_n_s_Morris_clearmuhlen;
 static PyObject *__pyx_n_s_Morris_make_score;
 static PyObject *__pyx_n_s_Morris_minimax;
-static PyObject *__pyx_n_s_Morris_minimax_2;
 static PyObject *__pyx_n_s_Morris_number_possible_moves;
 static PyObject *__pyx_n_s_Morris_possiblemoves;
+static PyObject *__pyx_n_s_Morris_toremove;
+static PyObject *__pyx_n_s_Morris_update_board_muhlen;
 static PyObject *__pyx_n_s_ai_minimax_alpha_beta;
 static PyObject *__pyx_kp_s_ai_minimax_alpha_beta_py;
 static PyObject *__pyx_n_s_alpha;
@@ -1425,37 +1448,41 @@ static PyObject *__pyx_n_s_board;
 static PyObject *__pyx_n_s_board_2;
 static PyObject *__pyx_n_s_board_continue;
 static PyObject *__pyx_n_s_board_muhlen;
-static PyObject *__pyx_n_s_board_new;
-static PyObject *__pyx_n_s_board_new_muhlen;
+static PyObject *__pyx_n_s_board_muhlen_new;
+static PyObject *__pyx_n_s_board_muhlen_old;
 static PyObject *__pyx_n_s_checkmuhle;
 static PyObject *__pyx_n_s_clearmuhlen;
 static PyObject *__pyx_n_s_cline_in_traceback;
 static PyObject *__pyx_n_s_copy;
-static PyObject *__pyx_n_s_ctypes;
 static PyObject *__pyx_n_s_deepcopy;
 static PyObject *__pyx_n_s_depth;
 static PyObject *__pyx_n_s_doc;
 static PyObject *__pyx_n_s_end;
+static PyObject *__pyx_n_s_enemies;
+static PyObject *__pyx_n_s_enemy;
 static PyObject *__pyx_n_s_evaluation;
+static PyObject *__pyx_n_s_evil_score;
 static PyObject *__pyx_n_s_file;
 static PyObject *__pyx_n_s_gameutil;
 static PyObject *__pyx_n_s_i;
 static PyObject *__pyx_n_s_import;
+static PyObject *__pyx_n_s_index;
 static PyObject *__pyx_n_s_init;
 static PyObject *__pyx_n_s_j;
 static PyObject *__pyx_n_s_main;
 static PyObject *__pyx_n_s_make_score;
 static PyObject *__pyx_n_s_mancolor;
+static PyObject *__pyx_n_s_max;
 static PyObject *__pyx_n_s_maxEval;
+static PyObject *__pyx_n_s_max_depth;
+static PyObject *__pyx_n_s_max_score;
 static PyObject *__pyx_n_s_metaclass;
-static PyObject *__pyx_n_s_minEval;
 static PyObject *__pyx_n_s_minimax;
-static PyObject *__pyx_n_s_minimax_2;
 static PyObject *__pyx_n_s_module;
 static PyObject *__pyx_n_s_move;
 static PyObject *__pyx_n_s_muhlen;
-static PyObject *__pyx_n_s_multiprocessing;
 static PyObject *__pyx_n_s_mymen;
+static PyObject *__pyx_kp_s_myscript_run;
 static PyObject *__pyx_n_s_n;
 static PyObject *__pyx_n_s_name;
 static PyObject *__pyx_n_s_number_possible_moves;
@@ -1465,40 +1492,42 @@ static PyObject *__pyx_n_s_player;
 static PyObject *__pyx_n_s_possiblemoves;
 static PyObject *__pyx_n_s_prepare;
 static PyObject *__pyx_n_s_print;
-static PyObject *__pyx_n_s_procs;
 static PyObject *__pyx_n_s_qualname;
 static PyObject *__pyx_n_s_range;
 static PyObject *__pyx_n_s_real_player;
 static PyObject *__pyx_n_s_remaining_set;
 static PyObject *__pyx_n_s_ring;
 static PyObject *__pyx_n_s_ringPos;
-static PyObject *__pyx_n_s_ring_2;
 static PyObject *__pyx_n_s_ringpos;
 static PyObject *__pyx_n_s_score;
 static PyObject *__pyx_n_s_score_add;
 static PyObject *__pyx_n_s_score_addition;
 static PyObject *__pyx_n_s_score_opponent;
 static PyObject *__pyx_n_s_score_player;
+static PyObject *__pyx_n_s_scores;
 static PyObject *__pyx_n_s_self;
 static PyObject *__pyx_n_s_spielfeld;
-static PyObject *__pyx_n_s_static_evaluation;
 static PyObject *__pyx_n_s_stelle;
 static PyObject *__pyx_n_s_stellePos;
-static PyObject *__pyx_n_s_stelle_2;
 static PyObject *__pyx_n_s_stellepos;
 static PyObject *__pyx_n_s_t;
 static PyObject *__pyx_n_s_test;
 static PyObject *__pyx_n_s_theirmen;
 static PyObject *__pyx_n_s_time;
+static PyObject *__pyx_n_s_to_remove;
 static PyObject *__pyx_n_s_tobecleared;
+static PyObject *__pyx_n_s_toremove;
+static PyObject *__pyx_n_s_update_board_muhlen;
 static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_board, PyObject *__pyx_v_board_muhlen, PyObject *__pyx_v_real_player, PyObject *__pyx_v_remaining_set); /* proto */
 static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_2make_score(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_board, PyObject *__pyx_v_board_muhlen, PyObject *__pyx_v_player, PyObject *__pyx_v_alpha, PyObject *__pyx_v_beta); /* proto */
 static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_board, PyObject *__pyx_v_board_muhlen, PyObject *__pyx_v_player, PyObject *__pyx_v_alpha, PyObject *__pyx_v_beta, PyObject *__pyx_v_remaining_set, PyObject *__pyx_v_depth); /* proto */
-static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_6minimax_(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_board, PyObject *__pyx_v_board_muhlen, PyObject *__pyx_v_player, PyObject *__pyx_v_alpha, PyObject *__pyx_v_beta, PyObject *__pyx_v_depth); /* proto */
-static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_8number_possible_moves(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_board, PyObject *__pyx_v_player); /* proto */
-static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_10possiblemoves(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_ringpos, PyObject *__pyx_v_stellepos, PyObject *__pyx_v_spielfeld); /* proto */
-static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_12checkmuhle(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_ringPos, PyObject *__pyx_v_stellePos, PyObject *__pyx_v_spielfeld, PyObject *__pyx_v_mancolor); /* proto */
-static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_14clearmuhlen(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_board, PyObject *__pyx_v_board_muhlen); /* proto */
+static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_6number_possible_moves(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_board, PyObject *__pyx_v_player); /* proto */
+static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_8possiblemoves(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_ringpos, PyObject *__pyx_v_stellepos, PyObject *__pyx_v_spielfeld); /* proto */
+static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_10checkmuhle(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_ringPos, PyObject *__pyx_v_stellePos, PyObject *__pyx_v_spielfeld, PyObject *__pyx_v_mancolor); /* proto */
+static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_12clearmuhlen(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_board, PyObject *__pyx_v_board_muhlen); /* proto */
+static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_14update_board_muhlen(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_board, PyObject *__pyx_v_board_muhlen_old); /* proto */
+static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_16toremove(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_board, PyObject *__pyx_v_enemy); /* proto */
+static __Pyx_CachedCFunction __pyx_umethod_PyList_Type_index = {0, &__pyx_n_s_index, 0, 0, 0};
 static PyObject *__pyx_int_0;
 static PyObject *__pyx_int_1;
 static PyObject *__pyx_int_2;
@@ -1506,10 +1535,9 @@ static PyObject *__pyx_int_3;
 static PyObject *__pyx_int_5;
 static PyObject *__pyx_int_8;
 static PyObject *__pyx_int_10;
-static PyObject *__pyx_int_20;
-static PyObject *__pyx_int_60;
 static PyObject *__pyx_int_100;
-static PyObject *__pyx_int_110;
+static PyObject *__pyx_int_500;
+static PyObject *__pyx_int_1000;
 static PyObject *__pyx_int_100000000000000;
 static PyObject *__pyx_int_neg_1000000000000000;
 static PyObject *__pyx_tuple_;
@@ -1520,6 +1548,7 @@ static PyObject *__pyx_tuple__9;
 static PyObject *__pyx_tuple__11;
 static PyObject *__pyx_tuple__13;
 static PyObject *__pyx_tuple__15;
+static PyObject *__pyx_tuple__17;
 static PyObject *__pyx_codeobj__2;
 static PyObject *__pyx_codeobj__4;
 static PyObject *__pyx_codeobj__6;
@@ -1528,6 +1557,7 @@ static PyObject *__pyx_codeobj__10;
 static PyObject *__pyx_codeobj__12;
 static PyObject *__pyx_codeobj__14;
 static PyObject *__pyx_codeobj__16;
+static PyObject *__pyx_codeobj__18;
 /* Late includes */
 
 /* "ai_minimax_alpha_beta.py":4
@@ -1677,7 +1707,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris___init__(CYTHON_UNUSED
  *         self.player = real_player
  *         self.opponent = 1 if self.player == 2 else 2             # <<<<<<<<<<<<<<
  *         self.remaining_set = remaining_set
- *         t = time.time()
+ *         self.max_depth = 5
  */
   __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_player); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 8, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
@@ -1700,21 +1730,30 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris___init__(CYTHON_UNUSED
  *         self.player = real_player
  *         self.opponent = 1 if self.player == 2 else 2
  *         self.remaining_set = remaining_set             # <<<<<<<<<<<<<<
+ *         self.max_depth = 5
  *         t = time.time()
- *         self.out = self.make_score(board, board_muhlen, real_player, -1000000000000000,
  */
   if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_remaining_set, __pyx_v_remaining_set) < 0) __PYX_ERR(0, 9, __pyx_L1_error)
 
   /* "ai_minimax_alpha_beta.py":10
  *         self.opponent = 1 if self.player == 2 else 2
  *         self.remaining_set = remaining_set
- *         t = time.time()             # <<<<<<<<<<<<<<
- *         self.out = self.make_score(board, board_muhlen, real_player, -1000000000000000,
- *                                                              100000000000000)
+ *         self.max_depth = 5             # <<<<<<<<<<<<<<
+ *         t = time.time()
+ *         print("myscript run")
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_time); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 10, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_max_depth, __pyx_int_5) < 0) __PYX_ERR(0, 10, __pyx_L1_error)
+
+  /* "ai_minimax_alpha_beta.py":11
+ *         self.remaining_set = remaining_set
+ *         self.max_depth = 5
+ *         t = time.time()             # <<<<<<<<<<<<<<
+ *         print("myscript run")
+ *         self.out = self.make_score(board, board_muhlen, real_player, -1000000000000000,
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_time); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 11, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_time); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 10, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_time); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 11, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_3 = NULL;
@@ -1729,20 +1768,29 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris___init__(CYTHON_UNUSED
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 10, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 11, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_t = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "ai_minimax_alpha_beta.py":11
- *         self.remaining_set = remaining_set
+  /* "ai_minimax_alpha_beta.py":12
+ *         self.max_depth = 5
  *         t = time.time()
+ *         print("myscript run")             # <<<<<<<<<<<<<<
+ *         self.out = self.make_score(board, board_muhlen, real_player, -1000000000000000,
+ *                                                              100000000000000)
+ */
+  if (__Pyx_PrintOne(0, __pyx_kp_s_myscript_run) < 0) __PYX_ERR(0, 12, __pyx_L1_error)
+
+  /* "ai_minimax_alpha_beta.py":13
+ *         t = time.time()
+ *         print("myscript run")
  *         self.out = self.make_score(board, board_muhlen, real_player, -1000000000000000,             # <<<<<<<<<<<<<<
  *                                                              100000000000000)
  *         print("AI time: %s sec" % str(time.time() - t))
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_make_score); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 11, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_make_score); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 13, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   __pyx_t_5 = 0;
@@ -1759,7 +1807,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris___init__(CYTHON_UNUSED
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_2)) {
     PyObject *__pyx_temp[6] = {__pyx_t_3, __pyx_v_board, __pyx_v_board_muhlen, __pyx_v_real_player, __pyx_int_neg_1000000000000000, __pyx_int_100000000000000};
-    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_5, 5+__pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 11, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_5, 5+__pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 13, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_GOTREF(__pyx_t_1);
   } else
@@ -1767,13 +1815,13 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris___init__(CYTHON_UNUSED
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
     PyObject *__pyx_temp[6] = {__pyx_t_3, __pyx_v_board, __pyx_v_board_muhlen, __pyx_v_real_player, __pyx_int_neg_1000000000000000, __pyx_int_100000000000000};
-    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_5, 5+__pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 11, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_5, 5+__pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 13, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_GOTREF(__pyx_t_1);
   } else
   #endif
   {
-    __pyx_t_6 = PyTuple_New(5+__pyx_t_5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 11, __pyx_L1_error)
+    __pyx_t_6 = PyTuple_New(5+__pyx_t_5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 13, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     if (__pyx_t_3) {
       __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_3); __pyx_t_3 = NULL;
@@ -1793,24 +1841,24 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris___init__(CYTHON_UNUSED
     __Pyx_INCREF(__pyx_int_100000000000000);
     __Pyx_GIVEREF(__pyx_int_100000000000000);
     PyTuple_SET_ITEM(__pyx_t_6, 4+__pyx_t_5, __pyx_int_100000000000000);
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_6, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 11, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_6, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 13, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_out, __pyx_t_1) < 0) __PYX_ERR(0, 11, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_out, __pyx_t_1) < 0) __PYX_ERR(0, 13, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "ai_minimax_alpha_beta.py":13
+  /* "ai_minimax_alpha_beta.py":15
  *         self.out = self.make_score(board, board_muhlen, real_player, -1000000000000000,
  *                                                              100000000000000)
  *         print("AI time: %s sec" % str(time.time() - t))             # <<<<<<<<<<<<<<
  *     ###
  *     # First function being called, remembers moves to return them
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_time); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 13, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_time); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 15, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_time); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 13, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_time); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 15, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_2 = NULL;
@@ -1825,19 +1873,19 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris___init__(CYTHON_UNUSED
   }
   __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_6, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_6);
   __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 13, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 15, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_6 = PyNumber_Subtract(__pyx_t_1, __pyx_v_t); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 13, __pyx_L1_error)
+  __pyx_t_6 = PyNumber_Subtract(__pyx_t_1, __pyx_v_t); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 15, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyString_Type)), __pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 13, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyString_Type)), __pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 15, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_6 = __Pyx_PyString_FormatSafe(__pyx_kp_s_AI_time_s_sec, __pyx_t_1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 13, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyString_FormatSafe(__pyx_kp_s_AI_time_s_sec, __pyx_t_1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 15, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (__Pyx_PrintOne(0, __pyx_t_6) < 0) __PYX_ERR(0, 13, __pyx_L1_error)
+  if (__Pyx_PrintOne(0, __pyx_t_6) < 0) __PYX_ERR(0, 15, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
   /* "ai_minimax_alpha_beta.py":4
@@ -1865,12 +1913,12 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris___init__(CYTHON_UNUSED
   return __pyx_r;
 }
 
-/* "ai_minimax_alpha_beta.py":17
+/* "ai_minimax_alpha_beta.py":19
  *     # First function being called, remembers moves to return them
  *     ###
  *     def make_score(self, board, board_muhlen, player, alpha, beta):             # <<<<<<<<<<<<<<
- *         procs = []
  *         maxEval = alpha
+ *         best_move = False
  */
 
 /* Python wrapper */
@@ -1917,35 +1965,35 @@ static PyObject *__pyx_pw_21ai_minimax_alpha_beta_6Morris_3make_score(PyObject *
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_board)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("make_score", 1, 6, 6, 1); __PYX_ERR(0, 17, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("make_score", 1, 6, 6, 1); __PYX_ERR(0, 19, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_board_muhlen)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("make_score", 1, 6, 6, 2); __PYX_ERR(0, 17, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("make_score", 1, 6, 6, 2); __PYX_ERR(0, 19, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_player)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("make_score", 1, 6, 6, 3); __PYX_ERR(0, 17, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("make_score", 1, 6, 6, 3); __PYX_ERR(0, 19, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
         if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_alpha)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("make_score", 1, 6, 6, 4); __PYX_ERR(0, 17, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("make_score", 1, 6, 6, 4); __PYX_ERR(0, 19, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  5:
         if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_beta)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("make_score", 1, 6, 6, 5); __PYX_ERR(0, 17, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("make_score", 1, 6, 6, 5); __PYX_ERR(0, 19, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "make_score") < 0)) __PYX_ERR(0, 17, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "make_score") < 0)) __PYX_ERR(0, 19, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 6) {
       goto __pyx_L5_argtuple_error;
@@ -1966,7 +2014,7 @@ static PyObject *__pyx_pw_21ai_minimax_alpha_beta_6Morris_3make_score(PyObject *
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("make_score", 1, 6, 6, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 17, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("make_score", 1, 6, 6, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 19, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("ai_minimax_alpha_beta.Morris.make_score", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -1980,18 +2028,17 @@ static PyObject *__pyx_pw_21ai_minimax_alpha_beta_6Morris_3make_score(PyObject *
 }
 
 static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_2make_score(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_board, PyObject *__pyx_v_board_muhlen, PyObject *__pyx_v_player, PyObject *__pyx_v_alpha, PyObject *__pyx_v_beta) {
-  CYTHON_UNUSED PyObject *__pyx_v_procs = NULL;
   PyObject *__pyx_v_maxEval = NULL;
   PyObject *__pyx_v_best_move = NULL;
   long __pyx_v_ring;
   long __pyx_v_stelle;
   PyObject *__pyx_v_move = NULL;
   PyObject *__pyx_v_board_continue = NULL;
+  PyObject *__pyx_v_score_add = NULL;
   PyObject *__pyx_v_evaluation = NULL;
   PyObject *__pyx_v_possiblemoves = NULL;
   PyObject *__pyx_v_board_ = NULL;
   PyObject *__pyx_v_muhlen_ = NULL;
-  PyObject *__pyx_v_score_add = NULL;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -2005,29 +2052,17 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_2make_score(CYTHON_UNU
   PyObject *__pyx_t_9 = NULL;
   int __pyx_t_10;
   PyObject *__pyx_t_11 = NULL;
-  Py_ssize_t __pyx_t_12;
-  PyObject *(*__pyx_t_13)(PyObject *);
-  PyObject *__pyx_t_14 = NULL;
+  PyObject *__pyx_t_12 = NULL;
+  Py_ssize_t __pyx_t_13;
+  PyObject *(*__pyx_t_14)(PyObject *);
   PyObject *__pyx_t_15 = NULL;
   PyObject *__pyx_t_16 = NULL;
   PyObject *__pyx_t_17 = NULL;
   __Pyx_RefNannySetupContext("make_score", 0);
 
-  /* "ai_minimax_alpha_beta.py":18
+  /* "ai_minimax_alpha_beta.py":20
  *     ###
  *     def make_score(self, board, board_muhlen, player, alpha, beta):
- *         procs = []             # <<<<<<<<<<<<<<
- *         maxEval = alpha
- *         best_move = False
- */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 18, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_v_procs = ((PyObject*)__pyx_t_1);
-  __pyx_t_1 = 0;
-
-  /* "ai_minimax_alpha_beta.py":19
- *     def make_score(self, board, board_muhlen, player, alpha, beta):
- *         procs = []
  *         maxEval = alpha             # <<<<<<<<<<<<<<
  *         best_move = False
  *         # If phase 1
@@ -2035,8 +2070,8 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_2make_score(CYTHON_UNU
   __Pyx_INCREF(__pyx_v_alpha);
   __pyx_v_maxEval = __pyx_v_alpha;
 
-  /* "ai_minimax_alpha_beta.py":20
- *         procs = []
+  /* "ai_minimax_alpha_beta.py":21
+ *     def make_score(self, board, board_muhlen, player, alpha, beta):
  *         maxEval = alpha
  *         best_move = False             # <<<<<<<<<<<<<<
  *         # If phase 1
@@ -2045,22 +2080,22 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_2make_score(CYTHON_UNU
   __Pyx_INCREF(Py_False);
   __pyx_v_best_move = Py_False;
 
-  /* "ai_minimax_alpha_beta.py":22
+  /* "ai_minimax_alpha_beta.py":23
  *         best_move = False
  *         # If phase 1
  *         if self.remaining_set > 0:             # <<<<<<<<<<<<<<
  *             for ring in range(3):
  *                 for stelle in range(8):
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_remaining_set); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 22, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_remaining_set); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 23, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyObject_RichCompare(__pyx_t_1, __pyx_int_0, Py_GT); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 22, __pyx_L1_error)
+  __pyx_t_2 = PyObject_RichCompare(__pyx_t_1, __pyx_int_0, Py_GT); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 23, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 22, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 23, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   if (__pyx_t_3) {
 
-    /* "ai_minimax_alpha_beta.py":23
+    /* "ai_minimax_alpha_beta.py":24
  *         # If phase 1
  *         if self.remaining_set > 0:
  *             for ring in range(3):             # <<<<<<<<<<<<<<
@@ -2070,7 +2105,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_2make_score(CYTHON_UNU
     for (__pyx_t_4 = 0; __pyx_t_4 < 3; __pyx_t_4+=1) {
       __pyx_v_ring = __pyx_t_4;
 
-      /* "ai_minimax_alpha_beta.py":24
+      /* "ai_minimax_alpha_beta.py":25
  *         if self.remaining_set > 0:
  *             for ring in range(3):
  *                 for stelle in range(8):             # <<<<<<<<<<<<<<
@@ -2080,37 +2115,37 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_2make_score(CYTHON_UNU
       for (__pyx_t_5 = 0; __pyx_t_5 < 8; __pyx_t_5+=1) {
         __pyx_v_stelle = __pyx_t_5;
 
-        /* "ai_minimax_alpha_beta.py":25
+        /* "ai_minimax_alpha_beta.py":26
  *             for ring in range(3):
  *                 for stelle in range(8):
  *                     if board[ring][stelle] == 0:             # <<<<<<<<<<<<<<
  *                         move = (ring, stelle)
  *                         board_continue = copy.deepcopy(board)
  */
-        __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_board, __pyx_v_ring, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 25, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_board, __pyx_v_ring, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 26, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
-        __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_2, __pyx_v_stelle, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 25, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_2, __pyx_v_stelle, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 26, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-        __pyx_t_2 = __Pyx_PyInt_EqObjC(__pyx_t_1, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 25, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyInt_EqObjC(__pyx_t_1, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 26, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-        __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 25, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 26, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         if (__pyx_t_3) {
 
-          /* "ai_minimax_alpha_beta.py":26
+          /* "ai_minimax_alpha_beta.py":27
  *                 for stelle in range(8):
  *                     if board[ring][stelle] == 0:
  *                         move = (ring, stelle)             # <<<<<<<<<<<<<<
  *                         board_continue = copy.deepcopy(board)
  *                         board_continue[ring][stelle] = self.player
  */
-          __pyx_t_2 = __Pyx_PyInt_From_long(__pyx_v_ring); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 26, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyInt_From_long(__pyx_v_ring); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 27, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
-          __pyx_t_1 = __Pyx_PyInt_From_long(__pyx_v_stelle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 26, __pyx_L1_error)
+          __pyx_t_1 = __Pyx_PyInt_From_long(__pyx_v_stelle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 27, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_1);
-          __pyx_t_6 = PyTuple_New(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 26, __pyx_L1_error)
+          __pyx_t_6 = PyTuple_New(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 27, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_6);
           __Pyx_GIVEREF(__pyx_t_2);
           PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_2);
@@ -2121,16 +2156,16 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_2make_score(CYTHON_UNU
           __Pyx_XDECREF_SET(__pyx_v_move, __pyx_t_6);
           __pyx_t_6 = 0;
 
-          /* "ai_minimax_alpha_beta.py":27
+          /* "ai_minimax_alpha_beta.py":28
  *                     if board[ring][stelle] == 0:
  *                         move = (ring, stelle)
  *                         board_continue = copy.deepcopy(board)             # <<<<<<<<<<<<<<
  *                         board_continue[ring][stelle] = self.player
- *                         evaluation = self.minimax(board_continue, copy.deepcopy(board_muhlen), 1 if player == 2 else 2
+ * 
  */
-          __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_copy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 27, __pyx_L1_error)
+          __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_copy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 28, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_1);
-          __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_deepcopy); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 27, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_deepcopy); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 28, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
           __pyx_t_1 = NULL;
@@ -2145,77 +2180,52 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_2make_score(CYTHON_UNU
           }
           __pyx_t_6 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_1, __pyx_v_board) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_board);
           __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-          if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 27, __pyx_L1_error)
+          if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 28, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_6);
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
           __Pyx_XDECREF_SET(__pyx_v_board_continue, __pyx_t_6);
           __pyx_t_6 = 0;
 
-          /* "ai_minimax_alpha_beta.py":28
+          /* "ai_minimax_alpha_beta.py":29
  *                         move = (ring, stelle)
  *                         board_continue = copy.deepcopy(board)
  *                         board_continue[ring][stelle] = self.player             # <<<<<<<<<<<<<<
- *                         evaluation = self.minimax(board_continue, copy.deepcopy(board_muhlen), 1 if player == 2 else 2
- *                                                   , maxEval, beta, self.remaining_set, 5)
+ * 
+ *                         score_add = 0
  */
-          __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_player); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 28, __pyx_L1_error)
+          __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_player); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 29, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_6);
-          __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_board_continue, __pyx_v_ring, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 28, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_board_continue, __pyx_v_ring, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 29, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
-          if (unlikely(__Pyx_SetItemInt(__pyx_t_2, __pyx_v_stelle, __pyx_t_6, long, 1, __Pyx_PyInt_From_long, 0, 1, 1) < 0)) __PYX_ERR(0, 28, __pyx_L1_error)
+          if (unlikely(__Pyx_SetItemInt(__pyx_t_2, __pyx_v_stelle, __pyx_t_6, long, 1, __Pyx_PyInt_From_long, 0, 1, 1) < 0)) __PYX_ERR(0, 29, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
           __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-          /* "ai_minimax_alpha_beta.py":29
- *                         board_continue = copy.deepcopy(board)
+          /* "ai_minimax_alpha_beta.py":31
  *                         board_continue[ring][stelle] = self.player
- *                         evaluation = self.minimax(board_continue, copy.deepcopy(board_muhlen), 1 if player == 2 else 2             # <<<<<<<<<<<<<<
- *                                                   , maxEval, beta, self.remaining_set, 5)
- *                         if evaluation > maxEval:
+ * 
+ *                         score_add = 0             # <<<<<<<<<<<<<<
+ *                         if self.checkmuhle(move[0], move[1], board_continue, self.player):
+ *                             score_add += 100
  */
-          __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_minimax); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 29, __pyx_L1_error)
-          __Pyx_GOTREF(__pyx_t_2);
-          __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_copy); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 29, __pyx_L1_error)
-          __Pyx_GOTREF(__pyx_t_7);
-          __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_deepcopy); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 29, __pyx_L1_error)
-          __Pyx_GOTREF(__pyx_t_8);
-          __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-          __pyx_t_7 = NULL;
-          if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_8))) {
-            __pyx_t_7 = PyMethod_GET_SELF(__pyx_t_8);
-            if (likely(__pyx_t_7)) {
-              PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_8);
-              __Pyx_INCREF(__pyx_t_7);
-              __Pyx_INCREF(function);
-              __Pyx_DECREF_SET(__pyx_t_8, function);
-            }
-          }
-          __pyx_t_1 = (__pyx_t_7) ? __Pyx_PyObject_Call2Args(__pyx_t_8, __pyx_t_7, __pyx_v_board_muhlen) : __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_v_board_muhlen);
-          __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-          if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 29, __pyx_L1_error)
-          __Pyx_GOTREF(__pyx_t_1);
-          __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-          __pyx_t_7 = __Pyx_PyInt_EqObjC(__pyx_v_player, __pyx_int_2, 2, 0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 29, __pyx_L1_error)
-          __Pyx_GOTREF(__pyx_t_7);
-          __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 29, __pyx_L1_error)
-          __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-          if (__pyx_t_3) {
-            __Pyx_INCREF(__pyx_int_1);
-            __pyx_t_8 = __pyx_int_1;
-          } else {
-            __Pyx_INCREF(__pyx_int_2);
-            __pyx_t_8 = __pyx_int_2;
-          }
+          __Pyx_INCREF(__pyx_int_0);
+          __Pyx_XDECREF_SET(__pyx_v_score_add, __pyx_int_0);
 
-          /* "ai_minimax_alpha_beta.py":30
- *                         board_continue[ring][stelle] = self.player
- *                         evaluation = self.minimax(board_continue, copy.deepcopy(board_muhlen), 1 if player == 2 else 2
- *                                                   , maxEval, beta, self.remaining_set, 5)             # <<<<<<<<<<<<<<
- *                         if evaluation > maxEval:
- *                             maxEval = evaluation
+          /* "ai_minimax_alpha_beta.py":32
+ * 
+ *                         score_add = 0
+ *                         if self.checkmuhle(move[0], move[1], board_continue, self.player):             # <<<<<<<<<<<<<<
+ *                             score_add += 100
+ * 
  */
-          __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_remaining_set); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 30, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_checkmuhle); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 32, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_2);
+          __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_move, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 32, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_1);
+          __pyx_t_7 = __Pyx_GetItemInt(__pyx_v_move, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 32, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_7);
+          __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_player); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 32, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_8);
           __pyx_t_9 = NULL;
           __pyx_t_10 = 0;
           if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -2230,75 +2240,223 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_2make_score(CYTHON_UNU
           }
           #if CYTHON_FAST_PYCALL
           if (PyFunction_Check(__pyx_t_2)) {
-            PyObject *__pyx_temp[8] = {__pyx_t_9, __pyx_v_board_continue, __pyx_t_1, __pyx_t_8, __pyx_v_maxEval, __pyx_v_beta, __pyx_t_7, __pyx_int_5};
-            __pyx_t_6 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_10, 7+__pyx_t_10); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 29, __pyx_L1_error)
+            PyObject *__pyx_temp[5] = {__pyx_t_9, __pyx_t_1, __pyx_t_7, __pyx_v_board_continue, __pyx_t_8};
+            __pyx_t_6 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_10, 4+__pyx_t_10); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 32, __pyx_L1_error)
             __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
             __Pyx_GOTREF(__pyx_t_6);
             __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-            __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
             __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+            __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
           } else
           #endif
           #if CYTHON_FAST_PYCCALL
           if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
-            PyObject *__pyx_temp[8] = {__pyx_t_9, __pyx_v_board_continue, __pyx_t_1, __pyx_t_8, __pyx_v_maxEval, __pyx_v_beta, __pyx_t_7, __pyx_int_5};
-            __pyx_t_6 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_10, 7+__pyx_t_10); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 29, __pyx_L1_error)
+            PyObject *__pyx_temp[5] = {__pyx_t_9, __pyx_t_1, __pyx_t_7, __pyx_v_board_continue, __pyx_t_8};
+            __pyx_t_6 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_10, 4+__pyx_t_10); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 32, __pyx_L1_error)
             __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
             __Pyx_GOTREF(__pyx_t_6);
             __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-            __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
             __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+            __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
           } else
           #endif
           {
-            __pyx_t_11 = PyTuple_New(7+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 29, __pyx_L1_error)
+            __pyx_t_11 = PyTuple_New(4+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 32, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_11);
             if (__pyx_t_9) {
               __Pyx_GIVEREF(__pyx_t_9); PyTuple_SET_ITEM(__pyx_t_11, 0, __pyx_t_9); __pyx_t_9 = NULL;
             }
+            __Pyx_GIVEREF(__pyx_t_1);
+            PyTuple_SET_ITEM(__pyx_t_11, 0+__pyx_t_10, __pyx_t_1);
+            __Pyx_GIVEREF(__pyx_t_7);
+            PyTuple_SET_ITEM(__pyx_t_11, 1+__pyx_t_10, __pyx_t_7);
             __Pyx_INCREF(__pyx_v_board_continue);
             __Pyx_GIVEREF(__pyx_v_board_continue);
-            PyTuple_SET_ITEM(__pyx_t_11, 0+__pyx_t_10, __pyx_v_board_continue);
-            __Pyx_GIVEREF(__pyx_t_1);
-            PyTuple_SET_ITEM(__pyx_t_11, 1+__pyx_t_10, __pyx_t_1);
+            PyTuple_SET_ITEM(__pyx_t_11, 2+__pyx_t_10, __pyx_v_board_continue);
             __Pyx_GIVEREF(__pyx_t_8);
-            PyTuple_SET_ITEM(__pyx_t_11, 2+__pyx_t_10, __pyx_t_8);
-            __Pyx_INCREF(__pyx_v_maxEval);
-            __Pyx_GIVEREF(__pyx_v_maxEval);
-            PyTuple_SET_ITEM(__pyx_t_11, 3+__pyx_t_10, __pyx_v_maxEval);
-            __Pyx_INCREF(__pyx_v_beta);
-            __Pyx_GIVEREF(__pyx_v_beta);
-            PyTuple_SET_ITEM(__pyx_t_11, 4+__pyx_t_10, __pyx_v_beta);
-            __Pyx_GIVEREF(__pyx_t_7);
-            PyTuple_SET_ITEM(__pyx_t_11, 5+__pyx_t_10, __pyx_t_7);
-            __Pyx_INCREF(__pyx_int_5);
-            __Pyx_GIVEREF(__pyx_int_5);
-            PyTuple_SET_ITEM(__pyx_t_11, 6+__pyx_t_10, __pyx_int_5);
+            PyTuple_SET_ITEM(__pyx_t_11, 3+__pyx_t_10, __pyx_t_8);
             __pyx_t_1 = 0;
-            __pyx_t_8 = 0;
             __pyx_t_7 = 0;
-            __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_11, NULL); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 29, __pyx_L1_error)
+            __pyx_t_8 = 0;
+            __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_11, NULL); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 32, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_6);
             __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+          }
+          __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+          __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 32, __pyx_L1_error)
+          __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+          if (__pyx_t_3) {
+
+            /* "ai_minimax_alpha_beta.py":33
+ *                         score_add = 0
+ *                         if self.checkmuhle(move[0], move[1], board_continue, self.player):
+ *                             score_add += 100             # <<<<<<<<<<<<<<
+ * 
+ *                         evaluation = self.minimax(board_continue, copy.deepcopy(board_muhlen), 1 if player == 2 else 2
+ */
+            __pyx_t_6 = __Pyx_PyInt_AddObjC(__pyx_v_score_add, __pyx_int_100, 0x64, 1, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 33, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_6);
+            __Pyx_DECREF_SET(__pyx_v_score_add, __pyx_t_6);
+            __pyx_t_6 = 0;
+
+            /* "ai_minimax_alpha_beta.py":32
+ * 
+ *                         score_add = 0
+ *                         if self.checkmuhle(move[0], move[1], board_continue, self.player):             # <<<<<<<<<<<<<<
+ *                             score_add += 100
+ * 
+ */
+          }
+
+          /* "ai_minimax_alpha_beta.py":35
+ *                             score_add += 100
+ * 
+ *                         evaluation = self.minimax(board_continue, copy.deepcopy(board_muhlen), 1 if player == 2 else 2             # <<<<<<<<<<<<<<
+ *                                                   , maxEval, beta, self.remaining_set, self.max_depth)
+ *                         evaluation += score_add
+ */
+          __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_minimax); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 35, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_2);
+          __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_n_s_copy); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 35, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_8);
+          __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_deepcopy); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 35, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_7);
+          __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+          __pyx_t_8 = NULL;
+          if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_7))) {
+            __pyx_t_8 = PyMethod_GET_SELF(__pyx_t_7);
+            if (likely(__pyx_t_8)) {
+              PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
+              __Pyx_INCREF(__pyx_t_8);
+              __Pyx_INCREF(function);
+              __Pyx_DECREF_SET(__pyx_t_7, function);
+            }
+          }
+          __pyx_t_11 = (__pyx_t_8) ? __Pyx_PyObject_Call2Args(__pyx_t_7, __pyx_t_8, __pyx_v_board_muhlen) : __Pyx_PyObject_CallOneArg(__pyx_t_7, __pyx_v_board_muhlen);
+          __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
+          if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 35, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_11);
+          __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+          __pyx_t_8 = __Pyx_PyInt_EqObjC(__pyx_v_player, __pyx_int_2, 2, 0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 35, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_8);
+          __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_8); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 35, __pyx_L1_error)
+          __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+          if (__pyx_t_3) {
+            __Pyx_INCREF(__pyx_int_1);
+            __pyx_t_7 = __pyx_int_1;
+          } else {
+            __Pyx_INCREF(__pyx_int_2);
+            __pyx_t_7 = __pyx_int_2;
+          }
+
+          /* "ai_minimax_alpha_beta.py":36
+ * 
+ *                         evaluation = self.minimax(board_continue, copy.deepcopy(board_muhlen), 1 if player == 2 else 2
+ *                                                   , maxEval, beta, self.remaining_set, self.max_depth)             # <<<<<<<<<<<<<<
+ *                         evaluation += score_add
+ * 
+ */
+          __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_remaining_set); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 36, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_8);
+          __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_max_depth); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 36, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_1);
+          __pyx_t_9 = NULL;
+          __pyx_t_10 = 0;
+          if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
+            __pyx_t_9 = PyMethod_GET_SELF(__pyx_t_2);
+            if (likely(__pyx_t_9)) {
+              PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+              __Pyx_INCREF(__pyx_t_9);
+              __Pyx_INCREF(function);
+              __Pyx_DECREF_SET(__pyx_t_2, function);
+              __pyx_t_10 = 1;
+            }
+          }
+          #if CYTHON_FAST_PYCALL
+          if (PyFunction_Check(__pyx_t_2)) {
+            PyObject *__pyx_temp[8] = {__pyx_t_9, __pyx_v_board_continue, __pyx_t_11, __pyx_t_7, __pyx_v_maxEval, __pyx_v_beta, __pyx_t_8, __pyx_t_1};
+            __pyx_t_6 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_10, 7+__pyx_t_10); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 35, __pyx_L1_error)
+            __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
+            __Pyx_GOTREF(__pyx_t_6);
+            __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+            __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+            __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+            __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          } else
+          #endif
+          #if CYTHON_FAST_PYCCALL
+          if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
+            PyObject *__pyx_temp[8] = {__pyx_t_9, __pyx_v_board_continue, __pyx_t_11, __pyx_t_7, __pyx_v_maxEval, __pyx_v_beta, __pyx_t_8, __pyx_t_1};
+            __pyx_t_6 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_10, 7+__pyx_t_10); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 35, __pyx_L1_error)
+            __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
+            __Pyx_GOTREF(__pyx_t_6);
+            __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+            __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+            __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+            __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          } else
+          #endif
+          {
+            __pyx_t_12 = PyTuple_New(7+__pyx_t_10); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 35, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_12);
+            if (__pyx_t_9) {
+              __Pyx_GIVEREF(__pyx_t_9); PyTuple_SET_ITEM(__pyx_t_12, 0, __pyx_t_9); __pyx_t_9 = NULL;
+            }
+            __Pyx_INCREF(__pyx_v_board_continue);
+            __Pyx_GIVEREF(__pyx_v_board_continue);
+            PyTuple_SET_ITEM(__pyx_t_12, 0+__pyx_t_10, __pyx_v_board_continue);
+            __Pyx_GIVEREF(__pyx_t_11);
+            PyTuple_SET_ITEM(__pyx_t_12, 1+__pyx_t_10, __pyx_t_11);
+            __Pyx_GIVEREF(__pyx_t_7);
+            PyTuple_SET_ITEM(__pyx_t_12, 2+__pyx_t_10, __pyx_t_7);
+            __Pyx_INCREF(__pyx_v_maxEval);
+            __Pyx_GIVEREF(__pyx_v_maxEval);
+            PyTuple_SET_ITEM(__pyx_t_12, 3+__pyx_t_10, __pyx_v_maxEval);
+            __Pyx_INCREF(__pyx_v_beta);
+            __Pyx_GIVEREF(__pyx_v_beta);
+            PyTuple_SET_ITEM(__pyx_t_12, 4+__pyx_t_10, __pyx_v_beta);
+            __Pyx_GIVEREF(__pyx_t_8);
+            PyTuple_SET_ITEM(__pyx_t_12, 5+__pyx_t_10, __pyx_t_8);
+            __Pyx_GIVEREF(__pyx_t_1);
+            PyTuple_SET_ITEM(__pyx_t_12, 6+__pyx_t_10, __pyx_t_1);
+            __pyx_t_11 = 0;
+            __pyx_t_7 = 0;
+            __pyx_t_8 = 0;
+            __pyx_t_1 = 0;
+            __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_12, NULL); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 35, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_6);
+            __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
           }
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
           __Pyx_XDECREF_SET(__pyx_v_evaluation, __pyx_t_6);
           __pyx_t_6 = 0;
 
-          /* "ai_minimax_alpha_beta.py":31
+          /* "ai_minimax_alpha_beta.py":37
  *                         evaluation = self.minimax(board_continue, copy.deepcopy(board_muhlen), 1 if player == 2 else 2
- *                                                   , maxEval, beta, self.remaining_set, 5)
+ *                                                   , maxEval, beta, self.remaining_set, self.max_depth)
+ *                         evaluation += score_add             # <<<<<<<<<<<<<<
+ * 
+ *                         if evaluation > maxEval:
+ */
+          __pyx_t_6 = PyNumber_InPlaceAdd(__pyx_v_evaluation, __pyx_v_score_add); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 37, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_6);
+          __Pyx_DECREF_SET(__pyx_v_evaluation, __pyx_t_6);
+          __pyx_t_6 = 0;
+
+          /* "ai_minimax_alpha_beta.py":39
+ *                         evaluation += score_add
+ * 
  *                         if evaluation > maxEval:             # <<<<<<<<<<<<<<
  *                             maxEval = evaluation
  *                             best_move = move
  */
-          __pyx_t_6 = PyObject_RichCompare(__pyx_v_evaluation, __pyx_v_maxEval, Py_GT); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 31, __pyx_L1_error)
-          __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 31, __pyx_L1_error)
+          __pyx_t_6 = PyObject_RichCompare(__pyx_v_evaluation, __pyx_v_maxEval, Py_GT); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 39, __pyx_L1_error)
+          __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 39, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
           if (__pyx_t_3) {
 
-            /* "ai_minimax_alpha_beta.py":32
- *                                                   , maxEval, beta, self.remaining_set, 5)
+            /* "ai_minimax_alpha_beta.py":40
+ * 
  *                         if evaluation > maxEval:
  *                             maxEval = evaluation             # <<<<<<<<<<<<<<
  *                             best_move = move
@@ -2307,7 +2465,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_2make_score(CYTHON_UNU
             __Pyx_INCREF(__pyx_v_evaluation);
             __Pyx_DECREF_SET(__pyx_v_maxEval, __pyx_v_evaluation);
 
-            /* "ai_minimax_alpha_beta.py":33
+            /* "ai_minimax_alpha_beta.py":41
  *                         if evaluation > maxEval:
  *                             maxEval = evaluation
  *                             best_move = move             # <<<<<<<<<<<<<<
@@ -2317,19 +2475,19 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_2make_score(CYTHON_UNU
             __Pyx_INCREF(__pyx_v_move);
             __Pyx_DECREF_SET(__pyx_v_best_move, __pyx_v_move);
 
-            /* "ai_minimax_alpha_beta.py":34
+            /* "ai_minimax_alpha_beta.py":42
  *                             maxEval = evaluation
  *                             best_move = move
  *                             if maxEval >= beta:             # <<<<<<<<<<<<<<
  *                                 break
  *                 else:
  */
-            __pyx_t_6 = PyObject_RichCompare(__pyx_v_maxEval, __pyx_v_beta, Py_GE); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 34, __pyx_L1_error)
-            __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 34, __pyx_L1_error)
+            __pyx_t_6 = PyObject_RichCompare(__pyx_v_maxEval, __pyx_v_beta, Py_GE); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 42, __pyx_L1_error)
+            __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 42, __pyx_L1_error)
             __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
             if (__pyx_t_3) {
 
-              /* "ai_minimax_alpha_beta.py":35
+              /* "ai_minimax_alpha_beta.py":43
  *                             best_move = move
  *                             if maxEval >= beta:
  *                                 break             # <<<<<<<<<<<<<<
@@ -2338,7 +2496,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_2make_score(CYTHON_UNU
  */
               goto __pyx_L7_break;
 
-              /* "ai_minimax_alpha_beta.py":34
+              /* "ai_minimax_alpha_beta.py":42
  *                             maxEval = evaluation
  *                             best_move = move
  *                             if maxEval >= beta:             # <<<<<<<<<<<<<<
@@ -2347,16 +2505,16 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_2make_score(CYTHON_UNU
  */
             }
 
-            /* "ai_minimax_alpha_beta.py":31
- *                         evaluation = self.minimax(board_continue, copy.deepcopy(board_muhlen), 1 if player == 2 else 2
- *                                                   , maxEval, beta, self.remaining_set, 5)
+            /* "ai_minimax_alpha_beta.py":39
+ *                         evaluation += score_add
+ * 
  *                         if evaluation > maxEval:             # <<<<<<<<<<<<<<
  *                             maxEval = evaluation
  *                             best_move = move
  */
           }
 
-          /* "ai_minimax_alpha_beta.py":25
+          /* "ai_minimax_alpha_beta.py":26
  *             for ring in range(3):
  *                 for stelle in range(8):
  *                     if board[ring][stelle] == 0:             # <<<<<<<<<<<<<<
@@ -2367,7 +2525,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_2make_score(CYTHON_UNU
       }
       /*else*/ {
 
-        /* "ai_minimax_alpha_beta.py":37
+        /* "ai_minimax_alpha_beta.py":45
  *                                 break
  *                 else:
  *                     continue             # <<<<<<<<<<<<<<
@@ -2378,7 +2536,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_2make_score(CYTHON_UNU
       }
       __pyx_L7_break:;
 
-      /* "ai_minimax_alpha_beta.py":38
+      /* "ai_minimax_alpha_beta.py":46
  *                 else:
  *                     continue
  *                 break             # <<<<<<<<<<<<<<
@@ -2390,7 +2548,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_2make_score(CYTHON_UNU
     }
     __pyx_L5_break:;
 
-    /* "ai_minimax_alpha_beta.py":39
+    /* "ai_minimax_alpha_beta.py":47
  *                     continue
  *                 break
  *             return best_move[0], best_move[1]             # <<<<<<<<<<<<<<
@@ -2398,23 +2556,23 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_2make_score(CYTHON_UNU
  *         else:
  */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_6 = __Pyx_GetItemInt(__pyx_v_best_move, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 39, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_GetItemInt(__pyx_v_best_move, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 47, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_best_move, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 39, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_best_move, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 47, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_11 = PyTuple_New(2); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 39, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_11);
+    __pyx_t_12 = PyTuple_New(2); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 47, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_12);
     __Pyx_GIVEREF(__pyx_t_6);
-    PyTuple_SET_ITEM(__pyx_t_11, 0, __pyx_t_6);
+    PyTuple_SET_ITEM(__pyx_t_12, 0, __pyx_t_6);
     __Pyx_GIVEREF(__pyx_t_2);
-    PyTuple_SET_ITEM(__pyx_t_11, 1, __pyx_t_2);
+    PyTuple_SET_ITEM(__pyx_t_12, 1, __pyx_t_2);
     __pyx_t_6 = 0;
     __pyx_t_2 = 0;
-    __pyx_r = __pyx_t_11;
-    __pyx_t_11 = 0;
+    __pyx_r = __pyx_t_12;
+    __pyx_t_12 = 0;
     goto __pyx_L0;
 
-    /* "ai_minimax_alpha_beta.py":22
+    /* "ai_minimax_alpha_beta.py":23
  *         best_move = False
  *         # If phase 1
  *         if self.remaining_set > 0:             # <<<<<<<<<<<<<<
@@ -2423,7 +2581,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_2make_score(CYTHON_UNU
  */
   }
 
-  /* "ai_minimax_alpha_beta.py":42
+  /* "ai_minimax_alpha_beta.py":50
  *         # If phase 2
  *         else:
  *             for ring in range(3):             # <<<<<<<<<<<<<<
@@ -2434,7 +2592,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_2make_score(CYTHON_UNU
     for (__pyx_t_4 = 0; __pyx_t_4 < 3; __pyx_t_4+=1) {
       __pyx_v_ring = __pyx_t_4;
 
-      /* "ai_minimax_alpha_beta.py":43
+      /* "ai_minimax_alpha_beta.py":51
  *         else:
  *             for ring in range(3):
  *                 for stelle in range(8):             # <<<<<<<<<<<<<<
@@ -2444,106 +2602,106 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_2make_score(CYTHON_UNU
       for (__pyx_t_5 = 0; __pyx_t_5 < 8; __pyx_t_5+=1) {
         __pyx_v_stelle = __pyx_t_5;
 
-        /* "ai_minimax_alpha_beta.py":44
+        /* "ai_minimax_alpha_beta.py":52
  *             for ring in range(3):
  *                 for stelle in range(8):
  *                     if board[ring][stelle] == self.player:             # <<<<<<<<<<<<<<
  *                         possiblemoves = self.possiblemoves(ring, stelle, board)
  *                         if possiblemoves:
  */
-        __pyx_t_11 = __Pyx_GetItemInt(__pyx_v_board, __pyx_v_ring, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 44, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_11);
-        __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_11, __pyx_v_stelle, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 44, __pyx_L1_error)
+        __pyx_t_12 = __Pyx_GetItemInt(__pyx_v_board, __pyx_v_ring, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 52, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_12);
+        __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_12, __pyx_v_stelle, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 52, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
-        __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-        __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_player); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 44, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_11);
-        __pyx_t_6 = PyObject_RichCompare(__pyx_t_2, __pyx_t_11, Py_EQ); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 44, __pyx_L1_error)
+        __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+        __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_player); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 52, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_12);
+        __pyx_t_6 = PyObject_RichCompare(__pyx_t_2, __pyx_t_12, Py_EQ); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 52, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-        __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-        __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 44, __pyx_L1_error)
+        __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+        __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 52, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
         if (__pyx_t_3) {
 
-          /* "ai_minimax_alpha_beta.py":45
+          /* "ai_minimax_alpha_beta.py":53
  *                 for stelle in range(8):
  *                     if board[ring][stelle] == self.player:
  *                         possiblemoves = self.possiblemoves(ring, stelle, board)             # <<<<<<<<<<<<<<
  *                         if possiblemoves:
  *                             for move in possiblemoves:
  */
-          __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_possiblemoves); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 45, __pyx_L1_error)
-          __Pyx_GOTREF(__pyx_t_11);
-          __pyx_t_2 = __Pyx_PyInt_From_long(__pyx_v_ring); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 45, __pyx_L1_error)
+          __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_possiblemoves); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 53, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_12);
+          __pyx_t_2 = __Pyx_PyInt_From_long(__pyx_v_ring); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 53, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
-          __pyx_t_7 = __Pyx_PyInt_From_long(__pyx_v_stelle); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 45, __pyx_L1_error)
-          __Pyx_GOTREF(__pyx_t_7);
+          __pyx_t_1 = __Pyx_PyInt_From_long(__pyx_v_stelle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 53, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_1);
           __pyx_t_8 = NULL;
           __pyx_t_10 = 0;
-          if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_11))) {
-            __pyx_t_8 = PyMethod_GET_SELF(__pyx_t_11);
+          if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_12))) {
+            __pyx_t_8 = PyMethod_GET_SELF(__pyx_t_12);
             if (likely(__pyx_t_8)) {
-              PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_11);
+              PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_12);
               __Pyx_INCREF(__pyx_t_8);
               __Pyx_INCREF(function);
-              __Pyx_DECREF_SET(__pyx_t_11, function);
+              __Pyx_DECREF_SET(__pyx_t_12, function);
               __pyx_t_10 = 1;
             }
           }
           #if CYTHON_FAST_PYCALL
-          if (PyFunction_Check(__pyx_t_11)) {
-            PyObject *__pyx_temp[4] = {__pyx_t_8, __pyx_t_2, __pyx_t_7, __pyx_v_board};
-            __pyx_t_6 = __Pyx_PyFunction_FastCall(__pyx_t_11, __pyx_temp+1-__pyx_t_10, 3+__pyx_t_10); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 45, __pyx_L1_error)
+          if (PyFunction_Check(__pyx_t_12)) {
+            PyObject *__pyx_temp[4] = {__pyx_t_8, __pyx_t_2, __pyx_t_1, __pyx_v_board};
+            __pyx_t_6 = __Pyx_PyFunction_FastCall(__pyx_t_12, __pyx_temp+1-__pyx_t_10, 3+__pyx_t_10); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 53, __pyx_L1_error)
             __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
             __Pyx_GOTREF(__pyx_t_6);
             __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-            __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+            __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
           } else
           #endif
           #if CYTHON_FAST_PYCCALL
-          if (__Pyx_PyFastCFunction_Check(__pyx_t_11)) {
-            PyObject *__pyx_temp[4] = {__pyx_t_8, __pyx_t_2, __pyx_t_7, __pyx_v_board};
-            __pyx_t_6 = __Pyx_PyCFunction_FastCall(__pyx_t_11, __pyx_temp+1-__pyx_t_10, 3+__pyx_t_10); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 45, __pyx_L1_error)
+          if (__Pyx_PyFastCFunction_Check(__pyx_t_12)) {
+            PyObject *__pyx_temp[4] = {__pyx_t_8, __pyx_t_2, __pyx_t_1, __pyx_v_board};
+            __pyx_t_6 = __Pyx_PyCFunction_FastCall(__pyx_t_12, __pyx_temp+1-__pyx_t_10, 3+__pyx_t_10); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 53, __pyx_L1_error)
             __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
             __Pyx_GOTREF(__pyx_t_6);
             __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-            __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+            __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
           } else
           #endif
           {
-            __pyx_t_1 = PyTuple_New(3+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 45, __pyx_L1_error)
-            __Pyx_GOTREF(__pyx_t_1);
+            __pyx_t_7 = PyTuple_New(3+__pyx_t_10); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 53, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_7);
             if (__pyx_t_8) {
-              __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_8); __pyx_t_8 = NULL;
+              __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_8); __pyx_t_8 = NULL;
             }
             __Pyx_GIVEREF(__pyx_t_2);
-            PyTuple_SET_ITEM(__pyx_t_1, 0+__pyx_t_10, __pyx_t_2);
-            __Pyx_GIVEREF(__pyx_t_7);
-            PyTuple_SET_ITEM(__pyx_t_1, 1+__pyx_t_10, __pyx_t_7);
+            PyTuple_SET_ITEM(__pyx_t_7, 0+__pyx_t_10, __pyx_t_2);
+            __Pyx_GIVEREF(__pyx_t_1);
+            PyTuple_SET_ITEM(__pyx_t_7, 1+__pyx_t_10, __pyx_t_1);
             __Pyx_INCREF(__pyx_v_board);
             __Pyx_GIVEREF(__pyx_v_board);
-            PyTuple_SET_ITEM(__pyx_t_1, 2+__pyx_t_10, __pyx_v_board);
+            PyTuple_SET_ITEM(__pyx_t_7, 2+__pyx_t_10, __pyx_v_board);
             __pyx_t_2 = 0;
-            __pyx_t_7 = 0;
-            __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_11, __pyx_t_1, NULL); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 45, __pyx_L1_error)
+            __pyx_t_1 = 0;
+            __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_12, __pyx_t_7, NULL); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 53, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_6);
-            __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+            __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
           }
-          __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+          __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
           __Pyx_XDECREF_SET(__pyx_v_possiblemoves, __pyx_t_6);
           __pyx_t_6 = 0;
 
-          /* "ai_minimax_alpha_beta.py":46
+          /* "ai_minimax_alpha_beta.py":54
  *                     if board[ring][stelle] == self.player:
  *                         possiblemoves = self.possiblemoves(ring, stelle, board)
  *                         if possiblemoves:             # <<<<<<<<<<<<<<
  *                             for move in possiblemoves:
  *                                 board_ = copy.deepcopy(board)
  */
-          __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_v_possiblemoves); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 46, __pyx_L1_error)
+          __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_v_possiblemoves); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 54, __pyx_L1_error)
           if (__pyx_t_3) {
 
-            /* "ai_minimax_alpha_beta.py":47
+            /* "ai_minimax_alpha_beta.py":55
  *                         possiblemoves = self.possiblemoves(ring, stelle, board)
  *                         if possiblemoves:
  *                             for move in possiblemoves:             # <<<<<<<<<<<<<<
@@ -2551,87 +2709,57 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_2make_score(CYTHON_UNU
  *                                 muhlen_ = copy.deepcopy(board_muhlen)
  */
             if (likely(PyList_CheckExact(__pyx_v_possiblemoves)) || PyTuple_CheckExact(__pyx_v_possiblemoves)) {
-              __pyx_t_6 = __pyx_v_possiblemoves; __Pyx_INCREF(__pyx_t_6); __pyx_t_12 = 0;
-              __pyx_t_13 = NULL;
+              __pyx_t_6 = __pyx_v_possiblemoves; __Pyx_INCREF(__pyx_t_6); __pyx_t_13 = 0;
+              __pyx_t_14 = NULL;
             } else {
-              __pyx_t_12 = -1; __pyx_t_6 = PyObject_GetIter(__pyx_v_possiblemoves); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 47, __pyx_L1_error)
+              __pyx_t_13 = -1; __pyx_t_6 = PyObject_GetIter(__pyx_v_possiblemoves); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 55, __pyx_L1_error)
               __Pyx_GOTREF(__pyx_t_6);
-              __pyx_t_13 = Py_TYPE(__pyx_t_6)->tp_iternext; if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 47, __pyx_L1_error)
+              __pyx_t_14 = Py_TYPE(__pyx_t_6)->tp_iternext; if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 55, __pyx_L1_error)
             }
             for (;;) {
-              if (likely(!__pyx_t_13)) {
+              if (likely(!__pyx_t_14)) {
                 if (likely(PyList_CheckExact(__pyx_t_6))) {
-                  if (__pyx_t_12 >= PyList_GET_SIZE(__pyx_t_6)) break;
+                  if (__pyx_t_13 >= PyList_GET_SIZE(__pyx_t_6)) break;
                   #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-                  __pyx_t_11 = PyList_GET_ITEM(__pyx_t_6, __pyx_t_12); __Pyx_INCREF(__pyx_t_11); __pyx_t_12++; if (unlikely(0 < 0)) __PYX_ERR(0, 47, __pyx_L1_error)
+                  __pyx_t_12 = PyList_GET_ITEM(__pyx_t_6, __pyx_t_13); __Pyx_INCREF(__pyx_t_12); __pyx_t_13++; if (unlikely(0 < 0)) __PYX_ERR(0, 55, __pyx_L1_error)
                   #else
-                  __pyx_t_11 = PySequence_ITEM(__pyx_t_6, __pyx_t_12); __pyx_t_12++; if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 47, __pyx_L1_error)
-                  __Pyx_GOTREF(__pyx_t_11);
+                  __pyx_t_12 = PySequence_ITEM(__pyx_t_6, __pyx_t_13); __pyx_t_13++; if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 55, __pyx_L1_error)
+                  __Pyx_GOTREF(__pyx_t_12);
                   #endif
                 } else {
-                  if (__pyx_t_12 >= PyTuple_GET_SIZE(__pyx_t_6)) break;
+                  if (__pyx_t_13 >= PyTuple_GET_SIZE(__pyx_t_6)) break;
                   #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-                  __pyx_t_11 = PyTuple_GET_ITEM(__pyx_t_6, __pyx_t_12); __Pyx_INCREF(__pyx_t_11); __pyx_t_12++; if (unlikely(0 < 0)) __PYX_ERR(0, 47, __pyx_L1_error)
+                  __pyx_t_12 = PyTuple_GET_ITEM(__pyx_t_6, __pyx_t_13); __Pyx_INCREF(__pyx_t_12); __pyx_t_13++; if (unlikely(0 < 0)) __PYX_ERR(0, 55, __pyx_L1_error)
                   #else
-                  __pyx_t_11 = PySequence_ITEM(__pyx_t_6, __pyx_t_12); __pyx_t_12++; if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 47, __pyx_L1_error)
-                  __Pyx_GOTREF(__pyx_t_11);
+                  __pyx_t_12 = PySequence_ITEM(__pyx_t_6, __pyx_t_13); __pyx_t_13++; if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 55, __pyx_L1_error)
+                  __Pyx_GOTREF(__pyx_t_12);
                   #endif
                 }
               } else {
-                __pyx_t_11 = __pyx_t_13(__pyx_t_6);
-                if (unlikely(!__pyx_t_11)) {
+                __pyx_t_12 = __pyx_t_14(__pyx_t_6);
+                if (unlikely(!__pyx_t_12)) {
                   PyObject* exc_type = PyErr_Occurred();
                   if (exc_type) {
                     if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-                    else __PYX_ERR(0, 47, __pyx_L1_error)
+                    else __PYX_ERR(0, 55, __pyx_L1_error)
                   }
                   break;
                 }
-                __Pyx_GOTREF(__pyx_t_11);
+                __Pyx_GOTREF(__pyx_t_12);
               }
-              __Pyx_XDECREF_SET(__pyx_v_move, __pyx_t_11);
-              __pyx_t_11 = 0;
+              __Pyx_XDECREF_SET(__pyx_v_move, __pyx_t_12);
+              __pyx_t_12 = 0;
 
-              /* "ai_minimax_alpha_beta.py":48
+              /* "ai_minimax_alpha_beta.py":56
  *                         if possiblemoves:
  *                             for move in possiblemoves:
  *                                 board_ = copy.deepcopy(board)             # <<<<<<<<<<<<<<
  *                                 muhlen_ = copy.deepcopy(board_muhlen)
  *                                 board_[ring][stelle] = 0
  */
-              __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_copy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 48, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_1);
-              __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_deepcopy); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 48, __pyx_L1_error)
+              __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_copy); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 56, __pyx_L1_error)
               __Pyx_GOTREF(__pyx_t_7);
-              __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-              __pyx_t_1 = NULL;
-              if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_7))) {
-                __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_7);
-                if (likely(__pyx_t_1)) {
-                  PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
-                  __Pyx_INCREF(__pyx_t_1);
-                  __Pyx_INCREF(function);
-                  __Pyx_DECREF_SET(__pyx_t_7, function);
-                }
-              }
-              __pyx_t_11 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_7, __pyx_t_1, __pyx_v_board) : __Pyx_PyObject_CallOneArg(__pyx_t_7, __pyx_v_board);
-              __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-              if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 48, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_11);
-              __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-              __Pyx_XDECREF_SET(__pyx_v_board_, __pyx_t_11);
-              __pyx_t_11 = 0;
-
-              /* "ai_minimax_alpha_beta.py":49
- *                             for move in possiblemoves:
- *                                 board_ = copy.deepcopy(board)
- *                                 muhlen_ = copy.deepcopy(board_muhlen)             # <<<<<<<<<<<<<<
- *                                 board_[ring][stelle] = 0
- *                                 try:
- */
-              __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_copy); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 49, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_7);
-              __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_deepcopy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 49, __pyx_L1_error)
+              __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_deepcopy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 56, __pyx_L1_error)
               __Pyx_GOTREF(__pyx_t_1);
               __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
               __pyx_t_7 = NULL;
@@ -2644,27 +2772,57 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_2make_score(CYTHON_UNU
                   __Pyx_DECREF_SET(__pyx_t_1, function);
                 }
               }
-              __pyx_t_11 = (__pyx_t_7) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_7, __pyx_v_board_muhlen) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_v_board_muhlen);
+              __pyx_t_12 = (__pyx_t_7) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_7, __pyx_v_board) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_v_board);
               __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-              if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 49, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_11);
+              if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 56, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_12);
               __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-              __Pyx_XDECREF_SET(__pyx_v_muhlen_, __pyx_t_11);
-              __pyx_t_11 = 0;
+              __Pyx_XDECREF_SET(__pyx_v_board_, __pyx_t_12);
+              __pyx_t_12 = 0;
 
-              /* "ai_minimax_alpha_beta.py":50
+              /* "ai_minimax_alpha_beta.py":57
+ *                             for move in possiblemoves:
+ *                                 board_ = copy.deepcopy(board)
+ *                                 muhlen_ = copy.deepcopy(board_muhlen)             # <<<<<<<<<<<<<<
+ *                                 board_[ring][stelle] = 0
+ *                                 try:
+ */
+              __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_copy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 57, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_1);
+              __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_deepcopy); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 57, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_7);
+              __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+              __pyx_t_1 = NULL;
+              if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_7))) {
+                __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_7);
+                if (likely(__pyx_t_1)) {
+                  PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
+                  __Pyx_INCREF(__pyx_t_1);
+                  __Pyx_INCREF(function);
+                  __Pyx_DECREF_SET(__pyx_t_7, function);
+                }
+              }
+              __pyx_t_12 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_7, __pyx_t_1, __pyx_v_board_muhlen) : __Pyx_PyObject_CallOneArg(__pyx_t_7, __pyx_v_board_muhlen);
+              __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+              if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 57, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_12);
+              __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+              __Pyx_XDECREF_SET(__pyx_v_muhlen_, __pyx_t_12);
+              __pyx_t_12 = 0;
+
+              /* "ai_minimax_alpha_beta.py":58
  *                                 board_ = copy.deepcopy(board)
  *                                 muhlen_ = copy.deepcopy(board_muhlen)
  *                                 board_[ring][stelle] = 0             # <<<<<<<<<<<<<<
  *                                 try:
  *                                     board_[move[0]][move[1]] = self.player
  */
-              __pyx_t_11 = __Pyx_GetItemInt(__pyx_v_board_, __pyx_v_ring, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 50, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_11);
-              if (unlikely(__Pyx_SetItemInt(__pyx_t_11, __pyx_v_stelle, __pyx_int_0, long, 1, __Pyx_PyInt_From_long, 0, 1, 1) < 0)) __PYX_ERR(0, 50, __pyx_L1_error)
-              __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+              __pyx_t_12 = __Pyx_GetItemInt(__pyx_v_board_, __pyx_v_ring, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 58, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_12);
+              if (unlikely(__Pyx_SetItemInt(__pyx_t_12, __pyx_v_stelle, __pyx_int_0, long, 1, __Pyx_PyInt_From_long, 0, 1, 1) < 0)) __PYX_ERR(0, 58, __pyx_L1_error)
+              __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
 
-              /* "ai_minimax_alpha_beta.py":51
+              /* "ai_minimax_alpha_beta.py":59
  *                                 muhlen_ = copy.deepcopy(board_muhlen)
  *                                 board_[ring][stelle] = 0
  *                                 try:             # <<<<<<<<<<<<<<
@@ -2674,34 +2832,34 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_2make_score(CYTHON_UNU
               {
                 __Pyx_PyThreadState_declare
                 __Pyx_PyThreadState_assign
-                __Pyx_ExceptionSave(&__pyx_t_14, &__pyx_t_15, &__pyx_t_16);
-                __Pyx_XGOTREF(__pyx_t_14);
+                __Pyx_ExceptionSave(&__pyx_t_15, &__pyx_t_16, &__pyx_t_17);
                 __Pyx_XGOTREF(__pyx_t_15);
                 __Pyx_XGOTREF(__pyx_t_16);
+                __Pyx_XGOTREF(__pyx_t_17);
                 /*try:*/ {
 
-                  /* "ai_minimax_alpha_beta.py":52
+                  /* "ai_minimax_alpha_beta.py":60
  *                                 board_[ring][stelle] = 0
  *                                 try:
  *                                     board_[move[0]][move[1]] = self.player             # <<<<<<<<<<<<<<
  *                                 except:
  *                                     print("ERROR"+str(move))
  */
-                  __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_player); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 52, __pyx_L19_error)
-                  __Pyx_GOTREF(__pyx_t_11);
-                  __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_move, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 52, __pyx_L19_error)
-                  __Pyx_GOTREF(__pyx_t_1);
-                  __pyx_t_7 = __Pyx_PyObject_GetItem(__pyx_v_board_, __pyx_t_1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 52, __pyx_L19_error)
+                  __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_player); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 60, __pyx_L20_error)
+                  __Pyx_GOTREF(__pyx_t_12);
+                  __pyx_t_7 = __Pyx_GetItemInt(__pyx_v_move, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 60, __pyx_L20_error)
                   __Pyx_GOTREF(__pyx_t_7);
-                  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-                  __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_move, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 52, __pyx_L19_error)
+                  __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_v_board_, __pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 60, __pyx_L20_error)
                   __Pyx_GOTREF(__pyx_t_1);
-                  if (unlikely(PyObject_SetItem(__pyx_t_7, __pyx_t_1, __pyx_t_11) < 0)) __PYX_ERR(0, 52, __pyx_L19_error)
                   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+                  __pyx_t_7 = __Pyx_GetItemInt(__pyx_v_move, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 60, __pyx_L20_error)
+                  __Pyx_GOTREF(__pyx_t_7);
+                  if (unlikely(PyObject_SetItem(__pyx_t_1, __pyx_t_7, __pyx_t_12) < 0)) __PYX_ERR(0, 60, __pyx_L20_error)
                   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-                  __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+                  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+                  __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
 
-                  /* "ai_minimax_alpha_beta.py":51
+                  /* "ai_minimax_alpha_beta.py":59
  *                                 muhlen_ = copy.deepcopy(board_muhlen)
  *                                 board_[ring][stelle] = 0
  *                                 try:             # <<<<<<<<<<<<<<
@@ -2709,19 +2867,20 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_2make_score(CYTHON_UNU
  *                                 except:
  */
                 }
-                __Pyx_XDECREF(__pyx_t_14); __pyx_t_14 = 0;
                 __Pyx_XDECREF(__pyx_t_15); __pyx_t_15 = 0;
                 __Pyx_XDECREF(__pyx_t_16); __pyx_t_16 = 0;
-                goto __pyx_L26_try_end;
-                __pyx_L19_error:;
+                __Pyx_XDECREF(__pyx_t_17); __pyx_t_17 = 0;
+                goto __pyx_L27_try_end;
+                __pyx_L20_error:;
                 __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
                 __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
+                __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
                 __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
                 __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
                 __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
                 __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-                /* "ai_minimax_alpha_beta.py":53
+                /* "ai_minimax_alpha_beta.py":61
  *                                 try:
  *                                     board_[move[0]][move[1]] = self.player
  *                                 except:             # <<<<<<<<<<<<<<
@@ -2730,53 +2889,53 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_2make_score(CYTHON_UNU
  */
                 /*except:*/ {
                   __Pyx_AddTraceback("ai_minimax_alpha_beta.Morris.make_score", __pyx_clineno, __pyx_lineno, __pyx_filename);
-                  if (__Pyx_GetException(&__pyx_t_11, &__pyx_t_1, &__pyx_t_7) < 0) __PYX_ERR(0, 53, __pyx_L21_except_error)
-                  __Pyx_GOTREF(__pyx_t_11);
-                  __Pyx_GOTREF(__pyx_t_1);
+                  if (__Pyx_GetException(&__pyx_t_12, &__pyx_t_7, &__pyx_t_1) < 0) __PYX_ERR(0, 61, __pyx_L22_except_error)
+                  __Pyx_GOTREF(__pyx_t_12);
                   __Pyx_GOTREF(__pyx_t_7);
+                  __Pyx_GOTREF(__pyx_t_1);
 
-                  /* "ai_minimax_alpha_beta.py":54
+                  /* "ai_minimax_alpha_beta.py":62
  *                                     board_[move[0]][move[1]] = self.player
  *                                 except:
  *                                     print("ERROR"+str(move))             # <<<<<<<<<<<<<<
  *                                 score_add = 0
  *                                 if self.checkmuhle(move[0], move[1], board_, self.player):
  */
-                  __pyx_t_2 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyString_Type)), __pyx_v_move); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 54, __pyx_L21_except_error)
+                  __pyx_t_2 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyString_Type)), __pyx_v_move); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 62, __pyx_L22_except_error)
                   __Pyx_GOTREF(__pyx_t_2);
-                  __pyx_t_8 = PyNumber_Add(__pyx_n_s_ERROR, __pyx_t_2); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 54, __pyx_L21_except_error)
+                  __pyx_t_8 = PyNumber_Add(__pyx_n_s_ERROR, __pyx_t_2); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 62, __pyx_L22_except_error)
                   __Pyx_GOTREF(__pyx_t_8);
                   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-                  if (__Pyx_PrintOne(0, __pyx_t_8) < 0) __PYX_ERR(0, 54, __pyx_L21_except_error)
+                  if (__Pyx_PrintOne(0, __pyx_t_8) < 0) __PYX_ERR(0, 62, __pyx_L22_except_error)
                   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-                  __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
-                  __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+                  __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
                   __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-                  goto __pyx_L20_exception_handled;
+                  __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+                  goto __pyx_L21_exception_handled;
                 }
-                __pyx_L21_except_error:;
+                __pyx_L22_except_error:;
 
-                /* "ai_minimax_alpha_beta.py":51
+                /* "ai_minimax_alpha_beta.py":59
  *                                 muhlen_ = copy.deepcopy(board_muhlen)
  *                                 board_[ring][stelle] = 0
  *                                 try:             # <<<<<<<<<<<<<<
  *                                     board_[move[0]][move[1]] = self.player
  *                                 except:
  */
-                __Pyx_XGIVEREF(__pyx_t_14);
                 __Pyx_XGIVEREF(__pyx_t_15);
                 __Pyx_XGIVEREF(__pyx_t_16);
-                __Pyx_ExceptionReset(__pyx_t_14, __pyx_t_15, __pyx_t_16);
+                __Pyx_XGIVEREF(__pyx_t_17);
+                __Pyx_ExceptionReset(__pyx_t_15, __pyx_t_16, __pyx_t_17);
                 goto __pyx_L1_error;
-                __pyx_L20_exception_handled:;
-                __Pyx_XGIVEREF(__pyx_t_14);
+                __pyx_L21_exception_handled:;
                 __Pyx_XGIVEREF(__pyx_t_15);
                 __Pyx_XGIVEREF(__pyx_t_16);
-                __Pyx_ExceptionReset(__pyx_t_14, __pyx_t_15, __pyx_t_16);
-                __pyx_L26_try_end:;
+                __Pyx_XGIVEREF(__pyx_t_17);
+                __Pyx_ExceptionReset(__pyx_t_15, __pyx_t_16, __pyx_t_17);
+                __pyx_L27_try_end:;
               }
 
-              /* "ai_minimax_alpha_beta.py":55
+              /* "ai_minimax_alpha_beta.py":63
  *                                 except:
  *                                     print("ERROR"+str(move))
  *                                 score_add = 0             # <<<<<<<<<<<<<<
@@ -2786,220 +2945,222 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_2make_score(CYTHON_UNU
               __Pyx_INCREF(__pyx_int_0);
               __Pyx_XDECREF_SET(__pyx_v_score_add, __pyx_int_0);
 
-              /* "ai_minimax_alpha_beta.py":56
+              /* "ai_minimax_alpha_beta.py":64
  *                                     print("ERROR"+str(move))
  *                                 score_add = 0
  *                                 if self.checkmuhle(move[0], move[1], board_, self.player):             # <<<<<<<<<<<<<<
  *                                     score_add += 100
- *                                 evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, maxEval, beta, 0, 3)
+ *                                 evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, maxEval, beta, self.remaining_set, self.max_depth)
  */
-              __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_checkmuhle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 56, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_1);
-              __pyx_t_11 = __Pyx_GetItemInt(__pyx_v_move, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 56, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_11);
-              __pyx_t_8 = __Pyx_GetItemInt(__pyx_v_move, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 56, __pyx_L1_error)
+              __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_checkmuhle); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 64, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_7);
+              __pyx_t_12 = __Pyx_GetItemInt(__pyx_v_move, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 64, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_12);
+              __pyx_t_8 = __Pyx_GetItemInt(__pyx_v_move, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 64, __pyx_L1_error)
               __Pyx_GOTREF(__pyx_t_8);
-              __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_player); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 56, __pyx_L1_error)
+              __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_player); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 64, __pyx_L1_error)
               __Pyx_GOTREF(__pyx_t_2);
-              __pyx_t_9 = NULL;
+              __pyx_t_11 = NULL;
               __pyx_t_10 = 0;
-              if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_1))) {
-                __pyx_t_9 = PyMethod_GET_SELF(__pyx_t_1);
-                if (likely(__pyx_t_9)) {
-                  PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
-                  __Pyx_INCREF(__pyx_t_9);
+              if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_7))) {
+                __pyx_t_11 = PyMethod_GET_SELF(__pyx_t_7);
+                if (likely(__pyx_t_11)) {
+                  PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
+                  __Pyx_INCREF(__pyx_t_11);
                   __Pyx_INCREF(function);
-                  __Pyx_DECREF_SET(__pyx_t_1, function);
+                  __Pyx_DECREF_SET(__pyx_t_7, function);
                   __pyx_t_10 = 1;
                 }
               }
               #if CYTHON_FAST_PYCALL
-              if (PyFunction_Check(__pyx_t_1)) {
-                PyObject *__pyx_temp[5] = {__pyx_t_9, __pyx_t_11, __pyx_t_8, __pyx_v_board_, __pyx_t_2};
-                __pyx_t_7 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_10, 4+__pyx_t_10); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 56, __pyx_L1_error)
-                __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
-                __Pyx_GOTREF(__pyx_t_7);
-                __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+              if (PyFunction_Check(__pyx_t_7)) {
+                PyObject *__pyx_temp[5] = {__pyx_t_11, __pyx_t_12, __pyx_t_8, __pyx_v_board_, __pyx_t_2};
+                __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_10, 4+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 64, __pyx_L1_error)
+                __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
+                __Pyx_GOTREF(__pyx_t_1);
+                __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
                 __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
                 __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
               } else
               #endif
               #if CYTHON_FAST_PYCCALL
-              if (__Pyx_PyFastCFunction_Check(__pyx_t_1)) {
-                PyObject *__pyx_temp[5] = {__pyx_t_9, __pyx_t_11, __pyx_t_8, __pyx_v_board_, __pyx_t_2};
-                __pyx_t_7 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_10, 4+__pyx_t_10); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 56, __pyx_L1_error)
-                __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
-                __Pyx_GOTREF(__pyx_t_7);
-                __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+              if (__Pyx_PyFastCFunction_Check(__pyx_t_7)) {
+                PyObject *__pyx_temp[5] = {__pyx_t_11, __pyx_t_12, __pyx_t_8, __pyx_v_board_, __pyx_t_2};
+                __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_10, 4+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 64, __pyx_L1_error)
+                __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
+                __Pyx_GOTREF(__pyx_t_1);
+                __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
                 __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
                 __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
               } else
               #endif
               {
-                __pyx_t_17 = PyTuple_New(4+__pyx_t_10); if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 56, __pyx_L1_error)
-                __Pyx_GOTREF(__pyx_t_17);
-                if (__pyx_t_9) {
-                  __Pyx_GIVEREF(__pyx_t_9); PyTuple_SET_ITEM(__pyx_t_17, 0, __pyx_t_9); __pyx_t_9 = NULL;
+                __pyx_t_9 = PyTuple_New(4+__pyx_t_10); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 64, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_9);
+                if (__pyx_t_11) {
+                  __Pyx_GIVEREF(__pyx_t_11); PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_11); __pyx_t_11 = NULL;
                 }
-                __Pyx_GIVEREF(__pyx_t_11);
-                PyTuple_SET_ITEM(__pyx_t_17, 0+__pyx_t_10, __pyx_t_11);
+                __Pyx_GIVEREF(__pyx_t_12);
+                PyTuple_SET_ITEM(__pyx_t_9, 0+__pyx_t_10, __pyx_t_12);
                 __Pyx_GIVEREF(__pyx_t_8);
-                PyTuple_SET_ITEM(__pyx_t_17, 1+__pyx_t_10, __pyx_t_8);
+                PyTuple_SET_ITEM(__pyx_t_9, 1+__pyx_t_10, __pyx_t_8);
                 __Pyx_INCREF(__pyx_v_board_);
                 __Pyx_GIVEREF(__pyx_v_board_);
-                PyTuple_SET_ITEM(__pyx_t_17, 2+__pyx_t_10, __pyx_v_board_);
+                PyTuple_SET_ITEM(__pyx_t_9, 2+__pyx_t_10, __pyx_v_board_);
                 __Pyx_GIVEREF(__pyx_t_2);
-                PyTuple_SET_ITEM(__pyx_t_17, 3+__pyx_t_10, __pyx_t_2);
-                __pyx_t_11 = 0;
+                PyTuple_SET_ITEM(__pyx_t_9, 3+__pyx_t_10, __pyx_t_2);
+                __pyx_t_12 = 0;
                 __pyx_t_8 = 0;
                 __pyx_t_2 = 0;
-                __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_17, NULL); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 56, __pyx_L1_error)
-                __Pyx_GOTREF(__pyx_t_7);
-                __Pyx_DECREF(__pyx_t_17); __pyx_t_17 = 0;
+                __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_9, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 64, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_1);
+                __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
               }
-              __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-              __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 56, __pyx_L1_error)
               __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+              __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 64, __pyx_L1_error)
+              __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
               if (__pyx_t_3) {
 
-                /* "ai_minimax_alpha_beta.py":57
+                /* "ai_minimax_alpha_beta.py":65
  *                                 score_add = 0
  *                                 if self.checkmuhle(move[0], move[1], board_, self.player):
  *                                     score_add += 100             # <<<<<<<<<<<<<<
- *                                 evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, maxEval, beta, 0, 3)
- *                                 # TODO: Evaluation is always 0 !?
+ *                                 evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, maxEval, beta, self.remaining_set, self.max_depth)
+ *                                 evaluation += score_add
  */
-                __pyx_t_7 = __Pyx_PyInt_AddObjC(__pyx_v_score_add, __pyx_int_100, 0x64, 1, 0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 57, __pyx_L1_error)
-                __Pyx_GOTREF(__pyx_t_7);
-                __Pyx_DECREF_SET(__pyx_v_score_add, __pyx_t_7);
-                __pyx_t_7 = 0;
+                __pyx_t_1 = __Pyx_PyInt_AddObjC(__pyx_v_score_add, __pyx_int_100, 0x64, 1, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 65, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_1);
+                __Pyx_DECREF_SET(__pyx_v_score_add, __pyx_t_1);
+                __pyx_t_1 = 0;
 
-                /* "ai_minimax_alpha_beta.py":56
+                /* "ai_minimax_alpha_beta.py":64
  *                                     print("ERROR"+str(move))
  *                                 score_add = 0
  *                                 if self.checkmuhle(move[0], move[1], board_, self.player):             # <<<<<<<<<<<<<<
  *                                     score_add += 100
- *                                 evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, maxEval, beta, 0, 3)
+ *                                 evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, maxEval, beta, self.remaining_set, self.max_depth)
  */
               }
 
-              /* "ai_minimax_alpha_beta.py":58
+              /* "ai_minimax_alpha_beta.py":66
  *                                 if self.checkmuhle(move[0], move[1], board_, self.player):
  *                                     score_add += 100
- *                                 evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, maxEval, beta, 0, 3)             # <<<<<<<<<<<<<<
- *                                 # TODO: Evaluation is always 0 !?
- *                                 print(move, evaluation)
+ *                                 evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, maxEval, beta, self.remaining_set, self.max_depth)             # <<<<<<<<<<<<<<
+ *                                 evaluation += score_add
+ * 
  */
-              __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_minimax); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 58, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_1);
-              __pyx_t_2 = __Pyx_PyInt_EqObjC(__pyx_v_player, __pyx_int_2, 2, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 58, __pyx_L1_error)
+              __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_minimax); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 66, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_7);
+              __pyx_t_2 = __Pyx_PyInt_EqObjC(__pyx_v_player, __pyx_int_2, 2, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 66, __pyx_L1_error)
               __Pyx_GOTREF(__pyx_t_2);
-              __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 58, __pyx_L1_error)
+              __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 66, __pyx_L1_error)
               __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
               if (__pyx_t_3) {
                 __Pyx_INCREF(__pyx_int_1);
-                __pyx_t_17 = __pyx_int_1;
+                __pyx_t_9 = __pyx_int_1;
               } else {
                 __Pyx_INCREF(__pyx_int_2);
-                __pyx_t_17 = __pyx_int_2;
+                __pyx_t_9 = __pyx_int_2;
               }
-              __pyx_t_2 = NULL;
+              __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_remaining_set); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 66, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_2);
+              __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_max_depth); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 66, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_8);
+              __pyx_t_12 = NULL;
               __pyx_t_10 = 0;
-              if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_1))) {
-                __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_1);
-                if (likely(__pyx_t_2)) {
-                  PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
-                  __Pyx_INCREF(__pyx_t_2);
+              if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_7))) {
+                __pyx_t_12 = PyMethod_GET_SELF(__pyx_t_7);
+                if (likely(__pyx_t_12)) {
+                  PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
+                  __Pyx_INCREF(__pyx_t_12);
                   __Pyx_INCREF(function);
-                  __Pyx_DECREF_SET(__pyx_t_1, function);
+                  __Pyx_DECREF_SET(__pyx_t_7, function);
                   __pyx_t_10 = 1;
                 }
               }
               #if CYTHON_FAST_PYCALL
-              if (PyFunction_Check(__pyx_t_1)) {
-                PyObject *__pyx_temp[8] = {__pyx_t_2, __pyx_v_board_, __pyx_v_muhlen_, __pyx_t_17, __pyx_v_maxEval, __pyx_v_beta, __pyx_int_0, __pyx_int_3};
-                __pyx_t_7 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_10, 7+__pyx_t_10); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 58, __pyx_L1_error)
-                __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-                __Pyx_GOTREF(__pyx_t_7);
-                __Pyx_DECREF(__pyx_t_17); __pyx_t_17 = 0;
+              if (PyFunction_Check(__pyx_t_7)) {
+                PyObject *__pyx_temp[8] = {__pyx_t_12, __pyx_v_board_, __pyx_v_muhlen_, __pyx_t_9, __pyx_v_maxEval, __pyx_v_beta, __pyx_t_2, __pyx_t_8};
+                __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_10, 7+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 66, __pyx_L1_error)
+                __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
+                __Pyx_GOTREF(__pyx_t_1);
+                __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+                __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+                __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
               } else
               #endif
               #if CYTHON_FAST_PYCCALL
-              if (__Pyx_PyFastCFunction_Check(__pyx_t_1)) {
-                PyObject *__pyx_temp[8] = {__pyx_t_2, __pyx_v_board_, __pyx_v_muhlen_, __pyx_t_17, __pyx_v_maxEval, __pyx_v_beta, __pyx_int_0, __pyx_int_3};
-                __pyx_t_7 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_10, 7+__pyx_t_10); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 58, __pyx_L1_error)
-                __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-                __Pyx_GOTREF(__pyx_t_7);
-                __Pyx_DECREF(__pyx_t_17); __pyx_t_17 = 0;
+              if (__Pyx_PyFastCFunction_Check(__pyx_t_7)) {
+                PyObject *__pyx_temp[8] = {__pyx_t_12, __pyx_v_board_, __pyx_v_muhlen_, __pyx_t_9, __pyx_v_maxEval, __pyx_v_beta, __pyx_t_2, __pyx_t_8};
+                __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_10, 7+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 66, __pyx_L1_error)
+                __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
+                __Pyx_GOTREF(__pyx_t_1);
+                __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+                __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+                __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
               } else
               #endif
               {
-                __pyx_t_8 = PyTuple_New(7+__pyx_t_10); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 58, __pyx_L1_error)
-                __Pyx_GOTREF(__pyx_t_8);
-                if (__pyx_t_2) {
-                  __Pyx_GIVEREF(__pyx_t_2); PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_2); __pyx_t_2 = NULL;
+                __pyx_t_11 = PyTuple_New(7+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 66, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_11);
+                if (__pyx_t_12) {
+                  __Pyx_GIVEREF(__pyx_t_12); PyTuple_SET_ITEM(__pyx_t_11, 0, __pyx_t_12); __pyx_t_12 = NULL;
                 }
                 __Pyx_INCREF(__pyx_v_board_);
                 __Pyx_GIVEREF(__pyx_v_board_);
-                PyTuple_SET_ITEM(__pyx_t_8, 0+__pyx_t_10, __pyx_v_board_);
+                PyTuple_SET_ITEM(__pyx_t_11, 0+__pyx_t_10, __pyx_v_board_);
                 __Pyx_INCREF(__pyx_v_muhlen_);
                 __Pyx_GIVEREF(__pyx_v_muhlen_);
-                PyTuple_SET_ITEM(__pyx_t_8, 1+__pyx_t_10, __pyx_v_muhlen_);
-                __Pyx_GIVEREF(__pyx_t_17);
-                PyTuple_SET_ITEM(__pyx_t_8, 2+__pyx_t_10, __pyx_t_17);
+                PyTuple_SET_ITEM(__pyx_t_11, 1+__pyx_t_10, __pyx_v_muhlen_);
+                __Pyx_GIVEREF(__pyx_t_9);
+                PyTuple_SET_ITEM(__pyx_t_11, 2+__pyx_t_10, __pyx_t_9);
                 __Pyx_INCREF(__pyx_v_maxEval);
                 __Pyx_GIVEREF(__pyx_v_maxEval);
-                PyTuple_SET_ITEM(__pyx_t_8, 3+__pyx_t_10, __pyx_v_maxEval);
+                PyTuple_SET_ITEM(__pyx_t_11, 3+__pyx_t_10, __pyx_v_maxEval);
                 __Pyx_INCREF(__pyx_v_beta);
                 __Pyx_GIVEREF(__pyx_v_beta);
-                PyTuple_SET_ITEM(__pyx_t_8, 4+__pyx_t_10, __pyx_v_beta);
-                __Pyx_INCREF(__pyx_int_0);
-                __Pyx_GIVEREF(__pyx_int_0);
-                PyTuple_SET_ITEM(__pyx_t_8, 5+__pyx_t_10, __pyx_int_0);
-                __Pyx_INCREF(__pyx_int_3);
-                __Pyx_GIVEREF(__pyx_int_3);
-                PyTuple_SET_ITEM(__pyx_t_8, 6+__pyx_t_10, __pyx_int_3);
-                __pyx_t_17 = 0;
-                __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_8, NULL); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 58, __pyx_L1_error)
-                __Pyx_GOTREF(__pyx_t_7);
-                __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+                PyTuple_SET_ITEM(__pyx_t_11, 4+__pyx_t_10, __pyx_v_beta);
+                __Pyx_GIVEREF(__pyx_t_2);
+                PyTuple_SET_ITEM(__pyx_t_11, 5+__pyx_t_10, __pyx_t_2);
+                __Pyx_GIVEREF(__pyx_t_8);
+                PyTuple_SET_ITEM(__pyx_t_11, 6+__pyx_t_10, __pyx_t_8);
+                __pyx_t_9 = 0;
+                __pyx_t_2 = 0;
+                __pyx_t_8 = 0;
+                __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_11, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 66, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_1);
+                __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
               }
-              __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-              __Pyx_XDECREF_SET(__pyx_v_evaluation, __pyx_t_7);
-              __pyx_t_7 = 0;
-
-              /* "ai_minimax_alpha_beta.py":60
- *                                 evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, maxEval, beta, 0, 3)
- *                                 # TODO: Evaluation is always 0 !?
- *                                 print(move, evaluation)             # <<<<<<<<<<<<<<
- *                                 if evaluation > maxEval:
- *                                     maxEval = evaluation
- */
-              __pyx_t_7 = PyTuple_New(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 60, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_7);
-              __Pyx_INCREF(__pyx_v_move);
-              __Pyx_GIVEREF(__pyx_v_move);
-              PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_v_move);
-              __Pyx_INCREF(__pyx_v_evaluation);
-              __Pyx_GIVEREF(__pyx_v_evaluation);
-              PyTuple_SET_ITEM(__pyx_t_7, 1, __pyx_v_evaluation);
-              if (__Pyx_PrintOne(0, __pyx_t_7) < 0) __PYX_ERR(0, 60, __pyx_L1_error)
               __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+              __Pyx_XDECREF_SET(__pyx_v_evaluation, __pyx_t_1);
+              __pyx_t_1 = 0;
 
-              /* "ai_minimax_alpha_beta.py":61
- *                                 # TODO: Evaluation is always 0 !?
- *                                 print(move, evaluation)
+              /* "ai_minimax_alpha_beta.py":67
+ *                                     score_add += 100
+ *                                 evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, maxEval, beta, self.remaining_set, self.max_depth)
+ *                                 evaluation += score_add             # <<<<<<<<<<<<<<
+ * 
+ *                                 if evaluation > maxEval:
+ */
+              __pyx_t_1 = PyNumber_InPlaceAdd(__pyx_v_evaluation, __pyx_v_score_add); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 67, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_1);
+              __Pyx_DECREF_SET(__pyx_v_evaluation, __pyx_t_1);
+              __pyx_t_1 = 0;
+
+              /* "ai_minimax_alpha_beta.py":69
+ *                                 evaluation += score_add
+ * 
  *                                 if evaluation > maxEval:             # <<<<<<<<<<<<<<
  *                                     maxEval = evaluation
  *                                     best_move = move[0], move[1], ring, stelle
  */
-              __pyx_t_7 = PyObject_RichCompare(__pyx_v_evaluation, __pyx_v_maxEval, Py_GT); __Pyx_XGOTREF(__pyx_t_7); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 61, __pyx_L1_error)
-              __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 61, __pyx_L1_error)
-              __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+              __pyx_t_1 = PyObject_RichCompare(__pyx_v_evaluation, __pyx_v_maxEval, Py_GT); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 69, __pyx_L1_error)
+              __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 69, __pyx_L1_error)
+              __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
               if (__pyx_t_3) {
 
-                /* "ai_minimax_alpha_beta.py":62
- *                                 print(move, evaluation)
+                /* "ai_minimax_alpha_beta.py":70
+ * 
  *                                 if evaluation > maxEval:
  *                                     maxEval = evaluation             # <<<<<<<<<<<<<<
  *                                     best_move = move[0], move[1], ring, stelle
@@ -3008,60 +3169,60 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_2make_score(CYTHON_UNU
                 __Pyx_INCREF(__pyx_v_evaluation);
                 __Pyx_DECREF_SET(__pyx_v_maxEval, __pyx_v_evaluation);
 
-                /* "ai_minimax_alpha_beta.py":63
+                /* "ai_minimax_alpha_beta.py":71
  *                                 if evaluation > maxEval:
  *                                     maxEval = evaluation
  *                                     best_move = move[0], move[1], ring, stelle             # <<<<<<<<<<<<<<
  *                                     if maxEval >= beta:
  *                                         break
  */
-                __pyx_t_7 = __Pyx_GetItemInt(__pyx_v_move, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 63, __pyx_L1_error)
-                __Pyx_GOTREF(__pyx_t_7);
-                __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_move, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 63, __pyx_L1_error)
+                __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_move, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 71, __pyx_L1_error)
                 __Pyx_GOTREF(__pyx_t_1);
-                __pyx_t_8 = __Pyx_PyInt_From_long(__pyx_v_ring); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 63, __pyx_L1_error)
+                __pyx_t_7 = __Pyx_GetItemInt(__pyx_v_move, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 71, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_7);
+                __pyx_t_11 = __Pyx_PyInt_From_long(__pyx_v_ring); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 71, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_11);
+                __pyx_t_8 = __Pyx_PyInt_From_long(__pyx_v_stelle); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 71, __pyx_L1_error)
                 __Pyx_GOTREF(__pyx_t_8);
-                __pyx_t_17 = __Pyx_PyInt_From_long(__pyx_v_stelle); if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 63, __pyx_L1_error)
-                __Pyx_GOTREF(__pyx_t_17);
-                __pyx_t_2 = PyTuple_New(4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 63, __pyx_L1_error)
+                __pyx_t_2 = PyTuple_New(4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 71, __pyx_L1_error)
                 __Pyx_GOTREF(__pyx_t_2);
-                __Pyx_GIVEREF(__pyx_t_7);
-                PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_7);
                 __Pyx_GIVEREF(__pyx_t_1);
-                PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_t_1);
+                PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1);
+                __Pyx_GIVEREF(__pyx_t_7);
+                PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_t_7);
+                __Pyx_GIVEREF(__pyx_t_11);
+                PyTuple_SET_ITEM(__pyx_t_2, 2, __pyx_t_11);
                 __Pyx_GIVEREF(__pyx_t_8);
-                PyTuple_SET_ITEM(__pyx_t_2, 2, __pyx_t_8);
-                __Pyx_GIVEREF(__pyx_t_17);
-                PyTuple_SET_ITEM(__pyx_t_2, 3, __pyx_t_17);
-                __pyx_t_7 = 0;
+                PyTuple_SET_ITEM(__pyx_t_2, 3, __pyx_t_8);
                 __pyx_t_1 = 0;
+                __pyx_t_7 = 0;
+                __pyx_t_11 = 0;
                 __pyx_t_8 = 0;
-                __pyx_t_17 = 0;
                 __Pyx_DECREF_SET(__pyx_v_best_move, __pyx_t_2);
                 __pyx_t_2 = 0;
 
-                /* "ai_minimax_alpha_beta.py":64
+                /* "ai_minimax_alpha_beta.py":72
  *                                     maxEval = evaluation
  *                                     best_move = move[0], move[1], ring, stelle
  *                                     if maxEval >= beta:             # <<<<<<<<<<<<<<
  *                                         break
  *                 else:
  */
-                __pyx_t_2 = PyObject_RichCompare(__pyx_v_maxEval, __pyx_v_beta, Py_GE); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 64, __pyx_L1_error)
-                __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 64, __pyx_L1_error)
+                __pyx_t_2 = PyObject_RichCompare(__pyx_v_maxEval, __pyx_v_beta, Py_GE); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 72, __pyx_L1_error)
+                __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 72, __pyx_L1_error)
                 __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
                 if (__pyx_t_3) {
 
-                  /* "ai_minimax_alpha_beta.py":65
+                  /* "ai_minimax_alpha_beta.py":73
  *                                     best_move = move[0], move[1], ring, stelle
  *                                     if maxEval >= beta:
  *                                         break             # <<<<<<<<<<<<<<
  *                 else:
  *                     continue
  */
-                  goto __pyx_L18_break;
+                  goto __pyx_L19_break;
 
-                  /* "ai_minimax_alpha_beta.py":64
+                  /* "ai_minimax_alpha_beta.py":72
  *                                     maxEval = evaluation
  *                                     best_move = move[0], move[1], ring, stelle
  *                                     if maxEval >= beta:             # <<<<<<<<<<<<<<
@@ -3070,16 +3231,16 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_2make_score(CYTHON_UNU
  */
                 }
 
-                /* "ai_minimax_alpha_beta.py":61
- *                                 # TODO: Evaluation is always 0 !?
- *                                 print(move, evaluation)
+                /* "ai_minimax_alpha_beta.py":69
+ *                                 evaluation += score_add
+ * 
  *                                 if evaluation > maxEval:             # <<<<<<<<<<<<<<
  *                                     maxEval = evaluation
  *                                     best_move = move[0], move[1], ring, stelle
  */
               }
 
-              /* "ai_minimax_alpha_beta.py":47
+              /* "ai_minimax_alpha_beta.py":55
  *                         possiblemoves = self.possiblemoves(ring, stelle, board)
  *                         if possiblemoves:
  *                             for move in possiblemoves:             # <<<<<<<<<<<<<<
@@ -3087,10 +3248,10 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_2make_score(CYTHON_UNU
  *                                 muhlen_ = copy.deepcopy(board_muhlen)
  */
             }
-            __pyx_L18_break:;
+            __pyx_L19_break:;
             __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-            /* "ai_minimax_alpha_beta.py":46
+            /* "ai_minimax_alpha_beta.py":54
  *                     if board[ring][stelle] == self.player:
  *                         possiblemoves = self.possiblemoves(ring, stelle, board)
  *                         if possiblemoves:             # <<<<<<<<<<<<<<
@@ -3099,7 +3260,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_2make_score(CYTHON_UNU
  */
           }
 
-          /* "ai_minimax_alpha_beta.py":44
+          /* "ai_minimax_alpha_beta.py":52
  *             for ring in range(3):
  *                 for stelle in range(8):
  *                     if board[ring][stelle] == self.player:             # <<<<<<<<<<<<<<
@@ -3110,19 +3271,19 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_2make_score(CYTHON_UNU
       }
       /*else*/ {
 
-        /* "ai_minimax_alpha_beta.py":67
+        /* "ai_minimax_alpha_beta.py":75
  *                                         break
  *                 else:
  *                     continue             # <<<<<<<<<<<<<<
  *                 break
  *             return best_move[0], best_move[1], best_move[2], best_move[3]
  */
-        goto __pyx_L11_continue;
+        goto __pyx_L12_continue;
       }
-      __pyx_L11_continue:;
+      __pyx_L12_continue:;
     }
 
-    /* "ai_minimax_alpha_beta.py":69
+    /* "ai_minimax_alpha_beta.py":77
  *                     continue
  *                 break
  *             return best_move[0], best_move[1], best_move[2], best_move[3]             # <<<<<<<<<<<<<<
@@ -3130,39 +3291,39 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_2make_score(CYTHON_UNU
  * 
  */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_6 = __Pyx_GetItemInt(__pyx_v_best_move, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 69, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_GetItemInt(__pyx_v_best_move, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 77, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_best_move, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 69, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_best_move, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 77, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_17 = __Pyx_GetItemInt(__pyx_v_best_move, 2, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 69, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_17);
-    __pyx_t_8 = __Pyx_GetItemInt(__pyx_v_best_move, 3, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 69, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_GetItemInt(__pyx_v_best_move, 2, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 77, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_1 = PyTuple_New(4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 69, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
+    __pyx_t_11 = __Pyx_GetItemInt(__pyx_v_best_move, 3, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 77, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_11);
+    __pyx_t_7 = PyTuple_New(4); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 77, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_7);
     __Pyx_GIVEREF(__pyx_t_6);
-    PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_6);
+    PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_6);
     __Pyx_GIVEREF(__pyx_t_2);
-    PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_2);
-    __Pyx_GIVEREF(__pyx_t_17);
-    PyTuple_SET_ITEM(__pyx_t_1, 2, __pyx_t_17);
+    PyTuple_SET_ITEM(__pyx_t_7, 1, __pyx_t_2);
     __Pyx_GIVEREF(__pyx_t_8);
-    PyTuple_SET_ITEM(__pyx_t_1, 3, __pyx_t_8);
+    PyTuple_SET_ITEM(__pyx_t_7, 2, __pyx_t_8);
+    __Pyx_GIVEREF(__pyx_t_11);
+    PyTuple_SET_ITEM(__pyx_t_7, 3, __pyx_t_11);
     __pyx_t_6 = 0;
     __pyx_t_2 = 0;
-    __pyx_t_17 = 0;
     __pyx_t_8 = 0;
-    __pyx_r = __pyx_t_1;
-    __pyx_t_1 = 0;
+    __pyx_t_11 = 0;
+    __pyx_r = __pyx_t_7;
+    __pyx_t_7 = 0;
     goto __pyx_L0;
   }
 
-  /* "ai_minimax_alpha_beta.py":17
+  /* "ai_minimax_alpha_beta.py":19
  *     # First function being called, remembers moves to return them
  *     ###
  *     def make_score(self, board, board_muhlen, player, alpha, beta):             # <<<<<<<<<<<<<<
- *         procs = []
  *         maxEval = alpha
+ *         best_move = False
  */
 
   /* function exit code */
@@ -3174,26 +3335,25 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_2make_score(CYTHON_UNU
   __Pyx_XDECREF(__pyx_t_8);
   __Pyx_XDECREF(__pyx_t_9);
   __Pyx_XDECREF(__pyx_t_11);
-  __Pyx_XDECREF(__pyx_t_17);
+  __Pyx_XDECREF(__pyx_t_12);
   __Pyx_AddTraceback("ai_minimax_alpha_beta.Morris.make_score", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
-  __Pyx_XDECREF(__pyx_v_procs);
   __Pyx_XDECREF(__pyx_v_maxEval);
   __Pyx_XDECREF(__pyx_v_best_move);
   __Pyx_XDECREF(__pyx_v_move);
   __Pyx_XDECREF(__pyx_v_board_continue);
+  __Pyx_XDECREF(__pyx_v_score_add);
   __Pyx_XDECREF(__pyx_v_evaluation);
   __Pyx_XDECREF(__pyx_v_possiblemoves);
   __Pyx_XDECREF(__pyx_v_board_);
   __Pyx_XDECREF(__pyx_v_muhlen_);
-  __Pyx_XDECREF(__pyx_v_score_add);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "ai_minimax_alpha_beta.py":75
+/* "ai_minimax_alpha_beta.py":83
  *     # Minimax function is simpler and only remembers and returns scores of the decision tree without the moves
  *     ###
  *     def minimax(self, board, board_muhlen, player, alpha, beta, remaining_set, depth):             # <<<<<<<<<<<<<<
@@ -3251,47 +3411,47 @@ static PyObject *__pyx_pw_21ai_minimax_alpha_beta_6Morris_5minimax(PyObject *__p
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_board)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("minimax", 1, 8, 8, 1); __PYX_ERR(0, 75, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("minimax", 1, 8, 8, 1); __PYX_ERR(0, 83, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_board_muhlen)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("minimax", 1, 8, 8, 2); __PYX_ERR(0, 75, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("minimax", 1, 8, 8, 2); __PYX_ERR(0, 83, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_player)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("minimax", 1, 8, 8, 3); __PYX_ERR(0, 75, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("minimax", 1, 8, 8, 3); __PYX_ERR(0, 83, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
         if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_alpha)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("minimax", 1, 8, 8, 4); __PYX_ERR(0, 75, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("minimax", 1, 8, 8, 4); __PYX_ERR(0, 83, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  5:
         if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_beta)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("minimax", 1, 8, 8, 5); __PYX_ERR(0, 75, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("minimax", 1, 8, 8, 5); __PYX_ERR(0, 83, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  6:
         if (likely((values[6] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_remaining_set)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("minimax", 1, 8, 8, 6); __PYX_ERR(0, 75, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("minimax", 1, 8, 8, 6); __PYX_ERR(0, 83, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  7:
         if (likely((values[7] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_depth)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("minimax", 1, 8, 8, 7); __PYX_ERR(0, 75, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("minimax", 1, 8, 8, 7); __PYX_ERR(0, 83, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "minimax") < 0)) __PYX_ERR(0, 75, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "minimax") < 0)) __PYX_ERR(0, 83, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 8) {
       goto __pyx_L5_argtuple_error;
@@ -3316,7 +3476,7 @@ static PyObject *__pyx_pw_21ai_minimax_alpha_beta_6Morris_5minimax(PyObject *__p
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("minimax", 1, 8, 8, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 75, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("minimax", 1, 8, 8, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 83, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("ai_minimax_alpha_beta.Morris.minimax", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -3340,8 +3500,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
   long __pyx_v_stelle;
   PyObject *__pyx_v_board_ = NULL;
   PyObject *__pyx_v_muhlen_ = NULL;
-  long __pyx_v_ring_;
-  long __pyx_v_stelle_;
+  PyObject *__pyx_v_to_remove = NULL;
   PyObject *__pyx_v_evaluation = NULL;
   PyObject *__pyx_v_mymen = NULL;
   PyObject *__pyx_v_theirmen = NULL;
@@ -3362,40 +3521,39 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
   int __pyx_t_10;
   PyObject *__pyx_t_11 = NULL;
   int __pyx_t_12;
-  long __pyx_t_13;
-  long __pyx_t_14;
-  Py_ssize_t __pyx_t_15;
-  PyObject *(*__pyx_t_16)(PyObject *);
+  int __pyx_t_13;
+  Py_ssize_t __pyx_t_14;
+  PyObject *(*__pyx_t_15)(PyObject *);
+  PyObject *__pyx_t_16 = NULL;
   PyObject *__pyx_t_17 = NULL;
   PyObject *__pyx_t_18 = NULL;
-  PyObject *__pyx_t_19 = NULL;
   __Pyx_RefNannySetupContext("minimax", 0);
 
-  /* "ai_minimax_alpha_beta.py":76
+  /* "ai_minimax_alpha_beta.py":84
  *     ###
  *     def minimax(self, board, board_muhlen, player, alpha, beta, remaining_set, depth):
  *         if depth <= 1:             # <<<<<<<<<<<<<<
  *             # Static evaluation for gamemode 1
  *             if remaining_set >= 1:
  */
-  __pyx_t_1 = PyObject_RichCompare(__pyx_v_depth, __pyx_int_1, Py_LE); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 76, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 76, __pyx_L1_error)
+  __pyx_t_1 = PyObject_RichCompare(__pyx_v_depth, __pyx_int_1, Py_LE); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 84, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 84, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (__pyx_t_2) {
 
-    /* "ai_minimax_alpha_beta.py":78
+    /* "ai_minimax_alpha_beta.py":86
  *         if depth <= 1:
  *             # Static evaluation for gamemode 1
  *             if remaining_set >= 1:             # <<<<<<<<<<<<<<
  *                 score_player = 0
  *                 score_opponent = 0
  */
-    __pyx_t_1 = PyObject_RichCompare(__pyx_v_remaining_set, __pyx_int_1, Py_GE); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 78, __pyx_L1_error)
-    __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 78, __pyx_L1_error)
+    __pyx_t_1 = PyObject_RichCompare(__pyx_v_remaining_set, __pyx_int_1, Py_GE); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 86, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 86, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     if (__pyx_t_2) {
 
-      /* "ai_minimax_alpha_beta.py":79
+      /* "ai_minimax_alpha_beta.py":87
  *             # Static evaluation for gamemode 1
  *             if remaining_set >= 1:
  *                 score_player = 0             # <<<<<<<<<<<<<<
@@ -3405,7 +3563,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
       __Pyx_INCREF(__pyx_int_0);
       __pyx_v_score_player = __pyx_int_0;
 
-      /* "ai_minimax_alpha_beta.py":80
+      /* "ai_minimax_alpha_beta.py":88
  *             if remaining_set >= 1:
  *                 score_player = 0
  *                 score_opponent = 0             # <<<<<<<<<<<<<<
@@ -3415,7 +3573,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
       __Pyx_INCREF(__pyx_int_0);
       __pyx_v_score_opponent = __pyx_int_0;
 
-      /* "ai_minimax_alpha_beta.py":81
+      /* "ai_minimax_alpha_beta.py":89
  *                 score_player = 0
  *                 score_opponent = 0
  *                 for i in range(3):             # <<<<<<<<<<<<<<
@@ -3425,7 +3583,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
       for (__pyx_t_3 = 0; __pyx_t_3 < 3; __pyx_t_3+=1) {
         __pyx_v_i = __pyx_t_3;
 
-        /* "ai_minimax_alpha_beta.py":82
+        /* "ai_minimax_alpha_beta.py":90
  *                 score_opponent = 0
  *                 for i in range(3):
  *                     for j in range(8):             # <<<<<<<<<<<<<<
@@ -3435,40 +3593,40 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
         for (__pyx_t_4 = 0; __pyx_t_4 < 8; __pyx_t_4+=1) {
           __pyx_v_j = __pyx_t_4;
 
-          /* "ai_minimax_alpha_beta.py":83
+          /* "ai_minimax_alpha_beta.py":91
  *                 for i in range(3):
  *                     for j in range(8):
  *                         if board[i][j] == self.player:             # <<<<<<<<<<<<<<
  *                             score_player += 1
  *                             pass
  */
-          __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_board, __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 83, __pyx_L1_error)
+          __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_board, __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 91, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_1);
-          __pyx_t_5 = __Pyx_GetItemInt(__pyx_t_1, __pyx_v_j, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 83, __pyx_L1_error)
+          __pyx_t_5 = __Pyx_GetItemInt(__pyx_t_1, __pyx_v_j, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 91, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_5);
           __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-          __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_player); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 83, __pyx_L1_error)
+          __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_player); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 91, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_1);
-          __pyx_t_6 = PyObject_RichCompare(__pyx_t_5, __pyx_t_1, Py_EQ); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 83, __pyx_L1_error)
+          __pyx_t_6 = PyObject_RichCompare(__pyx_t_5, __pyx_t_1, Py_EQ); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 91, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
           __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-          __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 83, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 91, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
           if (__pyx_t_2) {
 
-            /* "ai_minimax_alpha_beta.py":84
+            /* "ai_minimax_alpha_beta.py":92
  *                     for j in range(8):
  *                         if board[i][j] == self.player:
  *                             score_player += 1             # <<<<<<<<<<<<<<
  *                             pass
  *                         elif board[i][j] == self.opponent:
  */
-            __pyx_t_6 = __Pyx_PyInt_AddObjC(__pyx_v_score_player, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 84, __pyx_L1_error)
+            __pyx_t_6 = __Pyx_PyInt_AddObjC(__pyx_v_score_player, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 92, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_6);
             __Pyx_DECREF_SET(__pyx_v_score_player, __pyx_t_6);
             __pyx_t_6 = 0;
 
-            /* "ai_minimax_alpha_beta.py":83
+            /* "ai_minimax_alpha_beta.py":91
  *                 for i in range(3):
  *                     for j in range(8):
  *                         if board[i][j] == self.player:             # <<<<<<<<<<<<<<
@@ -3478,40 +3636,40 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
             goto __pyx_L9;
           }
 
-          /* "ai_minimax_alpha_beta.py":86
+          /* "ai_minimax_alpha_beta.py":94
  *                             score_player += 1
  *                             pass
  *                         elif board[i][j] == self.opponent:             # <<<<<<<<<<<<<<
  *                             score_opponent += 1
  *                         if gameutil.checkmuhle(i, j, board, board_muhlen, self.player) and \
  */
-          __pyx_t_6 = __Pyx_GetItemInt(__pyx_v_board, __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 86, __pyx_L1_error)
+          __pyx_t_6 = __Pyx_GetItemInt(__pyx_v_board, __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 94, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_6);
-          __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_6, __pyx_v_j, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 86, __pyx_L1_error)
+          __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_6, __pyx_v_j, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 94, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_1);
           __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-          __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opponent); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 86, __pyx_L1_error)
+          __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opponent); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 94, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_6);
-          __pyx_t_5 = PyObject_RichCompare(__pyx_t_1, __pyx_t_6, Py_EQ); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 86, __pyx_L1_error)
+          __pyx_t_5 = PyObject_RichCompare(__pyx_t_1, __pyx_t_6, Py_EQ); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 94, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
           __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-          __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 86, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 94, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
           if (__pyx_t_2) {
 
-            /* "ai_minimax_alpha_beta.py":87
+            /* "ai_minimax_alpha_beta.py":95
  *                             pass
  *                         elif board[i][j] == self.opponent:
  *                             score_opponent += 1             # <<<<<<<<<<<<<<
  *                         if gameutil.checkmuhle(i, j, board, board_muhlen, self.player) and \
  *                                 board[i][j] == self.player:
  */
-            __pyx_t_5 = __Pyx_PyInt_AddObjC(__pyx_v_score_opponent, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 87, __pyx_L1_error)
+            __pyx_t_5 = __Pyx_PyInt_AddObjC(__pyx_v_score_opponent, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 95, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_5);
             __Pyx_DECREF_SET(__pyx_v_score_opponent, __pyx_t_5);
             __pyx_t_5 = 0;
 
-            /* "ai_minimax_alpha_beta.py":86
+            /* "ai_minimax_alpha_beta.py":94
  *                             score_player += 1
  *                             pass
  *                         elif board[i][j] == self.opponent:             # <<<<<<<<<<<<<<
@@ -3521,23 +3679,23 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
           }
           __pyx_L9:;
 
-          /* "ai_minimax_alpha_beta.py":88
+          /* "ai_minimax_alpha_beta.py":96
  *                         elif board[i][j] == self.opponent:
  *                             score_opponent += 1
  *                         if gameutil.checkmuhle(i, j, board, board_muhlen, self.player) and \             # <<<<<<<<<<<<<<
  *                                 board[i][j] == self.player:
  *                             score_player += 100
  */
-          __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_gameutil); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 88, __pyx_L1_error)
+          __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_gameutil); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 96, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_6);
-          __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_checkmuhle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 88, __pyx_L1_error)
+          __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_checkmuhle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 96, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_1);
           __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-          __pyx_t_6 = __Pyx_PyInt_From_long(__pyx_v_i); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 88, __pyx_L1_error)
+          __pyx_t_6 = __Pyx_PyInt_From_long(__pyx_v_i); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 96, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_6);
-          __pyx_t_7 = __Pyx_PyInt_From_long(__pyx_v_j); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 88, __pyx_L1_error)
+          __pyx_t_7 = __Pyx_PyInt_From_long(__pyx_v_j); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 96, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_7);
-          __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_player); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 88, __pyx_L1_error)
+          __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_player); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 96, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_8);
           __pyx_t_9 = NULL;
           __pyx_t_10 = 0;
@@ -3554,7 +3712,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
           #if CYTHON_FAST_PYCALL
           if (PyFunction_Check(__pyx_t_1)) {
             PyObject *__pyx_temp[6] = {__pyx_t_9, __pyx_t_6, __pyx_t_7, __pyx_v_board, __pyx_v_board_muhlen, __pyx_t_8};
-            __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_10, 5+__pyx_t_10); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 88, __pyx_L1_error)
+            __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_10, 5+__pyx_t_10); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 96, __pyx_L1_error)
             __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
             __Pyx_GOTREF(__pyx_t_5);
             __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
@@ -3565,7 +3723,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
           #if CYTHON_FAST_PYCCALL
           if (__Pyx_PyFastCFunction_Check(__pyx_t_1)) {
             PyObject *__pyx_temp[6] = {__pyx_t_9, __pyx_t_6, __pyx_t_7, __pyx_v_board, __pyx_v_board_muhlen, __pyx_t_8};
-            __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_10, 5+__pyx_t_10); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 88, __pyx_L1_error)
+            __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_10, 5+__pyx_t_10); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 96, __pyx_L1_error)
             __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
             __Pyx_GOTREF(__pyx_t_5);
             __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
@@ -3574,7 +3732,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
           } else
           #endif
           {
-            __pyx_t_11 = PyTuple_New(5+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 88, __pyx_L1_error)
+            __pyx_t_11 = PyTuple_New(5+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 96, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_11);
             if (__pyx_t_9) {
               __Pyx_GIVEREF(__pyx_t_9); PyTuple_SET_ITEM(__pyx_t_11, 0, __pyx_t_9); __pyx_t_9 = NULL;
@@ -3594,12 +3752,12 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
             __pyx_t_6 = 0;
             __pyx_t_7 = 0;
             __pyx_t_8 = 0;
-            __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_11, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 88, __pyx_L1_error)
+            __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_11, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 96, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_5);
             __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
           }
           __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-          __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 88, __pyx_L1_error)
+          __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 96, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
           if (__pyx_t_12) {
           } else {
@@ -3607,29 +3765,29 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
             goto __pyx_L11_bool_binop_done;
           }
 
-          /* "ai_minimax_alpha_beta.py":89
+          /* "ai_minimax_alpha_beta.py":97
  *                             score_opponent += 1
  *                         if gameutil.checkmuhle(i, j, board, board_muhlen, self.player) and \
  *                                 board[i][j] == self.player:             # <<<<<<<<<<<<<<
  *                             score_player += 100
  * 
  */
-          __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_board, __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 89, __pyx_L1_error)
+          __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_board, __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 97, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_5);
-          __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_5, __pyx_v_j, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 89, __pyx_L1_error)
+          __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_5, __pyx_v_j, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 97, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_1);
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-          __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_player); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 89, __pyx_L1_error)
+          __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_player); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 97, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_5);
-          __pyx_t_11 = PyObject_RichCompare(__pyx_t_1, __pyx_t_5, Py_EQ); __Pyx_XGOTREF(__pyx_t_11); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 89, __pyx_L1_error)
+          __pyx_t_11 = PyObject_RichCompare(__pyx_t_1, __pyx_t_5, Py_EQ); __Pyx_XGOTREF(__pyx_t_11); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 97, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-          __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_11); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 89, __pyx_L1_error)
+          __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_11); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 97, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
           __pyx_t_2 = __pyx_t_12;
           __pyx_L11_bool_binop_done:;
 
-          /* "ai_minimax_alpha_beta.py":88
+          /* "ai_minimax_alpha_beta.py":96
  *                         elif board[i][j] == self.opponent:
  *                             score_opponent += 1
  *                         if gameutil.checkmuhle(i, j, board, board_muhlen, self.player) and \             # <<<<<<<<<<<<<<
@@ -3638,19 +3796,19 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
  */
           if (__pyx_t_2) {
 
-            /* "ai_minimax_alpha_beta.py":90
+            /* "ai_minimax_alpha_beta.py":98
  *                         if gameutil.checkmuhle(i, j, board, board_muhlen, self.player) and \
  *                                 board[i][j] == self.player:
  *                             score_player += 100             # <<<<<<<<<<<<<<
  * 
  *                         elif gameutil.checkmuhle(i, j, board, board_muhlen, self.opponent) and \
  */
-            __pyx_t_11 = __Pyx_PyInt_AddObjC(__pyx_v_score_player, __pyx_int_100, 0x64, 1, 0); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 90, __pyx_L1_error)
+            __pyx_t_11 = __Pyx_PyInt_AddObjC(__pyx_v_score_player, __pyx_int_100, 0x64, 1, 0); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 98, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_11);
             __Pyx_DECREF_SET(__pyx_v_score_player, __pyx_t_11);
             __pyx_t_11 = 0;
 
-            /* "ai_minimax_alpha_beta.py":88
+            /* "ai_minimax_alpha_beta.py":96
  *                         elif board[i][j] == self.opponent:
  *                             score_opponent += 1
  *                         if gameutil.checkmuhle(i, j, board, board_muhlen, self.player) and \             # <<<<<<<<<<<<<<
@@ -3660,23 +3818,23 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
             goto __pyx_L10;
           }
 
-          /* "ai_minimax_alpha_beta.py":92
+          /* "ai_minimax_alpha_beta.py":100
  *                             score_player += 100
  * 
  *                         elif gameutil.checkmuhle(i, j, board, board_muhlen, self.opponent) and \             # <<<<<<<<<<<<<<
  *                                 board[i][j] == self.opponent:
- *                             score_opponent += 110
+ *                             score_opponent += 1000
  */
-          __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_gameutil); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 92, __pyx_L1_error)
+          __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_gameutil); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 100, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_5);
-          __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_checkmuhle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 92, __pyx_L1_error)
+          __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_checkmuhle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 100, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_1);
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-          __pyx_t_5 = __Pyx_PyInt_From_long(__pyx_v_i); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 92, __pyx_L1_error)
+          __pyx_t_5 = __Pyx_PyInt_From_long(__pyx_v_i); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 100, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_5);
-          __pyx_t_8 = __Pyx_PyInt_From_long(__pyx_v_j); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 92, __pyx_L1_error)
+          __pyx_t_8 = __Pyx_PyInt_From_long(__pyx_v_j); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 100, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_8);
-          __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opponent); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 92, __pyx_L1_error)
+          __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opponent); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 100, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_7);
           __pyx_t_6 = NULL;
           __pyx_t_10 = 0;
@@ -3693,7 +3851,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
           #if CYTHON_FAST_PYCALL
           if (PyFunction_Check(__pyx_t_1)) {
             PyObject *__pyx_temp[6] = {__pyx_t_6, __pyx_t_5, __pyx_t_8, __pyx_v_board, __pyx_v_board_muhlen, __pyx_t_7};
-            __pyx_t_11 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_10, 5+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 92, __pyx_L1_error)
+            __pyx_t_11 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_10, 5+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 100, __pyx_L1_error)
             __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
             __Pyx_GOTREF(__pyx_t_11);
             __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
@@ -3704,7 +3862,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
           #if CYTHON_FAST_PYCCALL
           if (__Pyx_PyFastCFunction_Check(__pyx_t_1)) {
             PyObject *__pyx_temp[6] = {__pyx_t_6, __pyx_t_5, __pyx_t_8, __pyx_v_board, __pyx_v_board_muhlen, __pyx_t_7};
-            __pyx_t_11 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_10, 5+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 92, __pyx_L1_error)
+            __pyx_t_11 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_10, 5+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 100, __pyx_L1_error)
             __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
             __Pyx_GOTREF(__pyx_t_11);
             __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
@@ -3713,7 +3871,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
           } else
           #endif
           {
-            __pyx_t_9 = PyTuple_New(5+__pyx_t_10); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 92, __pyx_L1_error)
+            __pyx_t_9 = PyTuple_New(5+__pyx_t_10); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 100, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_9);
             if (__pyx_t_6) {
               __Pyx_GIVEREF(__pyx_t_6); PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_6); __pyx_t_6 = NULL;
@@ -3733,12 +3891,12 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
             __pyx_t_5 = 0;
             __pyx_t_8 = 0;
             __pyx_t_7 = 0;
-            __pyx_t_11 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_9, NULL); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 92, __pyx_L1_error)
+            __pyx_t_11 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_9, NULL); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 100, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_11);
             __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
           }
           __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-          __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_11); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 92, __pyx_L1_error)
+          __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_11); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 100, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
           if (__pyx_t_12) {
           } else {
@@ -3746,69 +3904,69 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
             goto __pyx_L13_bool_binop_done;
           }
 
-          /* "ai_minimax_alpha_beta.py":93
+          /* "ai_minimax_alpha_beta.py":101
  * 
  *                         elif gameutil.checkmuhle(i, j, board, board_muhlen, self.opponent) and \
  *                                 board[i][j] == self.opponent:             # <<<<<<<<<<<<<<
- *                             score_opponent += 110
+ *                             score_opponent += 1000
  *                         score_player += self.number_possible_moves(board, self.player)
  */
-          __pyx_t_11 = __Pyx_GetItemInt(__pyx_v_board, __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 93, __pyx_L1_error)
+          __pyx_t_11 = __Pyx_GetItemInt(__pyx_v_board, __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 101, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_11);
-          __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_11, __pyx_v_j, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 93, __pyx_L1_error)
+          __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_11, __pyx_v_j, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 101, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_1);
           __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-          __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opponent); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 93, __pyx_L1_error)
+          __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opponent); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 101, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_11);
-          __pyx_t_9 = PyObject_RichCompare(__pyx_t_1, __pyx_t_11, Py_EQ); __Pyx_XGOTREF(__pyx_t_9); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 93, __pyx_L1_error)
+          __pyx_t_9 = PyObject_RichCompare(__pyx_t_1, __pyx_t_11, Py_EQ); __Pyx_XGOTREF(__pyx_t_9); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 101, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
           __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-          __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_9); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 93, __pyx_L1_error)
+          __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_9); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 101, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
           __pyx_t_2 = __pyx_t_12;
           __pyx_L13_bool_binop_done:;
 
-          /* "ai_minimax_alpha_beta.py":92
+          /* "ai_minimax_alpha_beta.py":100
  *                             score_player += 100
  * 
  *                         elif gameutil.checkmuhle(i, j, board, board_muhlen, self.opponent) and \             # <<<<<<<<<<<<<<
  *                                 board[i][j] == self.opponent:
- *                             score_opponent += 110
+ *                             score_opponent += 1000
  */
           if (__pyx_t_2) {
 
-            /* "ai_minimax_alpha_beta.py":94
+            /* "ai_minimax_alpha_beta.py":102
  *                         elif gameutil.checkmuhle(i, j, board, board_muhlen, self.opponent) and \
  *                                 board[i][j] == self.opponent:
- *                             score_opponent += 110             # <<<<<<<<<<<<<<
+ *                             score_opponent += 1000             # <<<<<<<<<<<<<<
  *                         score_player += self.number_possible_moves(board, self.player)
  *                         score_opponent += self.number_possible_moves(board, self.opponent)
  */
-            __pyx_t_9 = __Pyx_PyInt_AddObjC(__pyx_v_score_opponent, __pyx_int_110, 0x6E, 1, 0); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 94, __pyx_L1_error)
+            __pyx_t_9 = __Pyx_PyInt_AddObjC(__pyx_v_score_opponent, __pyx_int_1000, 0x3E8, 1, 0); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 102, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_9);
             __Pyx_DECREF_SET(__pyx_v_score_opponent, __pyx_t_9);
             __pyx_t_9 = 0;
 
-            /* "ai_minimax_alpha_beta.py":92
+            /* "ai_minimax_alpha_beta.py":100
  *                             score_player += 100
  * 
  *                         elif gameutil.checkmuhle(i, j, board, board_muhlen, self.opponent) and \             # <<<<<<<<<<<<<<
  *                                 board[i][j] == self.opponent:
- *                             score_opponent += 110
+ *                             score_opponent += 1000
  */
           }
           __pyx_L10:;
 
-          /* "ai_minimax_alpha_beta.py":95
+          /* "ai_minimax_alpha_beta.py":103
  *                                 board[i][j] == self.opponent:
- *                             score_opponent += 110
+ *                             score_opponent += 1000
  *                         score_player += self.number_possible_moves(board, self.player)             # <<<<<<<<<<<<<<
  *                         score_opponent += self.number_possible_moves(board, self.opponent)
  *                 score = score_player - score_opponent
  */
-          __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_number_possible_moves); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 95, __pyx_L1_error)
+          __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_number_possible_moves); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 103, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_11);
-          __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_player); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 95, __pyx_L1_error)
+          __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_player); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 103, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_1);
           __pyx_t_7 = NULL;
           __pyx_t_10 = 0;
@@ -3825,7 +3983,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
           #if CYTHON_FAST_PYCALL
           if (PyFunction_Check(__pyx_t_11)) {
             PyObject *__pyx_temp[3] = {__pyx_t_7, __pyx_v_board, __pyx_t_1};
-            __pyx_t_9 = __Pyx_PyFunction_FastCall(__pyx_t_11, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 95, __pyx_L1_error)
+            __pyx_t_9 = __Pyx_PyFunction_FastCall(__pyx_t_11, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 103, __pyx_L1_error)
             __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
             __Pyx_GOTREF(__pyx_t_9);
             __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -3834,14 +3992,14 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
           #if CYTHON_FAST_PYCCALL
           if (__Pyx_PyFastCFunction_Check(__pyx_t_11)) {
             PyObject *__pyx_temp[3] = {__pyx_t_7, __pyx_v_board, __pyx_t_1};
-            __pyx_t_9 = __Pyx_PyCFunction_FastCall(__pyx_t_11, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 95, __pyx_L1_error)
+            __pyx_t_9 = __Pyx_PyCFunction_FastCall(__pyx_t_11, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 103, __pyx_L1_error)
             __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
             __Pyx_GOTREF(__pyx_t_9);
             __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
           } else
           #endif
           {
-            __pyx_t_8 = PyTuple_New(2+__pyx_t_10); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 95, __pyx_L1_error)
+            __pyx_t_8 = PyTuple_New(2+__pyx_t_10); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 103, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_8);
             if (__pyx_t_7) {
               __Pyx_GIVEREF(__pyx_t_7); PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_7); __pyx_t_7 = NULL;
@@ -3852,27 +4010,27 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
             __Pyx_GIVEREF(__pyx_t_1);
             PyTuple_SET_ITEM(__pyx_t_8, 1+__pyx_t_10, __pyx_t_1);
             __pyx_t_1 = 0;
-            __pyx_t_9 = __Pyx_PyObject_Call(__pyx_t_11, __pyx_t_8, NULL); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 95, __pyx_L1_error)
+            __pyx_t_9 = __Pyx_PyObject_Call(__pyx_t_11, __pyx_t_8, NULL); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 103, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_9);
             __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
           }
           __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-          __pyx_t_11 = PyNumber_InPlaceAdd(__pyx_v_score_player, __pyx_t_9); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 95, __pyx_L1_error)
+          __pyx_t_11 = PyNumber_InPlaceAdd(__pyx_v_score_player, __pyx_t_9); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 103, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_11);
           __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
           __Pyx_DECREF_SET(__pyx_v_score_player, __pyx_t_11);
           __pyx_t_11 = 0;
 
-          /* "ai_minimax_alpha_beta.py":96
- *                             score_opponent += 110
+          /* "ai_minimax_alpha_beta.py":104
+ *                             score_opponent += 1000
  *                         score_player += self.number_possible_moves(board, self.player)
  *                         score_opponent += self.number_possible_moves(board, self.opponent)             # <<<<<<<<<<<<<<
  *                 score = score_player - score_opponent
  *                 return score
  */
-          __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_number_possible_moves); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 96, __pyx_L1_error)
+          __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_number_possible_moves); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 104, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_9);
-          __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opponent); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 96, __pyx_L1_error)
+          __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opponent); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 104, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_8);
           __pyx_t_1 = NULL;
           __pyx_t_10 = 0;
@@ -3889,7 +4047,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
           #if CYTHON_FAST_PYCALL
           if (PyFunction_Check(__pyx_t_9)) {
             PyObject *__pyx_temp[3] = {__pyx_t_1, __pyx_v_board, __pyx_t_8};
-            __pyx_t_11 = __Pyx_PyFunction_FastCall(__pyx_t_9, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 96, __pyx_L1_error)
+            __pyx_t_11 = __Pyx_PyFunction_FastCall(__pyx_t_9, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 104, __pyx_L1_error)
             __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
             __Pyx_GOTREF(__pyx_t_11);
             __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
@@ -3898,14 +4056,14 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
           #if CYTHON_FAST_PYCCALL
           if (__Pyx_PyFastCFunction_Check(__pyx_t_9)) {
             PyObject *__pyx_temp[3] = {__pyx_t_1, __pyx_v_board, __pyx_t_8};
-            __pyx_t_11 = __Pyx_PyCFunction_FastCall(__pyx_t_9, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 96, __pyx_L1_error)
+            __pyx_t_11 = __Pyx_PyCFunction_FastCall(__pyx_t_9, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 104, __pyx_L1_error)
             __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
             __Pyx_GOTREF(__pyx_t_11);
             __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
           } else
           #endif
           {
-            __pyx_t_7 = PyTuple_New(2+__pyx_t_10); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 96, __pyx_L1_error)
+            __pyx_t_7 = PyTuple_New(2+__pyx_t_10); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 104, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_7);
             if (__pyx_t_1) {
               __Pyx_GIVEREF(__pyx_t_1); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_1); __pyx_t_1 = NULL;
@@ -3916,12 +4074,12 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
             __Pyx_GIVEREF(__pyx_t_8);
             PyTuple_SET_ITEM(__pyx_t_7, 1+__pyx_t_10, __pyx_t_8);
             __pyx_t_8 = 0;
-            __pyx_t_11 = __Pyx_PyObject_Call(__pyx_t_9, __pyx_t_7, NULL); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 96, __pyx_L1_error)
+            __pyx_t_11 = __Pyx_PyObject_Call(__pyx_t_9, __pyx_t_7, NULL); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 104, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_11);
             __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
           }
           __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-          __pyx_t_9 = PyNumber_InPlaceAdd(__pyx_v_score_opponent, __pyx_t_11); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 96, __pyx_L1_error)
+          __pyx_t_9 = PyNumber_InPlaceAdd(__pyx_v_score_opponent, __pyx_t_11); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 104, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_9);
           __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
           __Pyx_DECREF_SET(__pyx_v_score_opponent, __pyx_t_9);
@@ -3929,19 +4087,19 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
         }
       }
 
-      /* "ai_minimax_alpha_beta.py":97
+      /* "ai_minimax_alpha_beta.py":105
  *                         score_player += self.number_possible_moves(board, self.player)
  *                         score_opponent += self.number_possible_moves(board, self.opponent)
  *                 score = score_player - score_opponent             # <<<<<<<<<<<<<<
  *                 return score
  * 
  */
-      __pyx_t_9 = PyNumber_Subtract(__pyx_v_score_player, __pyx_v_score_opponent); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 97, __pyx_L1_error)
+      __pyx_t_9 = PyNumber_Subtract(__pyx_v_score_player, __pyx_v_score_opponent); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 105, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __pyx_v_score = __pyx_t_9;
       __pyx_t_9 = 0;
 
-      /* "ai_minimax_alpha_beta.py":98
+      /* "ai_minimax_alpha_beta.py":106
  *                         score_opponent += self.number_possible_moves(board, self.opponent)
  *                 score = score_player - score_opponent
  *                 return score             # <<<<<<<<<<<<<<
@@ -3953,7 +4111,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
       __pyx_r = __pyx_v_score;
       goto __pyx_L0;
 
-      /* "ai_minimax_alpha_beta.py":78
+      /* "ai_minimax_alpha_beta.py":86
  *         if depth <= 1:
  *             # Static evaluation for gamemode 1
  *             if remaining_set >= 1:             # <<<<<<<<<<<<<<
@@ -3962,7 +4120,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
  */
     }
 
-    /* "ai_minimax_alpha_beta.py":102
+    /* "ai_minimax_alpha_beta.py":110
  *             # Static evaluation for gamemode 2
  *             else:
  *                 score_player = 0             # <<<<<<<<<<<<<<
@@ -3973,7 +4131,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
       __Pyx_INCREF(__pyx_int_0);
       __pyx_v_score_player = __pyx_int_0;
 
-      /* "ai_minimax_alpha_beta.py":103
+      /* "ai_minimax_alpha_beta.py":111
  *             else:
  *                 score_player = 0
  *                 score_opponent = 0             # <<<<<<<<<<<<<<
@@ -3983,7 +4141,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
       __Pyx_INCREF(__pyx_int_0);
       __pyx_v_score_opponent = __pyx_int_0;
 
-      /* "ai_minimax_alpha_beta.py":104
+      /* "ai_minimax_alpha_beta.py":112
  *                 score_player = 0
  *                 score_opponent = 0
  *                 for i in range(3):             # <<<<<<<<<<<<<<
@@ -3993,7 +4151,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
       for (__pyx_t_3 = 0; __pyx_t_3 < 3; __pyx_t_3+=1) {
         __pyx_v_i = __pyx_t_3;
 
-        /* "ai_minimax_alpha_beta.py":105
+        /* "ai_minimax_alpha_beta.py":113
  *                 score_opponent = 0
  *                 for i in range(3):
  *                     for j in range(8):             # <<<<<<<<<<<<<<
@@ -4003,51 +4161,51 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
         for (__pyx_t_4 = 0; __pyx_t_4 < 8; __pyx_t_4+=1) {
           __pyx_v_j = __pyx_t_4;
 
-          /* "ai_minimax_alpha_beta.py":106
+          /* "ai_minimax_alpha_beta.py":114
  *                 for i in range(3):
  *                     for j in range(8):
  *                         if board[i][j] == self.player:             # <<<<<<<<<<<<<<
  *                             score_player += 1
  *                             if not self.possiblemoves(i, j, board):
  */
-          __pyx_t_9 = __Pyx_GetItemInt(__pyx_v_board, __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 106, __pyx_L1_error)
+          __pyx_t_9 = __Pyx_GetItemInt(__pyx_v_board, __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 114, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_9);
-          __pyx_t_11 = __Pyx_GetItemInt(__pyx_t_9, __pyx_v_j, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 106, __pyx_L1_error)
+          __pyx_t_11 = __Pyx_GetItemInt(__pyx_t_9, __pyx_v_j, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 114, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_11);
           __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-          __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_player); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 106, __pyx_L1_error)
+          __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_player); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 114, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_9);
-          __pyx_t_7 = PyObject_RichCompare(__pyx_t_11, __pyx_t_9, Py_EQ); __Pyx_XGOTREF(__pyx_t_7); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 106, __pyx_L1_error)
+          __pyx_t_7 = PyObject_RichCompare(__pyx_t_11, __pyx_t_9, Py_EQ); __Pyx_XGOTREF(__pyx_t_7); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 114, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
           __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-          __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 106, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 114, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
           if (__pyx_t_2) {
 
-            /* "ai_minimax_alpha_beta.py":107
+            /* "ai_minimax_alpha_beta.py":115
  *                     for j in range(8):
  *                         if board[i][j] == self.player:
  *                             score_player += 1             # <<<<<<<<<<<<<<
  *                             if not self.possiblemoves(i, j, board):
  *                                 score_opponent += 5
  */
-            __pyx_t_7 = __Pyx_PyInt_AddObjC(__pyx_v_score_player, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 107, __pyx_L1_error)
+            __pyx_t_7 = __Pyx_PyInt_AddObjC(__pyx_v_score_player, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 115, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_7);
             __Pyx_DECREF_SET(__pyx_v_score_player, __pyx_t_7);
             __pyx_t_7 = 0;
 
-            /* "ai_minimax_alpha_beta.py":108
+            /* "ai_minimax_alpha_beta.py":116
  *                         if board[i][j] == self.player:
  *                             score_player += 1
  *                             if not self.possiblemoves(i, j, board):             # <<<<<<<<<<<<<<
  *                                 score_opponent += 5
  *                         elif board[i][j] == self.opponent:
  */
-            __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_possiblemoves); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 108, __pyx_L1_error)
+            __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_possiblemoves); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 116, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_9);
-            __pyx_t_11 = __Pyx_PyInt_From_long(__pyx_v_i); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 108, __pyx_L1_error)
+            __pyx_t_11 = __Pyx_PyInt_From_long(__pyx_v_i); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 116, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_11);
-            __pyx_t_8 = __Pyx_PyInt_From_long(__pyx_v_j); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 108, __pyx_L1_error)
+            __pyx_t_8 = __Pyx_PyInt_From_long(__pyx_v_j); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 116, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_8);
             __pyx_t_1 = NULL;
             __pyx_t_10 = 0;
@@ -4064,7 +4222,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
             #if CYTHON_FAST_PYCALL
             if (PyFunction_Check(__pyx_t_9)) {
               PyObject *__pyx_temp[4] = {__pyx_t_1, __pyx_t_11, __pyx_t_8, __pyx_v_board};
-              __pyx_t_7 = __Pyx_PyFunction_FastCall(__pyx_t_9, __pyx_temp+1-__pyx_t_10, 3+__pyx_t_10); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 108, __pyx_L1_error)
+              __pyx_t_7 = __Pyx_PyFunction_FastCall(__pyx_t_9, __pyx_temp+1-__pyx_t_10, 3+__pyx_t_10); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 116, __pyx_L1_error)
               __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
               __Pyx_GOTREF(__pyx_t_7);
               __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
@@ -4074,7 +4232,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
             #if CYTHON_FAST_PYCCALL
             if (__Pyx_PyFastCFunction_Check(__pyx_t_9)) {
               PyObject *__pyx_temp[4] = {__pyx_t_1, __pyx_t_11, __pyx_t_8, __pyx_v_board};
-              __pyx_t_7 = __Pyx_PyCFunction_FastCall(__pyx_t_9, __pyx_temp+1-__pyx_t_10, 3+__pyx_t_10); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 108, __pyx_L1_error)
+              __pyx_t_7 = __Pyx_PyCFunction_FastCall(__pyx_t_9, __pyx_temp+1-__pyx_t_10, 3+__pyx_t_10); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 116, __pyx_L1_error)
               __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
               __Pyx_GOTREF(__pyx_t_7);
               __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
@@ -4082,7 +4240,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
             } else
             #endif
             {
-              __pyx_t_5 = PyTuple_New(3+__pyx_t_10); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 108, __pyx_L1_error)
+              __pyx_t_5 = PyTuple_New(3+__pyx_t_10); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 116, __pyx_L1_error)
               __Pyx_GOTREF(__pyx_t_5);
               if (__pyx_t_1) {
                 __Pyx_GIVEREF(__pyx_t_1); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_1); __pyx_t_1 = NULL;
@@ -4096,29 +4254,29 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
               PyTuple_SET_ITEM(__pyx_t_5, 2+__pyx_t_10, __pyx_v_board);
               __pyx_t_11 = 0;
               __pyx_t_8 = 0;
-              __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_9, __pyx_t_5, NULL); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 108, __pyx_L1_error)
+              __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_9, __pyx_t_5, NULL); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 116, __pyx_L1_error)
               __Pyx_GOTREF(__pyx_t_7);
               __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
             }
             __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-            __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 108, __pyx_L1_error)
+            __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 116, __pyx_L1_error)
             __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
             __pyx_t_12 = ((!__pyx_t_2) != 0);
             if (__pyx_t_12) {
 
-              /* "ai_minimax_alpha_beta.py":109
+              /* "ai_minimax_alpha_beta.py":117
  *                             score_player += 1
  *                             if not self.possiblemoves(i, j, board):
  *                                 score_opponent += 5             # <<<<<<<<<<<<<<
  *                         elif board[i][j] == self.opponent:
  *                             score_opponent += 1
  */
-              __pyx_t_7 = __Pyx_PyInt_AddObjC(__pyx_v_score_opponent, __pyx_int_5, 5, 1, 0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 109, __pyx_L1_error)
+              __pyx_t_7 = __Pyx_PyInt_AddObjC(__pyx_v_score_opponent, __pyx_int_5, 5, 1, 0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 117, __pyx_L1_error)
               __Pyx_GOTREF(__pyx_t_7);
               __Pyx_DECREF_SET(__pyx_v_score_opponent, __pyx_t_7);
               __pyx_t_7 = 0;
 
-              /* "ai_minimax_alpha_beta.py":108
+              /* "ai_minimax_alpha_beta.py":116
  *                         if board[i][j] == self.player:
  *                             score_player += 1
  *                             if not self.possiblemoves(i, j, board):             # <<<<<<<<<<<<<<
@@ -4127,7 +4285,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
  */
             }
 
-            /* "ai_minimax_alpha_beta.py":106
+            /* "ai_minimax_alpha_beta.py":114
  *                 for i in range(3):
  *                     for j in range(8):
  *                         if board[i][j] == self.player:             # <<<<<<<<<<<<<<
@@ -4137,51 +4295,51 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
             goto __pyx_L19;
           }
 
-          /* "ai_minimax_alpha_beta.py":110
+          /* "ai_minimax_alpha_beta.py":118
  *                             if not self.possiblemoves(i, j, board):
  *                                 score_opponent += 5
  *                         elif board[i][j] == self.opponent:             # <<<<<<<<<<<<<<
  *                             score_opponent += 1
  *                             if not self.possiblemoves(i, j, board):
  */
-          __pyx_t_7 = __Pyx_GetItemInt(__pyx_v_board, __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 110, __pyx_L1_error)
+          __pyx_t_7 = __Pyx_GetItemInt(__pyx_v_board, __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 118, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_7);
-          __pyx_t_9 = __Pyx_GetItemInt(__pyx_t_7, __pyx_v_j, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 110, __pyx_L1_error)
+          __pyx_t_9 = __Pyx_GetItemInt(__pyx_t_7, __pyx_v_j, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 118, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_9);
           __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-          __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opponent); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 110, __pyx_L1_error)
+          __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opponent); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 118, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_7);
-          __pyx_t_5 = PyObject_RichCompare(__pyx_t_9, __pyx_t_7, Py_EQ); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 110, __pyx_L1_error)
+          __pyx_t_5 = PyObject_RichCompare(__pyx_t_9, __pyx_t_7, Py_EQ); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 118, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
           __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-          __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 110, __pyx_L1_error)
+          __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 118, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
           if (__pyx_t_12) {
 
-            /* "ai_minimax_alpha_beta.py":111
+            /* "ai_minimax_alpha_beta.py":119
  *                                 score_opponent += 5
  *                         elif board[i][j] == self.opponent:
  *                             score_opponent += 1             # <<<<<<<<<<<<<<
  *                             if not self.possiblemoves(i, j, board):
  *                                 score_player += 5
  */
-            __pyx_t_5 = __Pyx_PyInt_AddObjC(__pyx_v_score_opponent, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 111, __pyx_L1_error)
+            __pyx_t_5 = __Pyx_PyInt_AddObjC(__pyx_v_score_opponent, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 119, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_5);
             __Pyx_DECREF_SET(__pyx_v_score_opponent, __pyx_t_5);
             __pyx_t_5 = 0;
 
-            /* "ai_minimax_alpha_beta.py":112
+            /* "ai_minimax_alpha_beta.py":120
  *                         elif board[i][j] == self.opponent:
  *                             score_opponent += 1
  *                             if not self.possiblemoves(i, j, board):             # <<<<<<<<<<<<<<
  *                                 score_player += 5
  * 
  */
-            __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_possiblemoves); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 112, __pyx_L1_error)
+            __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_possiblemoves); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 120, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_7);
-            __pyx_t_9 = __Pyx_PyInt_From_long(__pyx_v_i); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 112, __pyx_L1_error)
+            __pyx_t_9 = __Pyx_PyInt_From_long(__pyx_v_i); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 120, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_9);
-            __pyx_t_8 = __Pyx_PyInt_From_long(__pyx_v_j); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 112, __pyx_L1_error)
+            __pyx_t_8 = __Pyx_PyInt_From_long(__pyx_v_j); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 120, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_8);
             __pyx_t_11 = NULL;
             __pyx_t_10 = 0;
@@ -4198,7 +4356,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
             #if CYTHON_FAST_PYCALL
             if (PyFunction_Check(__pyx_t_7)) {
               PyObject *__pyx_temp[4] = {__pyx_t_11, __pyx_t_9, __pyx_t_8, __pyx_v_board};
-              __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_10, 3+__pyx_t_10); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 112, __pyx_L1_error)
+              __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_10, 3+__pyx_t_10); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 120, __pyx_L1_error)
               __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
               __Pyx_GOTREF(__pyx_t_5);
               __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
@@ -4208,7 +4366,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
             #if CYTHON_FAST_PYCCALL
             if (__Pyx_PyFastCFunction_Check(__pyx_t_7)) {
               PyObject *__pyx_temp[4] = {__pyx_t_11, __pyx_t_9, __pyx_t_8, __pyx_v_board};
-              __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_10, 3+__pyx_t_10); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 112, __pyx_L1_error)
+              __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_10, 3+__pyx_t_10); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 120, __pyx_L1_error)
               __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
               __Pyx_GOTREF(__pyx_t_5);
               __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
@@ -4216,7 +4374,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
             } else
             #endif
             {
-              __pyx_t_1 = PyTuple_New(3+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 112, __pyx_L1_error)
+              __pyx_t_1 = PyTuple_New(3+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 120, __pyx_L1_error)
               __Pyx_GOTREF(__pyx_t_1);
               if (__pyx_t_11) {
                 __Pyx_GIVEREF(__pyx_t_11); PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_11); __pyx_t_11 = NULL;
@@ -4230,29 +4388,29 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
               PyTuple_SET_ITEM(__pyx_t_1, 2+__pyx_t_10, __pyx_v_board);
               __pyx_t_9 = 0;
               __pyx_t_8 = 0;
-              __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_1, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 112, __pyx_L1_error)
+              __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_1, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 120, __pyx_L1_error)
               __Pyx_GOTREF(__pyx_t_5);
               __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
             }
             __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-            __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 112, __pyx_L1_error)
+            __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 120, __pyx_L1_error)
             __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
             __pyx_t_2 = ((!__pyx_t_12) != 0);
             if (__pyx_t_2) {
 
-              /* "ai_minimax_alpha_beta.py":113
+              /* "ai_minimax_alpha_beta.py":121
  *                             score_opponent += 1
  *                             if not self.possiblemoves(i, j, board):
  *                                 score_player += 5             # <<<<<<<<<<<<<<
  * 
  *                         if gameutil.checkmuhle(i, j, board, board_muhlen, self.player) and \
  */
-              __pyx_t_5 = __Pyx_PyInt_AddObjC(__pyx_v_score_player, __pyx_int_5, 5, 1, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 113, __pyx_L1_error)
+              __pyx_t_5 = __Pyx_PyInt_AddObjC(__pyx_v_score_player, __pyx_int_5, 5, 1, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 121, __pyx_L1_error)
               __Pyx_GOTREF(__pyx_t_5);
               __Pyx_DECREF_SET(__pyx_v_score_player, __pyx_t_5);
               __pyx_t_5 = 0;
 
-              /* "ai_minimax_alpha_beta.py":112
+              /* "ai_minimax_alpha_beta.py":120
  *                         elif board[i][j] == self.opponent:
  *                             score_opponent += 1
  *                             if not self.possiblemoves(i, j, board):             # <<<<<<<<<<<<<<
@@ -4261,7 +4419,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
  */
             }
 
-            /* "ai_minimax_alpha_beta.py":110
+            /* "ai_minimax_alpha_beta.py":118
  *                             if not self.possiblemoves(i, j, board):
  *                                 score_opponent += 5
  *                         elif board[i][j] == self.opponent:             # <<<<<<<<<<<<<<
@@ -4271,23 +4429,23 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
           }
           __pyx_L19:;
 
-          /* "ai_minimax_alpha_beta.py":115
+          /* "ai_minimax_alpha_beta.py":123
  *                                 score_player += 5
  * 
  *                         if gameutil.checkmuhle(i, j, board, board_muhlen, self.player) and \             # <<<<<<<<<<<<<<
  *                                 board[i][j] == self.player:
  *                             score_player += 10
  */
-          __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_gameutil); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 115, __pyx_L1_error)
+          __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_gameutil); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 123, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_7);
-          __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_checkmuhle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 115, __pyx_L1_error)
+          __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_checkmuhle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 123, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_1);
           __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-          __pyx_t_7 = __Pyx_PyInt_From_long(__pyx_v_i); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 115, __pyx_L1_error)
+          __pyx_t_7 = __Pyx_PyInt_From_long(__pyx_v_i); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 123, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_7);
-          __pyx_t_8 = __Pyx_PyInt_From_long(__pyx_v_j); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 115, __pyx_L1_error)
+          __pyx_t_8 = __Pyx_PyInt_From_long(__pyx_v_j); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 123, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_8);
-          __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_player); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 115, __pyx_L1_error)
+          __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_player); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 123, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_9);
           __pyx_t_11 = NULL;
           __pyx_t_10 = 0;
@@ -4304,7 +4462,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
           #if CYTHON_FAST_PYCALL
           if (PyFunction_Check(__pyx_t_1)) {
             PyObject *__pyx_temp[6] = {__pyx_t_11, __pyx_t_7, __pyx_t_8, __pyx_v_board, __pyx_v_board_muhlen, __pyx_t_9};
-            __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_10, 5+__pyx_t_10); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 115, __pyx_L1_error)
+            __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_10, 5+__pyx_t_10); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 123, __pyx_L1_error)
             __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
             __Pyx_GOTREF(__pyx_t_5);
             __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
@@ -4315,7 +4473,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
           #if CYTHON_FAST_PYCCALL
           if (__Pyx_PyFastCFunction_Check(__pyx_t_1)) {
             PyObject *__pyx_temp[6] = {__pyx_t_11, __pyx_t_7, __pyx_t_8, __pyx_v_board, __pyx_v_board_muhlen, __pyx_t_9};
-            __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_10, 5+__pyx_t_10); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 115, __pyx_L1_error)
+            __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_10, 5+__pyx_t_10); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 123, __pyx_L1_error)
             __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
             __Pyx_GOTREF(__pyx_t_5);
             __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
@@ -4324,7 +4482,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
           } else
           #endif
           {
-            __pyx_t_6 = PyTuple_New(5+__pyx_t_10); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 115, __pyx_L1_error)
+            __pyx_t_6 = PyTuple_New(5+__pyx_t_10); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 123, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_6);
             if (__pyx_t_11) {
               __Pyx_GIVEREF(__pyx_t_11); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_11); __pyx_t_11 = NULL;
@@ -4344,12 +4502,12 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
             __pyx_t_7 = 0;
             __pyx_t_8 = 0;
             __pyx_t_9 = 0;
-            __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_6, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 115, __pyx_L1_error)
+            __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_6, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 123, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_5);
             __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
           }
           __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-          __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 115, __pyx_L1_error)
+          __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 123, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
           if (__pyx_t_12) {
           } else {
@@ -4357,29 +4515,29 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
             goto __pyx_L23_bool_binop_done;
           }
 
-          /* "ai_minimax_alpha_beta.py":116
+          /* "ai_minimax_alpha_beta.py":124
  * 
  *                         if gameutil.checkmuhle(i, j, board, board_muhlen, self.player) and \
  *                                 board[i][j] == self.player:             # <<<<<<<<<<<<<<
  *                             score_player += 10
  *                         elif gameutil.checkmuhle(i, j, board, board_muhlen, self.opponent) and \
  */
-          __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_board, __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 116, __pyx_L1_error)
+          __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_board, __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 124, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_5);
-          __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_5, __pyx_v_j, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 116, __pyx_L1_error)
+          __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_5, __pyx_v_j, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 124, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_1);
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-          __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_player); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 116, __pyx_L1_error)
+          __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_player); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 124, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_5);
-          __pyx_t_6 = PyObject_RichCompare(__pyx_t_1, __pyx_t_5, Py_EQ); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 116, __pyx_L1_error)
+          __pyx_t_6 = PyObject_RichCompare(__pyx_t_1, __pyx_t_5, Py_EQ); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 124, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-          __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 116, __pyx_L1_error)
+          __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 124, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
           __pyx_t_2 = __pyx_t_12;
           __pyx_L23_bool_binop_done:;
 
-          /* "ai_minimax_alpha_beta.py":115
+          /* "ai_minimax_alpha_beta.py":123
  *                                 score_player += 5
  * 
  *                         if gameutil.checkmuhle(i, j, board, board_muhlen, self.player) and \             # <<<<<<<<<<<<<<
@@ -4388,19 +4546,19 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
  */
           if (__pyx_t_2) {
 
-            /* "ai_minimax_alpha_beta.py":117
+            /* "ai_minimax_alpha_beta.py":125
  *                         if gameutil.checkmuhle(i, j, board, board_muhlen, self.player) and \
  *                                 board[i][j] == self.player:
  *                             score_player += 10             # <<<<<<<<<<<<<<
  *                         elif gameutil.checkmuhle(i, j, board, board_muhlen, self.opponent) and \
  *                                 board[i][j] == self.opponent:
  */
-            __pyx_t_6 = __Pyx_PyInt_AddObjC(__pyx_v_score_player, __pyx_int_10, 10, 1, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 117, __pyx_L1_error)
+            __pyx_t_6 = __Pyx_PyInt_AddObjC(__pyx_v_score_player, __pyx_int_10, 10, 1, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 125, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_6);
             __Pyx_DECREF_SET(__pyx_v_score_player, __pyx_t_6);
             __pyx_t_6 = 0;
 
-            /* "ai_minimax_alpha_beta.py":115
+            /* "ai_minimax_alpha_beta.py":123
  *                                 score_player += 5
  * 
  *                         if gameutil.checkmuhle(i, j, board, board_muhlen, self.player) and \             # <<<<<<<<<<<<<<
@@ -4410,23 +4568,23 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
             goto __pyx_L22;
           }
 
-          /* "ai_minimax_alpha_beta.py":118
+          /* "ai_minimax_alpha_beta.py":126
  *                                 board[i][j] == self.player:
  *                             score_player += 10
  *                         elif gameutil.checkmuhle(i, j, board, board_muhlen, self.opponent) and \             # <<<<<<<<<<<<<<
  *                                 board[i][j] == self.opponent:
  *                             score_opponent += 100
  */
-          __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_gameutil); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 118, __pyx_L1_error)
+          __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_gameutil); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 126, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_5);
-          __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_checkmuhle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 118, __pyx_L1_error)
+          __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_checkmuhle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 126, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_1);
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-          __pyx_t_5 = __Pyx_PyInt_From_long(__pyx_v_i); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 118, __pyx_L1_error)
+          __pyx_t_5 = __Pyx_PyInt_From_long(__pyx_v_i); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 126, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_5);
-          __pyx_t_9 = __Pyx_PyInt_From_long(__pyx_v_j); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 118, __pyx_L1_error)
+          __pyx_t_9 = __Pyx_PyInt_From_long(__pyx_v_j); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 126, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_9);
-          __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opponent); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 118, __pyx_L1_error)
+          __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opponent); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 126, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_8);
           __pyx_t_7 = NULL;
           __pyx_t_10 = 0;
@@ -4443,7 +4601,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
           #if CYTHON_FAST_PYCALL
           if (PyFunction_Check(__pyx_t_1)) {
             PyObject *__pyx_temp[6] = {__pyx_t_7, __pyx_t_5, __pyx_t_9, __pyx_v_board, __pyx_v_board_muhlen, __pyx_t_8};
-            __pyx_t_6 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_10, 5+__pyx_t_10); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 118, __pyx_L1_error)
+            __pyx_t_6 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_10, 5+__pyx_t_10); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 126, __pyx_L1_error)
             __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
             __Pyx_GOTREF(__pyx_t_6);
             __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
@@ -4454,7 +4612,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
           #if CYTHON_FAST_PYCCALL
           if (__Pyx_PyFastCFunction_Check(__pyx_t_1)) {
             PyObject *__pyx_temp[6] = {__pyx_t_7, __pyx_t_5, __pyx_t_9, __pyx_v_board, __pyx_v_board_muhlen, __pyx_t_8};
-            __pyx_t_6 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_10, 5+__pyx_t_10); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 118, __pyx_L1_error)
+            __pyx_t_6 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_10, 5+__pyx_t_10); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 126, __pyx_L1_error)
             __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
             __Pyx_GOTREF(__pyx_t_6);
             __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
@@ -4463,7 +4621,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
           } else
           #endif
           {
-            __pyx_t_11 = PyTuple_New(5+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 118, __pyx_L1_error)
+            __pyx_t_11 = PyTuple_New(5+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 126, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_11);
             if (__pyx_t_7) {
               __Pyx_GIVEREF(__pyx_t_7); PyTuple_SET_ITEM(__pyx_t_11, 0, __pyx_t_7); __pyx_t_7 = NULL;
@@ -4483,12 +4641,12 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
             __pyx_t_5 = 0;
             __pyx_t_9 = 0;
             __pyx_t_8 = 0;
-            __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_11, NULL); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 118, __pyx_L1_error)
+            __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_11, NULL); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 126, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_6);
             __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
           }
           __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-          __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 118, __pyx_L1_error)
+          __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 126, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
           if (__pyx_t_12) {
           } else {
@@ -4496,29 +4654,29 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
             goto __pyx_L25_bool_binop_done;
           }
 
-          /* "ai_minimax_alpha_beta.py":119
+          /* "ai_minimax_alpha_beta.py":127
  *                             score_player += 10
  *                         elif gameutil.checkmuhle(i, j, board, board_muhlen, self.opponent) and \
  *                                 board[i][j] == self.opponent:             # <<<<<<<<<<<<<<
  *                             score_opponent += 100
  *                 return score_player - score_opponent
  */
-          __pyx_t_6 = __Pyx_GetItemInt(__pyx_v_board, __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 119, __pyx_L1_error)
+          __pyx_t_6 = __Pyx_GetItemInt(__pyx_v_board, __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 127, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_6);
-          __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_6, __pyx_v_j, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 119, __pyx_L1_error)
+          __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_6, __pyx_v_j, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 127, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_1);
           __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-          __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opponent); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 119, __pyx_L1_error)
+          __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opponent); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 127, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_6);
-          __pyx_t_11 = PyObject_RichCompare(__pyx_t_1, __pyx_t_6, Py_EQ); __Pyx_XGOTREF(__pyx_t_11); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 119, __pyx_L1_error)
+          __pyx_t_11 = PyObject_RichCompare(__pyx_t_1, __pyx_t_6, Py_EQ); __Pyx_XGOTREF(__pyx_t_11); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 127, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
           __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-          __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_11); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 119, __pyx_L1_error)
+          __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_11); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 127, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
           __pyx_t_2 = __pyx_t_12;
           __pyx_L25_bool_binop_done:;
 
-          /* "ai_minimax_alpha_beta.py":118
+          /* "ai_minimax_alpha_beta.py":126
  *                                 board[i][j] == self.player:
  *                             score_player += 10
  *                         elif gameutil.checkmuhle(i, j, board, board_muhlen, self.opponent) and \             # <<<<<<<<<<<<<<
@@ -4527,19 +4685,19 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
  */
           if (__pyx_t_2) {
 
-            /* "ai_minimax_alpha_beta.py":120
+            /* "ai_minimax_alpha_beta.py":128
  *                         elif gameutil.checkmuhle(i, j, board, board_muhlen, self.opponent) and \
  *                                 board[i][j] == self.opponent:
  *                             score_opponent += 100             # <<<<<<<<<<<<<<
  *                 return score_player - score_opponent
  *                         # Making a mill also generates points but is checked in the minimax function, not here
  */
-            __pyx_t_11 = __Pyx_PyInt_AddObjC(__pyx_v_score_opponent, __pyx_int_100, 0x64, 1, 0); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 120, __pyx_L1_error)
+            __pyx_t_11 = __Pyx_PyInt_AddObjC(__pyx_v_score_opponent, __pyx_int_100, 0x64, 1, 0); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 128, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_11);
             __Pyx_DECREF_SET(__pyx_v_score_opponent, __pyx_t_11);
             __pyx_t_11 = 0;
 
-            /* "ai_minimax_alpha_beta.py":118
+            /* "ai_minimax_alpha_beta.py":126
  *                                 board[i][j] == self.player:
  *                             score_player += 10
  *                         elif gameutil.checkmuhle(i, j, board, board_muhlen, self.opponent) and \             # <<<<<<<<<<<<<<
@@ -4551,7 +4709,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
         }
       }
 
-      /* "ai_minimax_alpha_beta.py":121
+      /* "ai_minimax_alpha_beta.py":129
  *                                 board[i][j] == self.opponent:
  *                             score_opponent += 100
  *                 return score_player - score_opponent             # <<<<<<<<<<<<<<
@@ -4559,14 +4717,14 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
  * 
  */
       __Pyx_XDECREF(__pyx_r);
-      __pyx_t_11 = PyNumber_Subtract(__pyx_v_score_player, __pyx_v_score_opponent); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 121, __pyx_L1_error)
+      __pyx_t_11 = PyNumber_Subtract(__pyx_v_score_player, __pyx_v_score_opponent); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 129, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_11);
       __pyx_r = __pyx_t_11;
       __pyx_t_11 = 0;
       goto __pyx_L0;
     }
 
-    /* "ai_minimax_alpha_beta.py":76
+    /* "ai_minimax_alpha_beta.py":84
  *     ###
  *     def minimax(self, board, board_muhlen, player, alpha, beta, remaining_set, depth):
  *         if depth <= 1:             # <<<<<<<<<<<<<<
@@ -4575,22 +4733,22 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
  */
   }
 
-  /* "ai_minimax_alpha_beta.py":125
+  /* "ai_minimax_alpha_beta.py":133
  * 
  *         # MAX
  *         if player == self.player:             # <<<<<<<<<<<<<<
  *             best_score = alpha
  *             # Phase 1
  */
-  __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_player); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 125, __pyx_L1_error)
+  __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_player); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 133, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_11);
-  __pyx_t_6 = PyObject_RichCompare(__pyx_v_player, __pyx_t_11, Py_EQ); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 125, __pyx_L1_error)
+  __pyx_t_6 = PyObject_RichCompare(__pyx_v_player, __pyx_t_11, Py_EQ); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 133, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 125, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 133, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   if (__pyx_t_2) {
 
-    /* "ai_minimax_alpha_beta.py":126
+    /* "ai_minimax_alpha_beta.py":134
  *         # MAX
  *         if player == self.player:
  *             best_score = alpha             # <<<<<<<<<<<<<<
@@ -4600,17 +4758,17 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
     __Pyx_INCREF(__pyx_v_alpha);
     __pyx_v_best_score = __pyx_v_alpha;
 
-    /* "ai_minimax_alpha_beta.py":128
+    /* "ai_minimax_alpha_beta.py":136
  *             best_score = alpha
  *             # Phase 1
  *             if remaining_set:             # <<<<<<<<<<<<<<
  *                 for ring in range(3):
  *                     for stelle in range(8):
  */
-    __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_v_remaining_set); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 128, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_v_remaining_set); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 136, __pyx_L1_error)
     if (__pyx_t_2) {
 
-      /* "ai_minimax_alpha_beta.py":129
+      /* "ai_minimax_alpha_beta.py":137
  *             # Phase 1
  *             if remaining_set:
  *                 for ring in range(3):             # <<<<<<<<<<<<<<
@@ -4620,7 +4778,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
       for (__pyx_t_3 = 0; __pyx_t_3 < 3; __pyx_t_3+=1) {
         __pyx_v_ring = __pyx_t_3;
 
-        /* "ai_minimax_alpha_beta.py":130
+        /* "ai_minimax_alpha_beta.py":138
  *             if remaining_set:
  *                 for ring in range(3):
  *                     for stelle in range(8):             # <<<<<<<<<<<<<<
@@ -4630,35 +4788,35 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
         for (__pyx_t_4 = 0; __pyx_t_4 < 8; __pyx_t_4+=1) {
           __pyx_v_stelle = __pyx_t_4;
 
-          /* "ai_minimax_alpha_beta.py":131
+          /* "ai_minimax_alpha_beta.py":139
  *                 for ring in range(3):
  *                     for stelle in range(8):
  *                         if board[ring][stelle] == 0:             # <<<<<<<<<<<<<<
  *                             board_ = copy.deepcopy(board)
  *                             board_[ring][stelle] = player
  */
-          __pyx_t_6 = __Pyx_GetItemInt(__pyx_v_board, __pyx_v_ring, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 131, __pyx_L1_error)
+          __pyx_t_6 = __Pyx_GetItemInt(__pyx_v_board, __pyx_v_ring, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 139, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_6);
-          __pyx_t_11 = __Pyx_GetItemInt(__pyx_t_6, __pyx_v_stelle, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 131, __pyx_L1_error)
+          __pyx_t_11 = __Pyx_GetItemInt(__pyx_t_6, __pyx_v_stelle, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 139, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_11);
           __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-          __pyx_t_6 = __Pyx_PyInt_EqObjC(__pyx_t_11, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 131, __pyx_L1_error)
+          __pyx_t_6 = __Pyx_PyInt_EqObjC(__pyx_t_11, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 139, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_6);
           __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-          __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 131, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 139, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
           if (__pyx_t_2) {
 
-            /* "ai_minimax_alpha_beta.py":132
+            /* "ai_minimax_alpha_beta.py":140
  *                     for stelle in range(8):
  *                         if board[ring][stelle] == 0:
  *                             board_ = copy.deepcopy(board)             # <<<<<<<<<<<<<<
  *                             board_[ring][stelle] = player
  *                             muhlen_ = copy.deepcopy(board_muhlen)
  */
-            __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_n_s_copy); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 132, __pyx_L1_error)
+            __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_n_s_copy); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 140, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_11);
-            __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_11, __pyx_n_s_deepcopy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 132, __pyx_L1_error)
+            __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_11, __pyx_n_s_deepcopy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 140, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_1);
             __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
             __pyx_t_11 = NULL;
@@ -4673,34 +4831,34 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
             }
             __pyx_t_6 = (__pyx_t_11) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_11, __pyx_v_board) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_v_board);
             __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
-            if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 132, __pyx_L1_error)
+            if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 140, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_6);
             __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
             __Pyx_XDECREF_SET(__pyx_v_board_, __pyx_t_6);
             __pyx_t_6 = 0;
 
-            /* "ai_minimax_alpha_beta.py":133
+            /* "ai_minimax_alpha_beta.py":141
  *                         if board[ring][stelle] == 0:
  *                             board_ = copy.deepcopy(board)
  *                             board_[ring][stelle] = player             # <<<<<<<<<<<<<<
  *                             muhlen_ = copy.deepcopy(board_muhlen)
  * 
  */
-            __pyx_t_6 = __Pyx_GetItemInt(__pyx_v_board_, __pyx_v_ring, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 133, __pyx_L1_error)
+            __pyx_t_6 = __Pyx_GetItemInt(__pyx_v_board_, __pyx_v_ring, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 141, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_6);
-            if (unlikely(__Pyx_SetItemInt(__pyx_t_6, __pyx_v_stelle, __pyx_v_player, long, 1, __Pyx_PyInt_From_long, 0, 1, 1) < 0)) __PYX_ERR(0, 133, __pyx_L1_error)
+            if (unlikely(__Pyx_SetItemInt(__pyx_t_6, __pyx_v_stelle, __pyx_v_player, long, 1, __Pyx_PyInt_From_long, 0, 1, 1) < 0)) __PYX_ERR(0, 141, __pyx_L1_error)
             __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-            /* "ai_minimax_alpha_beta.py":134
+            /* "ai_minimax_alpha_beta.py":142
  *                             board_ = copy.deepcopy(board)
  *                             board_[ring][stelle] = player
  *                             muhlen_ = copy.deepcopy(board_muhlen)             # <<<<<<<<<<<<<<
  * 
- *                             if gameutil.checkmuhle(ring, stelle, board_, muhlen_, player):
+ *                             if self.checkmuhle(ring, stelle, board_, player):
  */
-            __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_copy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 134, __pyx_L1_error)
+            __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_copy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 142, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_1);
-            __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_deepcopy); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 134, __pyx_L1_error)
+            __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_deepcopy); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 142, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_11);
             __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
             __pyx_t_1 = NULL;
@@ -4715,2878 +4873,104 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
             }
             __pyx_t_6 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_11, __pyx_t_1, __pyx_v_board_muhlen) : __Pyx_PyObject_CallOneArg(__pyx_t_11, __pyx_v_board_muhlen);
             __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-            if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 134, __pyx_L1_error)
+            if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 142, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_6);
             __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
             __Pyx_XDECREF_SET(__pyx_v_muhlen_, __pyx_t_6);
             __pyx_t_6 = 0;
 
-            /* "ai_minimax_alpha_beta.py":136
+            /* "ai_minimax_alpha_beta.py":144
  *                             muhlen_ = copy.deepcopy(board_muhlen)
  * 
- *                             if gameutil.checkmuhle(ring, stelle, board_, muhlen_, player):             # <<<<<<<<<<<<<<
- *                                 for ring_ in range(3):
- *                                     for stelle_ in range(8):
+ *                             if self.checkmuhle(ring, stelle, board_, player):             # <<<<<<<<<<<<<<
+ *                                 to_remove = self.toremove(board_, 1 if player == 2 else 2)
+ *                                 if board_[to_remove[0]][to_remove[1]] == (1 if player == 2 else 2) and not muhlen_[to_remove[0]][to_remove[1]] == 0:
  */
-            __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_n_s_gameutil); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 136, __pyx_L1_error)
+            __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_checkmuhle); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 144, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_11);
-            __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_11, __pyx_n_s_checkmuhle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 136, __pyx_L1_error)
+            __pyx_t_1 = __Pyx_PyInt_From_long(__pyx_v_ring); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 144, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_1);
-            __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-            __pyx_t_11 = __Pyx_PyInt_From_long(__pyx_v_ring); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 136, __pyx_L1_error)
-            __Pyx_GOTREF(__pyx_t_11);
-            __pyx_t_8 = __Pyx_PyInt_From_long(__pyx_v_stelle); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 136, __pyx_L1_error)
+            __pyx_t_8 = __Pyx_PyInt_From_long(__pyx_v_stelle); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 144, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_8);
             __pyx_t_9 = NULL;
             __pyx_t_10 = 0;
-            if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_1))) {
-              __pyx_t_9 = PyMethod_GET_SELF(__pyx_t_1);
+            if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_11))) {
+              __pyx_t_9 = PyMethod_GET_SELF(__pyx_t_11);
               if (likely(__pyx_t_9)) {
-                PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
+                PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_11);
                 __Pyx_INCREF(__pyx_t_9);
                 __Pyx_INCREF(function);
-                __Pyx_DECREF_SET(__pyx_t_1, function);
+                __Pyx_DECREF_SET(__pyx_t_11, function);
                 __pyx_t_10 = 1;
               }
             }
             #if CYTHON_FAST_PYCALL
-            if (PyFunction_Check(__pyx_t_1)) {
-              PyObject *__pyx_temp[6] = {__pyx_t_9, __pyx_t_11, __pyx_t_8, __pyx_v_board_, __pyx_v_muhlen_, __pyx_v_player};
-              __pyx_t_6 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_10, 5+__pyx_t_10); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 136, __pyx_L1_error)
+            if (PyFunction_Check(__pyx_t_11)) {
+              PyObject *__pyx_temp[5] = {__pyx_t_9, __pyx_t_1, __pyx_t_8, __pyx_v_board_, __pyx_v_player};
+              __pyx_t_6 = __Pyx_PyFunction_FastCall(__pyx_t_11, __pyx_temp+1-__pyx_t_10, 4+__pyx_t_10); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 144, __pyx_L1_error)
               __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
               __Pyx_GOTREF(__pyx_t_6);
-              __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+              __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
               __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
             } else
             #endif
             #if CYTHON_FAST_PYCCALL
-            if (__Pyx_PyFastCFunction_Check(__pyx_t_1)) {
-              PyObject *__pyx_temp[6] = {__pyx_t_9, __pyx_t_11, __pyx_t_8, __pyx_v_board_, __pyx_v_muhlen_, __pyx_v_player};
-              __pyx_t_6 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_10, 5+__pyx_t_10); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 136, __pyx_L1_error)
+            if (__Pyx_PyFastCFunction_Check(__pyx_t_11)) {
+              PyObject *__pyx_temp[5] = {__pyx_t_9, __pyx_t_1, __pyx_t_8, __pyx_v_board_, __pyx_v_player};
+              __pyx_t_6 = __Pyx_PyCFunction_FastCall(__pyx_t_11, __pyx_temp+1-__pyx_t_10, 4+__pyx_t_10); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 144, __pyx_L1_error)
               __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
               __Pyx_GOTREF(__pyx_t_6);
-              __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+              __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
               __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
             } else
             #endif
             {
-              __pyx_t_5 = PyTuple_New(5+__pyx_t_10); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 136, __pyx_L1_error)
+              __pyx_t_5 = PyTuple_New(4+__pyx_t_10); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 144, __pyx_L1_error)
               __Pyx_GOTREF(__pyx_t_5);
               if (__pyx_t_9) {
                 __Pyx_GIVEREF(__pyx_t_9); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_9); __pyx_t_9 = NULL;
               }
-              __Pyx_GIVEREF(__pyx_t_11);
-              PyTuple_SET_ITEM(__pyx_t_5, 0+__pyx_t_10, __pyx_t_11);
+              __Pyx_GIVEREF(__pyx_t_1);
+              PyTuple_SET_ITEM(__pyx_t_5, 0+__pyx_t_10, __pyx_t_1);
               __Pyx_GIVEREF(__pyx_t_8);
               PyTuple_SET_ITEM(__pyx_t_5, 1+__pyx_t_10, __pyx_t_8);
               __Pyx_INCREF(__pyx_v_board_);
               __Pyx_GIVEREF(__pyx_v_board_);
               PyTuple_SET_ITEM(__pyx_t_5, 2+__pyx_t_10, __pyx_v_board_);
-              __Pyx_INCREF(__pyx_v_muhlen_);
-              __Pyx_GIVEREF(__pyx_v_muhlen_);
-              PyTuple_SET_ITEM(__pyx_t_5, 3+__pyx_t_10, __pyx_v_muhlen_);
               __Pyx_INCREF(__pyx_v_player);
               __Pyx_GIVEREF(__pyx_v_player);
-              PyTuple_SET_ITEM(__pyx_t_5, 4+__pyx_t_10, __pyx_v_player);
-              __pyx_t_11 = 0;
-              __pyx_t_8 = 0;
-              __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_5, NULL); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 136, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_6);
-              __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-            }
-            __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-            __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 136, __pyx_L1_error)
-            __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-            if (__pyx_t_2) {
-
-              /* "ai_minimax_alpha_beta.py":137
- * 
- *                             if gameutil.checkmuhle(ring, stelle, board_, muhlen_, player):
- *                                 for ring_ in range(3):             # <<<<<<<<<<<<<<
- *                                     for stelle_ in range(8):
- *                                         # TODO: Consider all possible men being removed
- */
-              for (__pyx_t_13 = 0; __pyx_t_13 < 3; __pyx_t_13+=1) {
-                __pyx_v_ring_ = __pyx_t_13;
-
-                /* "ai_minimax_alpha_beta.py":138
- *                             if gameutil.checkmuhle(ring, stelle, board_, muhlen_, player):
- *                                 for ring_ in range(3):
- *                                     for stelle_ in range(8):             # <<<<<<<<<<<<<<
- *                                         # TODO: Consider all possible men being removed
- *                                         # Take the first enemy man and remove it
- */
-                for (__pyx_t_14 = 0; __pyx_t_14 < 8; __pyx_t_14+=1) {
-                  __pyx_v_stelle_ = __pyx_t_14;
-
-                  /* "ai_minimax_alpha_beta.py":141
- *                                         # TODO: Consider all possible men being removed
- *                                         # Take the first enemy man and remove it
- *                                         if board_[ring_][stelle_] == (1 if player == 2 else 2) and muhlen_[ring_][stelle_] == 0:             # <<<<<<<<<<<<<<
- *                                             board_[ring_][stelle_] = 0
- *                                             # break stelle
- */
-                  __pyx_t_6 = __Pyx_GetItemInt(__pyx_v_board_, __pyx_v_ring_, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 141, __pyx_L1_error)
-                  __Pyx_GOTREF(__pyx_t_6);
-                  __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_6, __pyx_v_stelle_, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 141, __pyx_L1_error)
-                  __Pyx_GOTREF(__pyx_t_1);
-                  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-                  __pyx_t_5 = __Pyx_PyInt_EqObjC(__pyx_v_player, __pyx_int_2, 2, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 141, __pyx_L1_error)
-                  __Pyx_GOTREF(__pyx_t_5);
-                  __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 141, __pyx_L1_error)
-                  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-                  if (__pyx_t_12) {
-                    __Pyx_INCREF(__pyx_int_1);
-                    __pyx_t_6 = __pyx_int_1;
-                  } else {
-                    __Pyx_INCREF(__pyx_int_2);
-                    __pyx_t_6 = __pyx_int_2;
-                  }
-                  __pyx_t_5 = PyObject_RichCompare(__pyx_t_1, __pyx_t_6, Py_EQ); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 141, __pyx_L1_error)
-                  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-                  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-                  __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 141, __pyx_L1_error)
-                  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-                  if (__pyx_t_12) {
-                  } else {
-                    __pyx_t_2 = __pyx_t_12;
-                    goto __pyx_L40_bool_binop_done;
-                  }
-                  __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_muhlen_, __pyx_v_ring_, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 141, __pyx_L1_error)
-                  __Pyx_GOTREF(__pyx_t_5);
-                  __pyx_t_6 = __Pyx_GetItemInt(__pyx_t_5, __pyx_v_stelle_, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 141, __pyx_L1_error)
-                  __Pyx_GOTREF(__pyx_t_6);
-                  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-                  __pyx_t_5 = __Pyx_PyInt_EqObjC(__pyx_t_6, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 141, __pyx_L1_error)
-                  __Pyx_GOTREF(__pyx_t_5);
-                  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-                  __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 141, __pyx_L1_error)
-                  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-                  __pyx_t_2 = __pyx_t_12;
-                  __pyx_L40_bool_binop_done:;
-                  if (__pyx_t_2) {
-
-                    /* "ai_minimax_alpha_beta.py":142
- *                                         # Take the first enemy man and remove it
- *                                         if board_[ring_][stelle_] == (1 if player == 2 else 2) and muhlen_[ring_][stelle_] == 0:
- *                                             board_[ring_][stelle_] = 0             # <<<<<<<<<<<<<<
- *                                             # break stelle
- *                                             break
- */
-                    __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_board_, __pyx_v_ring_, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 142, __pyx_L1_error)
-                    __Pyx_GOTREF(__pyx_t_5);
-                    if (unlikely(__Pyx_SetItemInt(__pyx_t_5, __pyx_v_stelle_, __pyx_int_0, long, 1, __Pyx_PyInt_From_long, 0, 1, 1) < 0)) __PYX_ERR(0, 142, __pyx_L1_error)
-                    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-
-                    /* "ai_minimax_alpha_beta.py":144
- *                                             board_[ring_][stelle_] = 0
- *                                             # break stelle
- *                                             break             # <<<<<<<<<<<<<<
- *                                     else:
- *                                         # continue if stelle wasnt broken
- */
-                    goto __pyx_L38_break;
-
-                    /* "ai_minimax_alpha_beta.py":141
- *                                         # TODO: Consider all possible men being removed
- *                                         # Take the first enemy man and remove it
- *                                         if board_[ring_][stelle_] == (1 if player == 2 else 2) and muhlen_[ring_][stelle_] == 0:             # <<<<<<<<<<<<<<
- *                                             board_[ring_][stelle_] = 0
- *                                             # break stelle
- */
-                  }
-                }
-                /*else*/ {
-
-                  /* "ai_minimax_alpha_beta.py":147
- *                                     else:
- *                                         # continue if stelle wasnt broken
- *                                         continue             # <<<<<<<<<<<<<<
- *                                     # break ring if stelle was broken
- *                                     break
- */
-                  goto __pyx_L35_continue;
-                }
-                __pyx_L38_break:;
-
-                /* "ai_minimax_alpha_beta.py":149
- *                                         continue
- *                                     # break ring if stelle was broken
- *                                     break             # <<<<<<<<<<<<<<
- * 
- *                             evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, best_score, beta, remaining_set - 1, depth-1)
- */
-                goto __pyx_L36_break;
-                __pyx_L35_continue:;
-              }
-              __pyx_L36_break:;
-
-              /* "ai_minimax_alpha_beta.py":136
- *                             muhlen_ = copy.deepcopy(board_muhlen)
- * 
- *                             if gameutil.checkmuhle(ring, stelle, board_, muhlen_, player):             # <<<<<<<<<<<<<<
- *                                 for ring_ in range(3):
- *                                     for stelle_ in range(8):
- */
-            }
-
-            /* "ai_minimax_alpha_beta.py":151
- *                                     break
- * 
- *                             evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, best_score, beta, remaining_set - 1, depth-1)             # <<<<<<<<<<<<<<
- *                             if evaluation > best_score:
- *                                 best_score = evaluation
- */
-            __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_minimax); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 151, __pyx_L1_error)
-            __Pyx_GOTREF(__pyx_t_6);
-            __pyx_t_8 = __Pyx_PyInt_EqObjC(__pyx_v_player, __pyx_int_2, 2, 0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 151, __pyx_L1_error)
-            __Pyx_GOTREF(__pyx_t_8);
-            __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_8); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 151, __pyx_L1_error)
-            __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-            if (__pyx_t_2) {
-              __Pyx_INCREF(__pyx_int_1);
-              __pyx_t_1 = __pyx_int_1;
-            } else {
-              __Pyx_INCREF(__pyx_int_2);
-              __pyx_t_1 = __pyx_int_2;
-            }
-            __pyx_t_8 = __Pyx_PyInt_SubtractObjC(__pyx_v_remaining_set, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 151, __pyx_L1_error)
-            __Pyx_GOTREF(__pyx_t_8);
-            __pyx_t_11 = __Pyx_PyInt_SubtractObjC(__pyx_v_depth, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 151, __pyx_L1_error)
-            __Pyx_GOTREF(__pyx_t_11);
-            __pyx_t_9 = NULL;
-            __pyx_t_10 = 0;
-            if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_6))) {
-              __pyx_t_9 = PyMethod_GET_SELF(__pyx_t_6);
-              if (likely(__pyx_t_9)) {
-                PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_6);
-                __Pyx_INCREF(__pyx_t_9);
-                __Pyx_INCREF(function);
-                __Pyx_DECREF_SET(__pyx_t_6, function);
-                __pyx_t_10 = 1;
-              }
-            }
-            #if CYTHON_FAST_PYCALL
-            if (PyFunction_Check(__pyx_t_6)) {
-              PyObject *__pyx_temp[8] = {__pyx_t_9, __pyx_v_board_, __pyx_v_muhlen_, __pyx_t_1, __pyx_v_best_score, __pyx_v_beta, __pyx_t_8, __pyx_t_11};
-              __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_10, 7+__pyx_t_10); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 151, __pyx_L1_error)
-              __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
-              __Pyx_GOTREF(__pyx_t_5);
-              __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-              __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-              __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-            } else
-            #endif
-            #if CYTHON_FAST_PYCCALL
-            if (__Pyx_PyFastCFunction_Check(__pyx_t_6)) {
-              PyObject *__pyx_temp[8] = {__pyx_t_9, __pyx_v_board_, __pyx_v_muhlen_, __pyx_t_1, __pyx_v_best_score, __pyx_v_beta, __pyx_t_8, __pyx_t_11};
-              __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_10, 7+__pyx_t_10); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 151, __pyx_L1_error)
-              __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
-              __Pyx_GOTREF(__pyx_t_5);
-              __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-              __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-              __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-            } else
-            #endif
-            {
-              __pyx_t_7 = PyTuple_New(7+__pyx_t_10); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 151, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_7);
-              if (__pyx_t_9) {
-                __Pyx_GIVEREF(__pyx_t_9); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_9); __pyx_t_9 = NULL;
-              }
-              __Pyx_INCREF(__pyx_v_board_);
-              __Pyx_GIVEREF(__pyx_v_board_);
-              PyTuple_SET_ITEM(__pyx_t_7, 0+__pyx_t_10, __pyx_v_board_);
-              __Pyx_INCREF(__pyx_v_muhlen_);
-              __Pyx_GIVEREF(__pyx_v_muhlen_);
-              PyTuple_SET_ITEM(__pyx_t_7, 1+__pyx_t_10, __pyx_v_muhlen_);
-              __Pyx_GIVEREF(__pyx_t_1);
-              PyTuple_SET_ITEM(__pyx_t_7, 2+__pyx_t_10, __pyx_t_1);
-              __Pyx_INCREF(__pyx_v_best_score);
-              __Pyx_GIVEREF(__pyx_v_best_score);
-              PyTuple_SET_ITEM(__pyx_t_7, 3+__pyx_t_10, __pyx_v_best_score);
-              __Pyx_INCREF(__pyx_v_beta);
-              __Pyx_GIVEREF(__pyx_v_beta);
-              PyTuple_SET_ITEM(__pyx_t_7, 4+__pyx_t_10, __pyx_v_beta);
-              __Pyx_GIVEREF(__pyx_t_8);
-              PyTuple_SET_ITEM(__pyx_t_7, 5+__pyx_t_10, __pyx_t_8);
-              __Pyx_GIVEREF(__pyx_t_11);
-              PyTuple_SET_ITEM(__pyx_t_7, 6+__pyx_t_10, __pyx_t_11);
+              PyTuple_SET_ITEM(__pyx_t_5, 3+__pyx_t_10, __pyx_v_player);
               __pyx_t_1 = 0;
               __pyx_t_8 = 0;
-              __pyx_t_11 = 0;
-              __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_7, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 151, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_5);
-              __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+              __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_11, __pyx_t_5, NULL); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 144, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_6);
+              __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
             }
+            __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+            __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 144, __pyx_L1_error)
             __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-            __Pyx_XDECREF_SET(__pyx_v_evaluation, __pyx_t_5);
-            __pyx_t_5 = 0;
-
-            /* "ai_minimax_alpha_beta.py":152
- * 
- *                             evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, best_score, beta, remaining_set - 1, depth-1)
- *                             if evaluation > best_score:             # <<<<<<<<<<<<<<
- *                                 best_score = evaluation
- *                                 if best_score >= beta:
- */
-            __pyx_t_5 = PyObject_RichCompare(__pyx_v_evaluation, __pyx_v_best_score, Py_GT); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 152, __pyx_L1_error)
-            __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 152, __pyx_L1_error)
-            __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
             if (__pyx_t_2) {
 
-              /* "ai_minimax_alpha_beta.py":153
- *                             evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, best_score, beta, remaining_set - 1, depth-1)
- *                             if evaluation > best_score:
- *                                 best_score = evaluation             # <<<<<<<<<<<<<<
- *                                 if best_score >= beta:
- *                                     break
- */
-              __Pyx_INCREF(__pyx_v_evaluation);
-              __Pyx_DECREF_SET(__pyx_v_best_score, __pyx_v_evaluation);
-
-              /* "ai_minimax_alpha_beta.py":154
- *                             if evaluation > best_score:
- *                                 best_score = evaluation
- *                                 if best_score >= beta:             # <<<<<<<<<<<<<<
- *                                     break
- *                     else:
- */
-              __pyx_t_5 = PyObject_RichCompare(__pyx_v_best_score, __pyx_v_beta, Py_GE); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 154, __pyx_L1_error)
-              __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 154, __pyx_L1_error)
-              __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-              if (__pyx_t_2) {
-
-                /* "ai_minimax_alpha_beta.py":155
- *                                 best_score = evaluation
- *                                 if best_score >= beta:
- *                                     break             # <<<<<<<<<<<<<<
- *                     else:
- *                         continue
- */
-                goto __pyx_L32_break;
-
-                /* "ai_minimax_alpha_beta.py":154
- *                             if evaluation > best_score:
- *                                 best_score = evaluation
- *                                 if best_score >= beta:             # <<<<<<<<<<<<<<
- *                                     break
- *                     else:
- */
-              }
-
-              /* "ai_minimax_alpha_beta.py":152
+              /* "ai_minimax_alpha_beta.py":145
  * 
- *                             evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, best_score, beta, remaining_set - 1, depth-1)
- *                             if evaluation > best_score:             # <<<<<<<<<<<<<<
- *                                 best_score = evaluation
- *                                 if best_score >= beta:
+ *                             if self.checkmuhle(ring, stelle, board_, player):
+ *                                 to_remove = self.toremove(board_, 1 if player == 2 else 2)             # <<<<<<<<<<<<<<
+ *                                 if board_[to_remove[0]][to_remove[1]] == (1 if player == 2 else 2) and not muhlen_[to_remove[0]][to_remove[1]] == 0:
+ *                                     board_[to_remove[0]][to_remove[1]] = 0
  */
-            }
-
-            /* "ai_minimax_alpha_beta.py":131
- *                 for ring in range(3):
- *                     for stelle in range(8):
- *                         if board[ring][stelle] == 0:             # <<<<<<<<<<<<<<
- *                             board_ = copy.deepcopy(board)
- *                             board_[ring][stelle] = player
- */
-          }
-        }
-        /*else*/ {
-
-          /* "ai_minimax_alpha_beta.py":157
- *                                     break
- *                     else:
- *                         continue             # <<<<<<<<<<<<<<
- *                     break
- *                 return best_score
- */
-          goto __pyx_L29_continue;
-        }
-        __pyx_L32_break:;
-
-        /* "ai_minimax_alpha_beta.py":158
- *                     else:
- *                         continue
- *                     break             # <<<<<<<<<<<<<<
- *                 return best_score
- *             else:
- */
-        goto __pyx_L30_break;
-        __pyx_L29_continue:;
-      }
-      __pyx_L30_break:;
-
-      /* "ai_minimax_alpha_beta.py":159
- *                         continue
- *                     break
- *                 return best_score             # <<<<<<<<<<<<<<
- *             else:
- *                 # Phase 2
- */
-      __Pyx_XDECREF(__pyx_r);
-      __Pyx_INCREF(__pyx_v_best_score);
-      __pyx_r = __pyx_v_best_score;
-      goto __pyx_L0;
-
-      /* "ai_minimax_alpha_beta.py":128
- *             best_score = alpha
- *             # Phase 1
- *             if remaining_set:             # <<<<<<<<<<<<<<
- *                 for ring in range(3):
- *                     for stelle in range(8):
- */
-    }
-
-    /* "ai_minimax_alpha_beta.py":162
- *             else:
- *                 # Phase 2
- *                 mymen = 0             # <<<<<<<<<<<<<<
- *                 theirmen = 0
- *                 for i in range(3):
- */
-    /*else*/ {
-      __Pyx_INCREF(__pyx_int_0);
-      __pyx_v_mymen = __pyx_int_0;
-
-      /* "ai_minimax_alpha_beta.py":163
- *                 # Phase 2
- *                 mymen = 0
- *                 theirmen = 0             # <<<<<<<<<<<<<<
- *                 for i in range(3):
- *                     for j in range(8):
- */
-      __Pyx_INCREF(__pyx_int_0);
-      __pyx_v_theirmen = __pyx_int_0;
-
-      /* "ai_minimax_alpha_beta.py":164
- *                 mymen = 0
- *                 theirmen = 0
- *                 for i in range(3):             # <<<<<<<<<<<<<<
- *                     for j in range(8):
- *                         if board[i][j] == player:
- */
-      for (__pyx_t_3 = 0; __pyx_t_3 < 3; __pyx_t_3+=1) {
-        __pyx_v_i = __pyx_t_3;
-
-        /* "ai_minimax_alpha_beta.py":165
- *                 theirmen = 0
- *                 for i in range(3):
- *                     for j in range(8):             # <<<<<<<<<<<<<<
- *                         if board[i][j] == player:
- *                             mymen += 1
- */
-        for (__pyx_t_4 = 0; __pyx_t_4 < 8; __pyx_t_4+=1) {
-          __pyx_v_j = __pyx_t_4;
-
-          /* "ai_minimax_alpha_beta.py":166
- *                 for i in range(3):
- *                     for j in range(8):
- *                         if board[i][j] == player:             # <<<<<<<<<<<<<<
- *                             mymen += 1
- *                         elif board[i][j] == 1 if player == 2 else 2:
- */
-          __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_board, __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 166, __pyx_L1_error)
-          __Pyx_GOTREF(__pyx_t_5);
-          __pyx_t_6 = __Pyx_GetItemInt(__pyx_t_5, __pyx_v_j, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 166, __pyx_L1_error)
-          __Pyx_GOTREF(__pyx_t_6);
-          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-          __pyx_t_5 = PyObject_RichCompare(__pyx_t_6, __pyx_v_player, Py_EQ); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 166, __pyx_L1_error)
-          __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-          __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 166, __pyx_L1_error)
-          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-          if (__pyx_t_2) {
-
-            /* "ai_minimax_alpha_beta.py":167
- *                     for j in range(8):
- *                         if board[i][j] == player:
- *                             mymen += 1             # <<<<<<<<<<<<<<
- *                         elif board[i][j] == 1 if player == 2 else 2:
- *                             theirmen += 1
- */
-            __pyx_t_5 = __Pyx_PyInt_AddObjC(__pyx_v_mymen, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 167, __pyx_L1_error)
-            __Pyx_GOTREF(__pyx_t_5);
-            __Pyx_DECREF_SET(__pyx_v_mymen, __pyx_t_5);
-            __pyx_t_5 = 0;
-
-            /* "ai_minimax_alpha_beta.py":166
- *                 for i in range(3):
- *                     for j in range(8):
- *                         if board[i][j] == player:             # <<<<<<<<<<<<<<
- *                             mymen += 1
- *                         elif board[i][j] == 1 if player == 2 else 2:
- */
-            goto __pyx_L48;
-          }
-
-          /* "ai_minimax_alpha_beta.py":168
- *                         if board[i][j] == player:
- *                             mymen += 1
- *                         elif board[i][j] == 1 if player == 2 else 2:             # <<<<<<<<<<<<<<
- *                             theirmen += 1
- * 
- */
-          __pyx_t_6 = __Pyx_PyInt_EqObjC(__pyx_v_player, __pyx_int_2, 2, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 168, __pyx_L1_error)
-          __Pyx_GOTREF(__pyx_t_6);
-          __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 168, __pyx_L1_error)
-          __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-          if (__pyx_t_2) {
-            __pyx_t_6 = __Pyx_GetItemInt(__pyx_v_board, __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 168, __pyx_L1_error)
-            __Pyx_GOTREF(__pyx_t_6);
-            __pyx_t_7 = __Pyx_GetItemInt(__pyx_t_6, __pyx_v_j, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 168, __pyx_L1_error)
-            __Pyx_GOTREF(__pyx_t_7);
-            __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-            __pyx_t_6 = __Pyx_PyInt_EqObjC(__pyx_t_7, __pyx_int_1, 1, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 168, __pyx_L1_error)
-            __Pyx_GOTREF(__pyx_t_6);
-            __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-            __pyx_t_5 = __pyx_t_6;
-            __pyx_t_6 = 0;
-          } else {
-            __Pyx_INCREF(__pyx_int_2);
-            __pyx_t_5 = __pyx_int_2;
-          }
-          __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 168, __pyx_L1_error)
-          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-          if (__pyx_t_2) {
-
-            /* "ai_minimax_alpha_beta.py":169
- *                             mymen += 1
- *                         elif board[i][j] == 1 if player == 2 else 2:
- *                             theirmen += 1             # <<<<<<<<<<<<<<
- * 
- *                 for ring in range(3):
- */
-            __pyx_t_5 = __Pyx_PyInt_AddObjC(__pyx_v_theirmen, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 169, __pyx_L1_error)
-            __Pyx_GOTREF(__pyx_t_5);
-            __Pyx_DECREF_SET(__pyx_v_theirmen, __pyx_t_5);
-            __pyx_t_5 = 0;
-
-            /* "ai_minimax_alpha_beta.py":168
- *                         if board[i][j] == player:
- *                             mymen += 1
- *                         elif board[i][j] == 1 if player == 2 else 2:             # <<<<<<<<<<<<<<
- *                             theirmen += 1
- * 
- */
-          }
-          __pyx_L48:;
-        }
-      }
-
-      /* "ai_minimax_alpha_beta.py":171
- *                             theirmen += 1
- * 
- *                 for ring in range(3):             # <<<<<<<<<<<<<<
- *                     for stelle in range(8):
- *                         if board[ring][stelle] == player:
- */
-      for (__pyx_t_3 = 0; __pyx_t_3 < 3; __pyx_t_3+=1) {
-        __pyx_v_ring = __pyx_t_3;
-
-        /* "ai_minimax_alpha_beta.py":172
- * 
- *                 for ring in range(3):
- *                     for stelle in range(8):             # <<<<<<<<<<<<<<
- *                         if board[ring][stelle] == player:
- *                             possiblemoves = self.possiblemoves(ring, stelle, board)
- */
-        for (__pyx_t_4 = 0; __pyx_t_4 < 8; __pyx_t_4+=1) {
-          __pyx_v_stelle = __pyx_t_4;
-
-          /* "ai_minimax_alpha_beta.py":173
- *                 for ring in range(3):
- *                     for stelle in range(8):
- *                         if board[ring][stelle] == player:             # <<<<<<<<<<<<<<
- *                             possiblemoves = self.possiblemoves(ring, stelle, board)
- *                             if not possiblemoves:
- */
-          __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_board, __pyx_v_ring, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 173, __pyx_L1_error)
-          __Pyx_GOTREF(__pyx_t_5);
-          __pyx_t_6 = __Pyx_GetItemInt(__pyx_t_5, __pyx_v_stelle, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 173, __pyx_L1_error)
-          __Pyx_GOTREF(__pyx_t_6);
-          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-          __pyx_t_5 = PyObject_RichCompare(__pyx_t_6, __pyx_v_player, Py_EQ); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 173, __pyx_L1_error)
-          __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-          __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 173, __pyx_L1_error)
-          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-          if (__pyx_t_2) {
-
-            /* "ai_minimax_alpha_beta.py":174
- *                     for stelle in range(8):
- *                         if board[ring][stelle] == player:
- *                             possiblemoves = self.possiblemoves(ring, stelle, board)             # <<<<<<<<<<<<<<
- *                             if not possiblemoves:
- *                                 continue
- */
-            __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_possiblemoves); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 174, __pyx_L1_error)
-            __Pyx_GOTREF(__pyx_t_6);
-            __pyx_t_7 = __Pyx_PyInt_From_long(__pyx_v_ring); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 174, __pyx_L1_error)
-            __Pyx_GOTREF(__pyx_t_7);
-            __pyx_t_11 = __Pyx_PyInt_From_long(__pyx_v_stelle); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 174, __pyx_L1_error)
-            __Pyx_GOTREF(__pyx_t_11);
-            __pyx_t_8 = NULL;
-            __pyx_t_10 = 0;
-            if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_6))) {
-              __pyx_t_8 = PyMethod_GET_SELF(__pyx_t_6);
-              if (likely(__pyx_t_8)) {
-                PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_6);
-                __Pyx_INCREF(__pyx_t_8);
-                __Pyx_INCREF(function);
-                __Pyx_DECREF_SET(__pyx_t_6, function);
-                __pyx_t_10 = 1;
-              }
-            }
-            #if CYTHON_FAST_PYCALL
-            if (PyFunction_Check(__pyx_t_6)) {
-              PyObject *__pyx_temp[4] = {__pyx_t_8, __pyx_t_7, __pyx_t_11, __pyx_v_board};
-              __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_10, 3+__pyx_t_10); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 174, __pyx_L1_error)
-              __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-              __Pyx_GOTREF(__pyx_t_5);
-              __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-              __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-            } else
-            #endif
-            #if CYTHON_FAST_PYCCALL
-            if (__Pyx_PyFastCFunction_Check(__pyx_t_6)) {
-              PyObject *__pyx_temp[4] = {__pyx_t_8, __pyx_t_7, __pyx_t_11, __pyx_v_board};
-              __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_10, 3+__pyx_t_10); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 174, __pyx_L1_error)
-              __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-              __Pyx_GOTREF(__pyx_t_5);
-              __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-              __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-            } else
-            #endif
-            {
-              __pyx_t_1 = PyTuple_New(3+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 174, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_1);
-              if (__pyx_t_8) {
-                __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_8); __pyx_t_8 = NULL;
-              }
-              __Pyx_GIVEREF(__pyx_t_7);
-              PyTuple_SET_ITEM(__pyx_t_1, 0+__pyx_t_10, __pyx_t_7);
-              __Pyx_GIVEREF(__pyx_t_11);
-              PyTuple_SET_ITEM(__pyx_t_1, 1+__pyx_t_10, __pyx_t_11);
-              __Pyx_INCREF(__pyx_v_board);
-              __Pyx_GIVEREF(__pyx_v_board);
-              PyTuple_SET_ITEM(__pyx_t_1, 2+__pyx_t_10, __pyx_v_board);
-              __pyx_t_7 = 0;
-              __pyx_t_11 = 0;
-              __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_1, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 174, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_5);
-              __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-            }
-            __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-            __Pyx_XDECREF_SET(__pyx_v_possiblemoves, __pyx_t_5);
-            __pyx_t_5 = 0;
-
-            /* "ai_minimax_alpha_beta.py":175
- *                         if board[ring][stelle] == player:
- *                             possiblemoves = self.possiblemoves(ring, stelle, board)
- *                             if not possiblemoves:             # <<<<<<<<<<<<<<
- *                                 continue
- *                             for move in possiblemoves:
- */
-            __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_v_possiblemoves); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 175, __pyx_L1_error)
-            __pyx_t_12 = ((!__pyx_t_2) != 0);
-            if (__pyx_t_12) {
-
-              /* "ai_minimax_alpha_beta.py":176
- *                             possiblemoves = self.possiblemoves(ring, stelle, board)
- *                             if not possiblemoves:
- *                                 continue             # <<<<<<<<<<<<<<
- *                             for move in possiblemoves:
- *                                 board_ = copy.deepcopy(board)
- */
-              goto __pyx_L51_continue;
-
-              /* "ai_minimax_alpha_beta.py":175
- *                         if board[ring][stelle] == player:
- *                             possiblemoves = self.possiblemoves(ring, stelle, board)
- *                             if not possiblemoves:             # <<<<<<<<<<<<<<
- *                                 continue
- *                             for move in possiblemoves:
- */
-            }
-
-            /* "ai_minimax_alpha_beta.py":177
- *                             if not possiblemoves:
- *                                 continue
- *                             for move in possiblemoves:             # <<<<<<<<<<<<<<
- *                                 board_ = copy.deepcopy(board)
- *                                 muhlen_ = copy.deepcopy(board_muhlen)
- */
-            if (likely(PyList_CheckExact(__pyx_v_possiblemoves)) || PyTuple_CheckExact(__pyx_v_possiblemoves)) {
-              __pyx_t_5 = __pyx_v_possiblemoves; __Pyx_INCREF(__pyx_t_5); __pyx_t_15 = 0;
-              __pyx_t_16 = NULL;
-            } else {
-              __pyx_t_15 = -1; __pyx_t_5 = PyObject_GetIter(__pyx_v_possiblemoves); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 177, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_5);
-              __pyx_t_16 = Py_TYPE(__pyx_t_5)->tp_iternext; if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 177, __pyx_L1_error)
-            }
-            for (;;) {
-              if (likely(!__pyx_t_16)) {
-                if (likely(PyList_CheckExact(__pyx_t_5))) {
-                  if (__pyx_t_15 >= PyList_GET_SIZE(__pyx_t_5)) break;
-                  #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-                  __pyx_t_6 = PyList_GET_ITEM(__pyx_t_5, __pyx_t_15); __Pyx_INCREF(__pyx_t_6); __pyx_t_15++; if (unlikely(0 < 0)) __PYX_ERR(0, 177, __pyx_L1_error)
-                  #else
-                  __pyx_t_6 = PySequence_ITEM(__pyx_t_5, __pyx_t_15); __pyx_t_15++; if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 177, __pyx_L1_error)
-                  __Pyx_GOTREF(__pyx_t_6);
-                  #endif
-                } else {
-                  if (__pyx_t_15 >= PyTuple_GET_SIZE(__pyx_t_5)) break;
-                  #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-                  __pyx_t_6 = PyTuple_GET_ITEM(__pyx_t_5, __pyx_t_15); __Pyx_INCREF(__pyx_t_6); __pyx_t_15++; if (unlikely(0 < 0)) __PYX_ERR(0, 177, __pyx_L1_error)
-                  #else
-                  __pyx_t_6 = PySequence_ITEM(__pyx_t_5, __pyx_t_15); __pyx_t_15++; if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 177, __pyx_L1_error)
-                  __Pyx_GOTREF(__pyx_t_6);
-                  #endif
-                }
-              } else {
-                __pyx_t_6 = __pyx_t_16(__pyx_t_5);
-                if (unlikely(!__pyx_t_6)) {
-                  PyObject* exc_type = PyErr_Occurred();
-                  if (exc_type) {
-                    if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-                    else __PYX_ERR(0, 177, __pyx_L1_error)
-                  }
-                  break;
-                }
-                __Pyx_GOTREF(__pyx_t_6);
-              }
-              __Pyx_XDECREF_SET(__pyx_v_move, __pyx_t_6);
-              __pyx_t_6 = 0;
-
-              /* "ai_minimax_alpha_beta.py":178
- *                                 continue
- *                             for move in possiblemoves:
- *                                 board_ = copy.deepcopy(board)             # <<<<<<<<<<<<<<
- *                                 muhlen_ = copy.deepcopy(board_muhlen)
- *                                 board_[ring][stelle] = 0
- */
-              __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_copy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 178, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_1);
-              __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_deepcopy); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 178, __pyx_L1_error)
+              __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_toremove); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 145, __pyx_L1_error)
               __Pyx_GOTREF(__pyx_t_11);
-              __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-              __pyx_t_1 = NULL;
-              if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_11))) {
-                __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_11);
-                if (likely(__pyx_t_1)) {
-                  PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_11);
-                  __Pyx_INCREF(__pyx_t_1);
-                  __Pyx_INCREF(function);
-                  __Pyx_DECREF_SET(__pyx_t_11, function);
-                }
-              }
-              __pyx_t_6 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_11, __pyx_t_1, __pyx_v_board) : __Pyx_PyObject_CallOneArg(__pyx_t_11, __pyx_v_board);
-              __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-              if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 178, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_6);
-              __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-              __Pyx_XDECREF_SET(__pyx_v_board_, __pyx_t_6);
-              __pyx_t_6 = 0;
-
-              /* "ai_minimax_alpha_beta.py":179
- *                             for move in possiblemoves:
- *                                 board_ = copy.deepcopy(board)
- *                                 muhlen_ = copy.deepcopy(board_muhlen)             # <<<<<<<<<<<<<<
- *                                 board_[ring][stelle] = 0
- *                                 try:
- */
-              __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_n_s_copy); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 179, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_11);
-              __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_11, __pyx_n_s_deepcopy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 179, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_1);
-              __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-              __pyx_t_11 = NULL;
-              if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_1))) {
-                __pyx_t_11 = PyMethod_GET_SELF(__pyx_t_1);
-                if (likely(__pyx_t_11)) {
-                  PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
-                  __Pyx_INCREF(__pyx_t_11);
-                  __Pyx_INCREF(function);
-                  __Pyx_DECREF_SET(__pyx_t_1, function);
-                }
-              }
-              __pyx_t_6 = (__pyx_t_11) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_11, __pyx_v_board_muhlen) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_v_board_muhlen);
-              __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
-              if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 179, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_6);
-              __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-              __Pyx_XDECREF_SET(__pyx_v_muhlen_, __pyx_t_6);
-              __pyx_t_6 = 0;
-
-              /* "ai_minimax_alpha_beta.py":180
- *                                 board_ = copy.deepcopy(board)
- *                                 muhlen_ = copy.deepcopy(board_muhlen)
- *                                 board_[ring][stelle] = 0             # <<<<<<<<<<<<<<
- *                                 try:
- *                                     board_[move[0]][move[1]] = player
- */
-              __pyx_t_6 = __Pyx_GetItemInt(__pyx_v_board_, __pyx_v_ring, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 180, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_6);
-              if (unlikely(__Pyx_SetItemInt(__pyx_t_6, __pyx_v_stelle, __pyx_int_0, long, 1, __Pyx_PyInt_From_long, 0, 1, 1) < 0)) __PYX_ERR(0, 180, __pyx_L1_error)
-              __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-
-              /* "ai_minimax_alpha_beta.py":181
- *                                 muhlen_ = copy.deepcopy(board_muhlen)
- *                                 board_[ring][stelle] = 0
- *                                 try:             # <<<<<<<<<<<<<<
- *                                     board_[move[0]][move[1]] = player
- *                                 except:
- */
-              {
-                __Pyx_PyThreadState_declare
-                __Pyx_PyThreadState_assign
-                __Pyx_ExceptionSave(&__pyx_t_17, &__pyx_t_18, &__pyx_t_19);
-                __Pyx_XGOTREF(__pyx_t_17);
-                __Pyx_XGOTREF(__pyx_t_18);
-                __Pyx_XGOTREF(__pyx_t_19);
-                /*try:*/ {
-
-                  /* "ai_minimax_alpha_beta.py":182
- *                                 board_[ring][stelle] = 0
- *                                 try:
- *                                     board_[move[0]][move[1]] = player             # <<<<<<<<<<<<<<
- *                                 except:
- *                                     print("ERROR"+str(move))
- */
-                  __pyx_t_6 = __Pyx_GetItemInt(__pyx_v_move, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 182, __pyx_L57_error)
-                  __Pyx_GOTREF(__pyx_t_6);
-                  __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_v_board_, __pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 182, __pyx_L57_error)
-                  __Pyx_GOTREF(__pyx_t_1);
-                  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-                  __pyx_t_6 = __Pyx_GetItemInt(__pyx_v_move, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 182, __pyx_L57_error)
-                  __Pyx_GOTREF(__pyx_t_6);
-                  if (unlikely(PyObject_SetItem(__pyx_t_1, __pyx_t_6, __pyx_v_player) < 0)) __PYX_ERR(0, 182, __pyx_L57_error)
-                  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-                  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-
-                  /* "ai_minimax_alpha_beta.py":181
- *                                 muhlen_ = copy.deepcopy(board_muhlen)
- *                                 board_[ring][stelle] = 0
- *                                 try:             # <<<<<<<<<<<<<<
- *                                     board_[move[0]][move[1]] = player
- *                                 except:
- */
-                }
-                __Pyx_XDECREF(__pyx_t_17); __pyx_t_17 = 0;
-                __Pyx_XDECREF(__pyx_t_18); __pyx_t_18 = 0;
-                __Pyx_XDECREF(__pyx_t_19); __pyx_t_19 = 0;
-                goto __pyx_L64_try_end;
-                __pyx_L57_error:;
-                __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-                __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
-                __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-                __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-                __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-                __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
-
-                /* "ai_minimax_alpha_beta.py":183
- *                                 try:
- *                                     board_[move[0]][move[1]] = player
- *                                 except:             # <<<<<<<<<<<<<<
- *                                     print("ERROR"+str(move))
- *                                 # check if new mill has been generated / zwickmuehle
- */
-                /*except:*/ {
-                  __Pyx_AddTraceback("ai_minimax_alpha_beta.Morris.minimax", __pyx_clineno, __pyx_lineno, __pyx_filename);
-                  if (__Pyx_GetException(&__pyx_t_6, &__pyx_t_1, &__pyx_t_11) < 0) __PYX_ERR(0, 183, __pyx_L59_except_error)
-                  __Pyx_GOTREF(__pyx_t_6);
-                  __Pyx_GOTREF(__pyx_t_1);
-                  __Pyx_GOTREF(__pyx_t_11);
-
-                  /* "ai_minimax_alpha_beta.py":184
- *                                     board_[move[0]][move[1]] = player
- *                                 except:
- *                                     print("ERROR"+str(move))             # <<<<<<<<<<<<<<
- *                                 # check if new mill has been generated / zwickmuehle
- *                                 # TODO: kinda whack
- */
-                  __pyx_t_7 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyString_Type)), __pyx_v_move); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 184, __pyx_L59_except_error)
-                  __Pyx_GOTREF(__pyx_t_7);
-                  __pyx_t_8 = PyNumber_Add(__pyx_n_s_ERROR, __pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 184, __pyx_L59_except_error)
-                  __Pyx_GOTREF(__pyx_t_8);
-                  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-                  if (__Pyx_PrintOne(0, __pyx_t_8) < 0) __PYX_ERR(0, 184, __pyx_L59_except_error)
-                  __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-                  __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-                  __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-                  __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
-                  goto __pyx_L58_exception_handled;
-                }
-                __pyx_L59_except_error:;
-
-                /* "ai_minimax_alpha_beta.py":181
- *                                 muhlen_ = copy.deepcopy(board_muhlen)
- *                                 board_[ring][stelle] = 0
- *                                 try:             # <<<<<<<<<<<<<<
- *                                     board_[move[0]][move[1]] = player
- *                                 except:
- */
-                __Pyx_XGIVEREF(__pyx_t_17);
-                __Pyx_XGIVEREF(__pyx_t_18);
-                __Pyx_XGIVEREF(__pyx_t_19);
-                __Pyx_ExceptionReset(__pyx_t_17, __pyx_t_18, __pyx_t_19);
-                goto __pyx_L1_error;
-                __pyx_L58_exception_handled:;
-                __Pyx_XGIVEREF(__pyx_t_17);
-                __Pyx_XGIVEREF(__pyx_t_18);
-                __Pyx_XGIVEREF(__pyx_t_19);
-                __Pyx_ExceptionReset(__pyx_t_17, __pyx_t_18, __pyx_t_19);
-                __pyx_L64_try_end:;
-              }
-
-              /* "ai_minimax_alpha_beta.py":187
- *                                 # check if new mill has been generated / zwickmuehle
- *                                 # TODO: kinda whack
- *                                 score_addition = 0             # <<<<<<<<<<<<<<
- *                                 if self.checkmuhle(move[0], move[1], board_, player):
- *                                     # New mill generated
- */
-              __Pyx_INCREF(__pyx_int_0);
-              __Pyx_XDECREF_SET(__pyx_v_score_addition, __pyx_int_0);
-
-              /* "ai_minimax_alpha_beta.py":188
- *                                 # TODO: kinda whack
- *                                 score_addition = 0
- *                                 if self.checkmuhle(move[0], move[1], board_, player):             # <<<<<<<<<<<<<<
- *                                     # New mill generated
- *                                     score_addition += 20
- */
-              __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_checkmuhle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 188, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_1);
-              __pyx_t_6 = __Pyx_GetItemInt(__pyx_v_move, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 188, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_6);
-              __pyx_t_8 = __Pyx_GetItemInt(__pyx_v_move, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 188, __pyx_L1_error)
+              __pyx_t_8 = __Pyx_PyInt_EqObjC(__pyx_v_player, __pyx_int_2, 2, 0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 145, __pyx_L1_error)
               __Pyx_GOTREF(__pyx_t_8);
-              __pyx_t_7 = NULL;
-              __pyx_t_10 = 0;
-              if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_1))) {
-                __pyx_t_7 = PyMethod_GET_SELF(__pyx_t_1);
-                if (likely(__pyx_t_7)) {
-                  PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
-                  __Pyx_INCREF(__pyx_t_7);
-                  __Pyx_INCREF(function);
-                  __Pyx_DECREF_SET(__pyx_t_1, function);
-                  __pyx_t_10 = 1;
-                }
-              }
-              #if CYTHON_FAST_PYCALL
-              if (PyFunction_Check(__pyx_t_1)) {
-                PyObject *__pyx_temp[5] = {__pyx_t_7, __pyx_t_6, __pyx_t_8, __pyx_v_board_, __pyx_v_player};
-                __pyx_t_11 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_10, 4+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 188, __pyx_L1_error)
-                __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-                __Pyx_GOTREF(__pyx_t_11);
-                __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-                __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-              } else
-              #endif
-              #if CYTHON_FAST_PYCCALL
-              if (__Pyx_PyFastCFunction_Check(__pyx_t_1)) {
-                PyObject *__pyx_temp[5] = {__pyx_t_7, __pyx_t_6, __pyx_t_8, __pyx_v_board_, __pyx_v_player};
-                __pyx_t_11 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_10, 4+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 188, __pyx_L1_error)
-                __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-                __Pyx_GOTREF(__pyx_t_11);
-                __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-                __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-              } else
-              #endif
-              {
-                __pyx_t_9 = PyTuple_New(4+__pyx_t_10); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 188, __pyx_L1_error)
-                __Pyx_GOTREF(__pyx_t_9);
-                if (__pyx_t_7) {
-                  __Pyx_GIVEREF(__pyx_t_7); PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_7); __pyx_t_7 = NULL;
-                }
-                __Pyx_GIVEREF(__pyx_t_6);
-                PyTuple_SET_ITEM(__pyx_t_9, 0+__pyx_t_10, __pyx_t_6);
-                __Pyx_GIVEREF(__pyx_t_8);
-                PyTuple_SET_ITEM(__pyx_t_9, 1+__pyx_t_10, __pyx_t_8);
-                __Pyx_INCREF(__pyx_v_board_);
-                __Pyx_GIVEREF(__pyx_v_board_);
-                PyTuple_SET_ITEM(__pyx_t_9, 2+__pyx_t_10, __pyx_v_board_);
-                __Pyx_INCREF(__pyx_v_player);
-                __Pyx_GIVEREF(__pyx_v_player);
-                PyTuple_SET_ITEM(__pyx_t_9, 3+__pyx_t_10, __pyx_v_player);
-                __pyx_t_6 = 0;
-                __pyx_t_8 = 0;
-                __pyx_t_11 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_9, NULL); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 188, __pyx_L1_error)
-                __Pyx_GOTREF(__pyx_t_11);
-                __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-              }
-              __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-              __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_11); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 188, __pyx_L1_error)
-              __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-              if (__pyx_t_12) {
-
-                /* "ai_minimax_alpha_beta.py":190
- *                                 if self.checkmuhle(move[0], move[1], board_, player):
- *                                     # New mill generated
- *                                     score_addition += 20             # <<<<<<<<<<<<<<
- *                                     if self.checkmuhle(ring, stelle, board, player):
- *                                         # Zwickmuehle
- */
-                __pyx_t_11 = __Pyx_PyInt_AddObjC(__pyx_v_score_addition, __pyx_int_20, 20, 1, 0); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 190, __pyx_L1_error)
-                __Pyx_GOTREF(__pyx_t_11);
-                __Pyx_DECREF_SET(__pyx_v_score_addition, __pyx_t_11);
-                __pyx_t_11 = 0;
-
-                /* "ai_minimax_alpha_beta.py":191
- *                                     # New mill generated
- *                                     score_addition += 20
- *                                     if self.checkmuhle(ring, stelle, board, player):             # <<<<<<<<<<<<<<
- *                                         # Zwickmuehle
- *                                         score_addition += 60
- */
-                __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_checkmuhle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 191, __pyx_L1_error)
-                __Pyx_GOTREF(__pyx_t_1);
-                __pyx_t_9 = __Pyx_PyInt_From_long(__pyx_v_ring); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 191, __pyx_L1_error)
-                __Pyx_GOTREF(__pyx_t_9);
-                __pyx_t_8 = __Pyx_PyInt_From_long(__pyx_v_stelle); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 191, __pyx_L1_error)
-                __Pyx_GOTREF(__pyx_t_8);
-                __pyx_t_6 = NULL;
-                __pyx_t_10 = 0;
-                if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_1))) {
-                  __pyx_t_6 = PyMethod_GET_SELF(__pyx_t_1);
-                  if (likely(__pyx_t_6)) {
-                    PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
-                    __Pyx_INCREF(__pyx_t_6);
-                    __Pyx_INCREF(function);
-                    __Pyx_DECREF_SET(__pyx_t_1, function);
-                    __pyx_t_10 = 1;
-                  }
-                }
-                #if CYTHON_FAST_PYCALL
-                if (PyFunction_Check(__pyx_t_1)) {
-                  PyObject *__pyx_temp[5] = {__pyx_t_6, __pyx_t_9, __pyx_t_8, __pyx_v_board, __pyx_v_player};
-                  __pyx_t_11 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_10, 4+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 191, __pyx_L1_error)
-                  __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-                  __Pyx_GOTREF(__pyx_t_11);
-                  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-                  __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-                } else
-                #endif
-                #if CYTHON_FAST_PYCCALL
-                if (__Pyx_PyFastCFunction_Check(__pyx_t_1)) {
-                  PyObject *__pyx_temp[5] = {__pyx_t_6, __pyx_t_9, __pyx_t_8, __pyx_v_board, __pyx_v_player};
-                  __pyx_t_11 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_10, 4+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 191, __pyx_L1_error)
-                  __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-                  __Pyx_GOTREF(__pyx_t_11);
-                  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-                  __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-                } else
-                #endif
-                {
-                  __pyx_t_7 = PyTuple_New(4+__pyx_t_10); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 191, __pyx_L1_error)
-                  __Pyx_GOTREF(__pyx_t_7);
-                  if (__pyx_t_6) {
-                    __Pyx_GIVEREF(__pyx_t_6); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_6); __pyx_t_6 = NULL;
-                  }
-                  __Pyx_GIVEREF(__pyx_t_9);
-                  PyTuple_SET_ITEM(__pyx_t_7, 0+__pyx_t_10, __pyx_t_9);
-                  __Pyx_GIVEREF(__pyx_t_8);
-                  PyTuple_SET_ITEM(__pyx_t_7, 1+__pyx_t_10, __pyx_t_8);
-                  __Pyx_INCREF(__pyx_v_board);
-                  __Pyx_GIVEREF(__pyx_v_board);
-                  PyTuple_SET_ITEM(__pyx_t_7, 2+__pyx_t_10, __pyx_v_board);
-                  __Pyx_INCREF(__pyx_v_player);
-                  __Pyx_GIVEREF(__pyx_v_player);
-                  PyTuple_SET_ITEM(__pyx_t_7, 3+__pyx_t_10, __pyx_v_player);
-                  __pyx_t_9 = 0;
-                  __pyx_t_8 = 0;
-                  __pyx_t_11 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_7, NULL); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 191, __pyx_L1_error)
-                  __Pyx_GOTREF(__pyx_t_11);
-                  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-                }
-                __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-                __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_11); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 191, __pyx_L1_error)
-                __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-                if (__pyx_t_12) {
-
-                  /* "ai_minimax_alpha_beta.py":193
- *                                     if self.checkmuhle(ring, stelle, board, player):
- *                                         # Zwickmuehle
- *                                         score_addition += 60             # <<<<<<<<<<<<<<
- * 
- *                                     # Finally, remove one random enemy man
- */
-                  __pyx_t_11 = __Pyx_PyInt_AddObjC(__pyx_v_score_addition, __pyx_int_60, 60, 1, 0); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 193, __pyx_L1_error)
-                  __Pyx_GOTREF(__pyx_t_11);
-                  __Pyx_DECREF_SET(__pyx_v_score_addition, __pyx_t_11);
-                  __pyx_t_11 = 0;
-
-                  /* "ai_minimax_alpha_beta.py":191
- *                                     # New mill generated
- *                                     score_addition += 20
- *                                     if self.checkmuhle(ring, stelle, board, player):             # <<<<<<<<<<<<<<
- *                                         # Zwickmuehle
- *                                         score_addition += 60
- */
-                }
-
-                /* "ai_minimax_alpha_beta.py":196
- * 
- *                                     # Finally, remove one random enemy man
- *                                     for ring_ in range(3):             # <<<<<<<<<<<<<<
- *                                         for stelle_ in range(8):
- *                                             if board_[ring_][stelle_] == (1 if player == 2 else 2) and muhlen_[ring_][stelle_] == 0:
- */
-                for (__pyx_t_13 = 0; __pyx_t_13 < 3; __pyx_t_13+=1) {
-                  __pyx_v_ring_ = __pyx_t_13;
-
-                  /* "ai_minimax_alpha_beta.py":197
- *                                     # Finally, remove one random enemy man
- *                                     for ring_ in range(3):
- *                                         for stelle_ in range(8):             # <<<<<<<<<<<<<<
- *                                             if board_[ring_][stelle_] == (1 if player == 2 else 2) and muhlen_[ring_][stelle_] == 0:
- *                                                 board_[ring_][stelle_] = 0
- */
-                  for (__pyx_t_14 = 0; __pyx_t_14 < 8; __pyx_t_14+=1) {
-                    __pyx_v_stelle_ = __pyx_t_14;
-
-                    /* "ai_minimax_alpha_beta.py":198
- *                                     for ring_ in range(3):
- *                                         for stelle_ in range(8):
- *                                             if board_[ring_][stelle_] == (1 if player == 2 else 2) and muhlen_[ring_][stelle_] == 0:             # <<<<<<<<<<<<<<
- *                                                 board_[ring_][stelle_] = 0
- *                                                 break
- */
-                    __pyx_t_11 = __Pyx_GetItemInt(__pyx_v_board_, __pyx_v_ring_, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 198, __pyx_L1_error)
-                    __Pyx_GOTREF(__pyx_t_11);
-                    __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_11, __pyx_v_stelle_, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 198, __pyx_L1_error)
-                    __Pyx_GOTREF(__pyx_t_1);
-                    __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-                    __pyx_t_7 = __Pyx_PyInt_EqObjC(__pyx_v_player, __pyx_int_2, 2, 0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 198, __pyx_L1_error)
-                    __Pyx_GOTREF(__pyx_t_7);
-                    __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 198, __pyx_L1_error)
-                    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-                    if (__pyx_t_2) {
-                      __Pyx_INCREF(__pyx_int_1);
-                      __pyx_t_11 = __pyx_int_1;
-                    } else {
-                      __Pyx_INCREF(__pyx_int_2);
-                      __pyx_t_11 = __pyx_int_2;
-                    }
-                    __pyx_t_7 = PyObject_RichCompare(__pyx_t_1, __pyx_t_11, Py_EQ); __Pyx_XGOTREF(__pyx_t_7); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 198, __pyx_L1_error)
-                    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-                    __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-                    __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 198, __pyx_L1_error)
-                    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-                    if (__pyx_t_2) {
-                    } else {
-                      __pyx_t_12 = __pyx_t_2;
-                      goto __pyx_L74_bool_binop_done;
-                    }
-                    __pyx_t_7 = __Pyx_GetItemInt(__pyx_v_muhlen_, __pyx_v_ring_, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 198, __pyx_L1_error)
-                    __Pyx_GOTREF(__pyx_t_7);
-                    __pyx_t_11 = __Pyx_GetItemInt(__pyx_t_7, __pyx_v_stelle_, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 198, __pyx_L1_error)
-                    __Pyx_GOTREF(__pyx_t_11);
-                    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-                    __pyx_t_7 = __Pyx_PyInt_EqObjC(__pyx_t_11, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 198, __pyx_L1_error)
-                    __Pyx_GOTREF(__pyx_t_7);
-                    __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-                    __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 198, __pyx_L1_error)
-                    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-                    __pyx_t_12 = __pyx_t_2;
-                    __pyx_L74_bool_binop_done:;
-                    if (__pyx_t_12) {
-
-                      /* "ai_minimax_alpha_beta.py":199
- *                                         for stelle_ in range(8):
- *                                             if board_[ring_][stelle_] == (1 if player == 2 else 2) and muhlen_[ring_][stelle_] == 0:
- *                                                 board_[ring_][stelle_] = 0             # <<<<<<<<<<<<<<
- *                                                 break
- *                                         else:
- */
-                      __pyx_t_7 = __Pyx_GetItemInt(__pyx_v_board_, __pyx_v_ring_, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 199, __pyx_L1_error)
-                      __Pyx_GOTREF(__pyx_t_7);
-                      if (unlikely(__Pyx_SetItemInt(__pyx_t_7, __pyx_v_stelle_, __pyx_int_0, long, 1, __Pyx_PyInt_From_long, 0, 1, 1) < 0)) __PYX_ERR(0, 199, __pyx_L1_error)
-                      __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-
-                      /* "ai_minimax_alpha_beta.py":200
- *                                             if board_[ring_][stelle_] == (1 if player == 2 else 2) and muhlen_[ring_][stelle_] == 0:
- *                                                 board_[ring_][stelle_] = 0
- *                                                 break             # <<<<<<<<<<<<<<
- *                                         else:
- *                                             continue
- */
-                      goto __pyx_L72_break;
-
-                      /* "ai_minimax_alpha_beta.py":198
- *                                     for ring_ in range(3):
- *                                         for stelle_ in range(8):
- *                                             if board_[ring_][stelle_] == (1 if player == 2 else 2) and muhlen_[ring_][stelle_] == 0:             # <<<<<<<<<<<<<<
- *                                                 board_[ring_][stelle_] = 0
- *                                                 break
- */
-                    }
-                  }
-                  /*else*/ {
-
-                    /* "ai_minimax_alpha_beta.py":202
- *                                                 break
- *                                         else:
- *                                             continue             # <<<<<<<<<<<<<<
- *                                         break
- * 
- */
-                    goto __pyx_L69_continue;
-                  }
-                  __pyx_L72_break:;
-
-                  /* "ai_minimax_alpha_beta.py":203
- *                                         else:
- *                                             continue
- *                                         break             # <<<<<<<<<<<<<<
- * 
- *                                 evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, best_score, beta,
- */
-                  goto __pyx_L70_break;
-                  __pyx_L69_continue:;
-                }
-                __pyx_L70_break:;
-
-                /* "ai_minimax_alpha_beta.py":188
- *                                 # TODO: kinda whack
- *                                 score_addition = 0
- *                                 if self.checkmuhle(move[0], move[1], board_, player):             # <<<<<<<<<<<<<<
- *                                     # New mill generated
- *                                     score_addition += 20
- */
-              }
-
-              /* "ai_minimax_alpha_beta.py":205
- *                                         break
- * 
- *                                 evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, best_score, beta,             # <<<<<<<<<<<<<<
- *                                                           remaining_set, depth - 1)
- *                                 evaluation += score_addition
- */
-              __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_minimax); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 205, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_11);
-              __pyx_t_8 = __Pyx_PyInt_EqObjC(__pyx_v_player, __pyx_int_2, 2, 0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 205, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_8);
-              __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_8); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 205, __pyx_L1_error)
+              __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_8); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 145, __pyx_L1_error)
               __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-              if (__pyx_t_12) {
-                __Pyx_INCREF(__pyx_int_1);
-                __pyx_t_1 = __pyx_int_1;
-              } else {
-                __Pyx_INCREF(__pyx_int_2);
-                __pyx_t_1 = __pyx_int_2;
-              }
-
-              /* "ai_minimax_alpha_beta.py":206
- * 
- *                                 evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, best_score, beta,
- *                                                           remaining_set, depth - 1)             # <<<<<<<<<<<<<<
- *                                 evaluation += score_addition
- *                                 if evaluation > best_score:
- */
-              __pyx_t_8 = __Pyx_PyInt_SubtractObjC(__pyx_v_depth, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 206, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_8);
-              __pyx_t_9 = NULL;
-              __pyx_t_10 = 0;
-              if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_11))) {
-                __pyx_t_9 = PyMethod_GET_SELF(__pyx_t_11);
-                if (likely(__pyx_t_9)) {
-                  PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_11);
-                  __Pyx_INCREF(__pyx_t_9);
-                  __Pyx_INCREF(function);
-                  __Pyx_DECREF_SET(__pyx_t_11, function);
-                  __pyx_t_10 = 1;
-                }
-              }
-              #if CYTHON_FAST_PYCALL
-              if (PyFunction_Check(__pyx_t_11)) {
-                PyObject *__pyx_temp[8] = {__pyx_t_9, __pyx_v_board_, __pyx_v_muhlen_, __pyx_t_1, __pyx_v_best_score, __pyx_v_beta, __pyx_v_remaining_set, __pyx_t_8};
-                __pyx_t_7 = __Pyx_PyFunction_FastCall(__pyx_t_11, __pyx_temp+1-__pyx_t_10, 7+__pyx_t_10); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 205, __pyx_L1_error)
-                __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
-                __Pyx_GOTREF(__pyx_t_7);
-                __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-                __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-              } else
-              #endif
-              #if CYTHON_FAST_PYCCALL
-              if (__Pyx_PyFastCFunction_Check(__pyx_t_11)) {
-                PyObject *__pyx_temp[8] = {__pyx_t_9, __pyx_v_board_, __pyx_v_muhlen_, __pyx_t_1, __pyx_v_best_score, __pyx_v_beta, __pyx_v_remaining_set, __pyx_t_8};
-                __pyx_t_7 = __Pyx_PyCFunction_FastCall(__pyx_t_11, __pyx_temp+1-__pyx_t_10, 7+__pyx_t_10); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 205, __pyx_L1_error)
-                __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
-                __Pyx_GOTREF(__pyx_t_7);
-                __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-                __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-              } else
-              #endif
-              {
-                __pyx_t_6 = PyTuple_New(7+__pyx_t_10); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 205, __pyx_L1_error)
-                __Pyx_GOTREF(__pyx_t_6);
-                if (__pyx_t_9) {
-                  __Pyx_GIVEREF(__pyx_t_9); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_9); __pyx_t_9 = NULL;
-                }
-                __Pyx_INCREF(__pyx_v_board_);
-                __Pyx_GIVEREF(__pyx_v_board_);
-                PyTuple_SET_ITEM(__pyx_t_6, 0+__pyx_t_10, __pyx_v_board_);
-                __Pyx_INCREF(__pyx_v_muhlen_);
-                __Pyx_GIVEREF(__pyx_v_muhlen_);
-                PyTuple_SET_ITEM(__pyx_t_6, 1+__pyx_t_10, __pyx_v_muhlen_);
-                __Pyx_GIVEREF(__pyx_t_1);
-                PyTuple_SET_ITEM(__pyx_t_6, 2+__pyx_t_10, __pyx_t_1);
-                __Pyx_INCREF(__pyx_v_best_score);
-                __Pyx_GIVEREF(__pyx_v_best_score);
-                PyTuple_SET_ITEM(__pyx_t_6, 3+__pyx_t_10, __pyx_v_best_score);
-                __Pyx_INCREF(__pyx_v_beta);
-                __Pyx_GIVEREF(__pyx_v_beta);
-                PyTuple_SET_ITEM(__pyx_t_6, 4+__pyx_t_10, __pyx_v_beta);
-                __Pyx_INCREF(__pyx_v_remaining_set);
-                __Pyx_GIVEREF(__pyx_v_remaining_set);
-                PyTuple_SET_ITEM(__pyx_t_6, 5+__pyx_t_10, __pyx_v_remaining_set);
-                __Pyx_GIVEREF(__pyx_t_8);
-                PyTuple_SET_ITEM(__pyx_t_6, 6+__pyx_t_10, __pyx_t_8);
-                __pyx_t_1 = 0;
-                __pyx_t_8 = 0;
-                __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_11, __pyx_t_6, NULL); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 205, __pyx_L1_error)
-                __Pyx_GOTREF(__pyx_t_7);
-                __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-              }
-              __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-              __Pyx_XDECREF_SET(__pyx_v_evaluation, __pyx_t_7);
-              __pyx_t_7 = 0;
-
-              /* "ai_minimax_alpha_beta.py":207
- *                                 evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, best_score, beta,
- *                                                           remaining_set, depth - 1)
- *                                 evaluation += score_addition             # <<<<<<<<<<<<<<
- *                                 if evaluation > best_score:
- *                                     best_score = evaluation
- */
-              __pyx_t_7 = PyNumber_InPlaceAdd(__pyx_v_evaluation, __pyx_v_score_addition); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 207, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_7);
-              __Pyx_DECREF_SET(__pyx_v_evaluation, __pyx_t_7);
-              __pyx_t_7 = 0;
-
-              /* "ai_minimax_alpha_beta.py":208
- *                                                           remaining_set, depth - 1)
- *                                 evaluation += score_addition
- *                                 if evaluation > best_score:             # <<<<<<<<<<<<<<
- *                                     best_score = evaluation
- *                                     if best_score >= beta:
- */
-              __pyx_t_7 = PyObject_RichCompare(__pyx_v_evaluation, __pyx_v_best_score, Py_GT); __Pyx_XGOTREF(__pyx_t_7); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 208, __pyx_L1_error)
-              __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 208, __pyx_L1_error)
-              __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-              if (__pyx_t_12) {
-
-                /* "ai_minimax_alpha_beta.py":209
- *                                 evaluation += score_addition
- *                                 if evaluation > best_score:
- *                                     best_score = evaluation             # <<<<<<<<<<<<<<
- *                                     if best_score >= beta:
- *                                         break
- */
-                __Pyx_INCREF(__pyx_v_evaluation);
-                __Pyx_DECREF_SET(__pyx_v_best_score, __pyx_v_evaluation);
-
-                /* "ai_minimax_alpha_beta.py":210
- *                                 if evaluation > best_score:
- *                                     best_score = evaluation
- *                                     if best_score >= beta:             # <<<<<<<<<<<<<<
- *                                         break
- *                         else:
- */
-                __pyx_t_7 = PyObject_RichCompare(__pyx_v_best_score, __pyx_v_beta, Py_GE); __Pyx_XGOTREF(__pyx_t_7); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 210, __pyx_L1_error)
-                __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 210, __pyx_L1_error)
-                __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-                if (__pyx_t_12) {
-
-                  /* "ai_minimax_alpha_beta.py":211
- *                                     best_score = evaluation
- *                                     if best_score >= beta:
- *                                         break             # <<<<<<<<<<<<<<
- *                         else:
- *                             continue
- */
-                  goto __pyx_L56_break;
-
-                  /* "ai_minimax_alpha_beta.py":210
- *                                 if evaluation > best_score:
- *                                     best_score = evaluation
- *                                     if best_score >= beta:             # <<<<<<<<<<<<<<
- *                                         break
- *                         else:
- */
-                }
-
-                /* "ai_minimax_alpha_beta.py":208
- *                                                           remaining_set, depth - 1)
- *                                 evaluation += score_addition
- *                                 if evaluation > best_score:             # <<<<<<<<<<<<<<
- *                                     best_score = evaluation
- *                                     if best_score >= beta:
- */
-              }
-
-              /* "ai_minimax_alpha_beta.py":177
- *                             if not possiblemoves:
- *                                 continue
- *                             for move in possiblemoves:             # <<<<<<<<<<<<<<
- *                                 board_ = copy.deepcopy(board)
- *                                 muhlen_ = copy.deepcopy(board_muhlen)
- */
-            }
-            __pyx_L56_break:;
-            __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-
-            /* "ai_minimax_alpha_beta.py":173
- *                 for ring in range(3):
- *                     for stelle in range(8):
- *                         if board[ring][stelle] == player:             # <<<<<<<<<<<<<<
- *                             possiblemoves = self.possiblemoves(ring, stelle, board)
- *                             if not possiblemoves:
- */
-            goto __pyx_L53;
-          }
-
-          /* "ai_minimax_alpha_beta.py":213
- *                                         break
- *                         else:
- *                             continue             # <<<<<<<<<<<<<<
- *                         break
- * 
- */
-          /*else*/ {
-            goto __pyx_L51_continue;
-          }
-          __pyx_L53:;
-
-          /* "ai_minimax_alpha_beta.py":214
- *                         else:
- *                             continue
- *                         break             # <<<<<<<<<<<<<<
- * 
- *                 return best_score
- */
-          goto __pyx_L52_break;
-          __pyx_L51_continue:;
-        }
-        __pyx_L52_break:;
-      }
-
-      /* "ai_minimax_alpha_beta.py":216
- *                         break
- * 
- *                 return best_score             # <<<<<<<<<<<<<<
- * 
- * 
- */
-      __Pyx_XDECREF(__pyx_r);
-      __Pyx_INCREF(__pyx_v_best_score);
-      __pyx_r = __pyx_v_best_score;
-      goto __pyx_L0;
-    }
-
-    /* "ai_minimax_alpha_beta.py":125
- * 
- *         # MAX
- *         if player == self.player:             # <<<<<<<<<<<<<<
- *             best_score = alpha
- *             # Phase 1
- */
-  }
-
-  /* "ai_minimax_alpha_beta.py":221
- *         # MIN
- *         else:
- *             best_score = beta             # <<<<<<<<<<<<<<
- *             if remaining_set:
- *                 # Phase 1
- */
-  /*else*/ {
-    __Pyx_INCREF(__pyx_v_beta);
-    __pyx_v_best_score = __pyx_v_beta;
-
-    /* "ai_minimax_alpha_beta.py":222
- *         else:
- *             best_score = beta
- *             if remaining_set:             # <<<<<<<<<<<<<<
- *                 # Phase 1
- *                 for ring in range(3):
- */
-    __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_v_remaining_set); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 222, __pyx_L1_error)
-    if (__pyx_t_12) {
-
-      /* "ai_minimax_alpha_beta.py":224
- *             if remaining_set:
- *                 # Phase 1
- *                 for ring in range(3):             # <<<<<<<<<<<<<<
- *                     for stelle in range(8):
- *                         if board[ring][stelle] == 0:
- */
-      for (__pyx_t_3 = 0; __pyx_t_3 < 3; __pyx_t_3+=1) {
-        __pyx_v_ring = __pyx_t_3;
-
-        /* "ai_minimax_alpha_beta.py":225
- *                 # Phase 1
- *                 for ring in range(3):
- *                     for stelle in range(8):             # <<<<<<<<<<<<<<
- *                         if board[ring][stelle] == 0:
- *                             board_ = copy.deepcopy(board)
- */
-        for (__pyx_t_4 = 0; __pyx_t_4 < 8; __pyx_t_4+=1) {
-          __pyx_v_stelle = __pyx_t_4;
-
-          /* "ai_minimax_alpha_beta.py":226
- *                 for ring in range(3):
- *                     for stelle in range(8):
- *                         if board[ring][stelle] == 0:             # <<<<<<<<<<<<<<
- *                             board_ = copy.deepcopy(board)
- *                             board_[ring][stelle] = player
- */
-          __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_board, __pyx_v_ring, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 226, __pyx_L1_error)
-          __Pyx_GOTREF(__pyx_t_5);
-          __pyx_t_7 = __Pyx_GetItemInt(__pyx_t_5, __pyx_v_stelle, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 226, __pyx_L1_error)
-          __Pyx_GOTREF(__pyx_t_7);
-          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-          __pyx_t_5 = __Pyx_PyInt_EqObjC(__pyx_t_7, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 226, __pyx_L1_error)
-          __Pyx_GOTREF(__pyx_t_5);
-          __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-          __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 226, __pyx_L1_error)
-          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-          if (__pyx_t_12) {
-
-            /* "ai_minimax_alpha_beta.py":227
- *                     for stelle in range(8):
- *                         if board[ring][stelle] == 0:
- *                             board_ = copy.deepcopy(board)             # <<<<<<<<<<<<<<
- *                             board_[ring][stelle] = player
- *                             muhlen_ = copy.deepcopy(board_muhlen)
- */
-            __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_copy); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 227, __pyx_L1_error)
-            __Pyx_GOTREF(__pyx_t_7);
-            __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_deepcopy); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 227, __pyx_L1_error)
-            __Pyx_GOTREF(__pyx_t_11);
-            __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-            __pyx_t_7 = NULL;
-            if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_11))) {
-              __pyx_t_7 = PyMethod_GET_SELF(__pyx_t_11);
-              if (likely(__pyx_t_7)) {
-                PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_11);
-                __Pyx_INCREF(__pyx_t_7);
-                __Pyx_INCREF(function);
-                __Pyx_DECREF_SET(__pyx_t_11, function);
-              }
-            }
-            __pyx_t_5 = (__pyx_t_7) ? __Pyx_PyObject_Call2Args(__pyx_t_11, __pyx_t_7, __pyx_v_board) : __Pyx_PyObject_CallOneArg(__pyx_t_11, __pyx_v_board);
-            __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-            if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 227, __pyx_L1_error)
-            __Pyx_GOTREF(__pyx_t_5);
-            __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-            __Pyx_XDECREF_SET(__pyx_v_board_, __pyx_t_5);
-            __pyx_t_5 = 0;
-
-            /* "ai_minimax_alpha_beta.py":228
- *                         if board[ring][stelle] == 0:
- *                             board_ = copy.deepcopy(board)
- *                             board_[ring][stelle] = player             # <<<<<<<<<<<<<<
- *                             muhlen_ = copy.deepcopy(board_muhlen)
- * 
- */
-            __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_board_, __pyx_v_ring, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 228, __pyx_L1_error)
-            __Pyx_GOTREF(__pyx_t_5);
-            if (unlikely(__Pyx_SetItemInt(__pyx_t_5, __pyx_v_stelle, __pyx_v_player, long, 1, __Pyx_PyInt_From_long, 0, 1, 1) < 0)) __PYX_ERR(0, 228, __pyx_L1_error)
-            __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-
-            /* "ai_minimax_alpha_beta.py":229
- *                             board_ = copy.deepcopy(board)
- *                             board_[ring][stelle] = player
- *                             muhlen_ = copy.deepcopy(board_muhlen)             # <<<<<<<<<<<<<<
- * 
- *                             if self.checkmuhle(ring, stelle, board_, player):
- */
-            __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_n_s_copy); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 229, __pyx_L1_error)
-            __Pyx_GOTREF(__pyx_t_11);
-            __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_11, __pyx_n_s_deepcopy); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 229, __pyx_L1_error)
-            __Pyx_GOTREF(__pyx_t_7);
-            __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-            __pyx_t_11 = NULL;
-            if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_7))) {
-              __pyx_t_11 = PyMethod_GET_SELF(__pyx_t_7);
-              if (likely(__pyx_t_11)) {
-                PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
-                __Pyx_INCREF(__pyx_t_11);
-                __Pyx_INCREF(function);
-                __Pyx_DECREF_SET(__pyx_t_7, function);
-              }
-            }
-            __pyx_t_5 = (__pyx_t_11) ? __Pyx_PyObject_Call2Args(__pyx_t_7, __pyx_t_11, __pyx_v_board_muhlen) : __Pyx_PyObject_CallOneArg(__pyx_t_7, __pyx_v_board_muhlen);
-            __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
-            if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 229, __pyx_L1_error)
-            __Pyx_GOTREF(__pyx_t_5);
-            __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-            __Pyx_XDECREF_SET(__pyx_v_muhlen_, __pyx_t_5);
-            __pyx_t_5 = 0;
-
-            /* "ai_minimax_alpha_beta.py":231
- *                             muhlen_ = copy.deepcopy(board_muhlen)
- * 
- *                             if self.checkmuhle(ring, stelle, board_, player):             # <<<<<<<<<<<<<<
- *                                 for ring_ in range(3):
- *                                     for stelle_ in range(8):
- */
-            __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_checkmuhle); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 231, __pyx_L1_error)
-            __Pyx_GOTREF(__pyx_t_7);
-            __pyx_t_11 = __Pyx_PyInt_From_long(__pyx_v_ring); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 231, __pyx_L1_error)
-            __Pyx_GOTREF(__pyx_t_11);
-            __pyx_t_6 = __Pyx_PyInt_From_long(__pyx_v_stelle); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 231, __pyx_L1_error)
-            __Pyx_GOTREF(__pyx_t_6);
-            __pyx_t_8 = NULL;
-            __pyx_t_10 = 0;
-            if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_7))) {
-              __pyx_t_8 = PyMethod_GET_SELF(__pyx_t_7);
-              if (likely(__pyx_t_8)) {
-                PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
-                __Pyx_INCREF(__pyx_t_8);
-                __Pyx_INCREF(function);
-                __Pyx_DECREF_SET(__pyx_t_7, function);
-                __pyx_t_10 = 1;
-              }
-            }
-            #if CYTHON_FAST_PYCALL
-            if (PyFunction_Check(__pyx_t_7)) {
-              PyObject *__pyx_temp[5] = {__pyx_t_8, __pyx_t_11, __pyx_t_6, __pyx_v_board_, __pyx_v_player};
-              __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_10, 4+__pyx_t_10); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 231, __pyx_L1_error)
-              __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-              __Pyx_GOTREF(__pyx_t_5);
-              __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-              __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-            } else
-            #endif
-            #if CYTHON_FAST_PYCCALL
-            if (__Pyx_PyFastCFunction_Check(__pyx_t_7)) {
-              PyObject *__pyx_temp[5] = {__pyx_t_8, __pyx_t_11, __pyx_t_6, __pyx_v_board_, __pyx_v_player};
-              __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_10, 4+__pyx_t_10); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 231, __pyx_L1_error)
-              __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-              __Pyx_GOTREF(__pyx_t_5);
-              __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-              __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-            } else
-            #endif
-            {
-              __pyx_t_1 = PyTuple_New(4+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 231, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_1);
-              if (__pyx_t_8) {
-                __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_8); __pyx_t_8 = NULL;
-              }
-              __Pyx_GIVEREF(__pyx_t_11);
-              PyTuple_SET_ITEM(__pyx_t_1, 0+__pyx_t_10, __pyx_t_11);
-              __Pyx_GIVEREF(__pyx_t_6);
-              PyTuple_SET_ITEM(__pyx_t_1, 1+__pyx_t_10, __pyx_t_6);
-              __Pyx_INCREF(__pyx_v_board_);
-              __Pyx_GIVEREF(__pyx_v_board_);
-              PyTuple_SET_ITEM(__pyx_t_1, 2+__pyx_t_10, __pyx_v_board_);
-              __Pyx_INCREF(__pyx_v_player);
-              __Pyx_GIVEREF(__pyx_v_player);
-              PyTuple_SET_ITEM(__pyx_t_1, 3+__pyx_t_10, __pyx_v_player);
-              __pyx_t_11 = 0;
-              __pyx_t_6 = 0;
-              __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_1, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 231, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_5);
-              __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-            }
-            __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-            __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 231, __pyx_L1_error)
-            __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-            if (__pyx_t_12) {
-
-              /* "ai_minimax_alpha_beta.py":232
- * 
- *                             if self.checkmuhle(ring, stelle, board_, player):
- *                                 for ring_ in range(3):             # <<<<<<<<<<<<<<
- *                                     for stelle_ in range(8):
- *                                         if board_[ring_][stelle_] == (1 if player == 2 else 2) and muhlen_[ring_][stelle_] == 0:
- */
-              for (__pyx_t_13 = 0; __pyx_t_13 < 3; __pyx_t_13+=1) {
-                __pyx_v_ring_ = __pyx_t_13;
-
-                /* "ai_minimax_alpha_beta.py":233
- *                             if self.checkmuhle(ring, stelle, board_, player):
- *                                 for ring_ in range(3):
- *                                     for stelle_ in range(8):             # <<<<<<<<<<<<<<
- *                                         if board_[ring_][stelle_] == (1 if player == 2 else 2) and muhlen_[ring_][stelle_] == 0:
- *                                             board_[ring_][stelle_] = 0
- */
-                for (__pyx_t_14 = 0; __pyx_t_14 < 8; __pyx_t_14+=1) {
-                  __pyx_v_stelle_ = __pyx_t_14;
-
-                  /* "ai_minimax_alpha_beta.py":234
- *                                 for ring_ in range(3):
- *                                     for stelle_ in range(8):
- *                                         if board_[ring_][stelle_] == (1 if player == 2 else 2) and muhlen_[ring_][stelle_] == 0:             # <<<<<<<<<<<<<<
- *                                             board_[ring_][stelle_] = 0
- *                                             break
- */
-                  __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_board_, __pyx_v_ring_, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 234, __pyx_L1_error)
-                  __Pyx_GOTREF(__pyx_t_5);
-                  __pyx_t_7 = __Pyx_GetItemInt(__pyx_t_5, __pyx_v_stelle_, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 234, __pyx_L1_error)
-                  __Pyx_GOTREF(__pyx_t_7);
-                  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-                  __pyx_t_1 = __Pyx_PyInt_EqObjC(__pyx_v_player, __pyx_int_2, 2, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 234, __pyx_L1_error)
-                  __Pyx_GOTREF(__pyx_t_1);
-                  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 234, __pyx_L1_error)
-                  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-                  if (__pyx_t_2) {
-                    __Pyx_INCREF(__pyx_int_1);
-                    __pyx_t_5 = __pyx_int_1;
-                  } else {
-                    __Pyx_INCREF(__pyx_int_2);
-                    __pyx_t_5 = __pyx_int_2;
-                  }
-                  __pyx_t_1 = PyObject_RichCompare(__pyx_t_7, __pyx_t_5, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 234, __pyx_L1_error)
-                  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-                  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-                  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 234, __pyx_L1_error)
-                  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-                  if (__pyx_t_2) {
-                  } else {
-                    __pyx_t_12 = __pyx_t_2;
-                    goto __pyx_L90_bool_binop_done;
-                  }
-                  __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_muhlen_, __pyx_v_ring_, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 234, __pyx_L1_error)
-                  __Pyx_GOTREF(__pyx_t_1);
-                  __pyx_t_5 = __Pyx_GetItemInt(__pyx_t_1, __pyx_v_stelle_, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 234, __pyx_L1_error)
-                  __Pyx_GOTREF(__pyx_t_5);
-                  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-                  __pyx_t_1 = __Pyx_PyInt_EqObjC(__pyx_t_5, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 234, __pyx_L1_error)
-                  __Pyx_GOTREF(__pyx_t_1);
-                  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-                  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 234, __pyx_L1_error)
-                  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-                  __pyx_t_12 = __pyx_t_2;
-                  __pyx_L90_bool_binop_done:;
-                  if (__pyx_t_12) {
-
-                    /* "ai_minimax_alpha_beta.py":235
- *                                     for stelle_ in range(8):
- *                                         if board_[ring_][stelle_] == (1 if player == 2 else 2) and muhlen_[ring_][stelle_] == 0:
- *                                             board_[ring_][stelle_] = 0             # <<<<<<<<<<<<<<
- *                                             break
- *                                     else:
- */
-                    __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_board_, __pyx_v_ring_, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 235, __pyx_L1_error)
-                    __Pyx_GOTREF(__pyx_t_1);
-                    if (unlikely(__Pyx_SetItemInt(__pyx_t_1, __pyx_v_stelle_, __pyx_int_0, long, 1, __Pyx_PyInt_From_long, 0, 1, 1) < 0)) __PYX_ERR(0, 235, __pyx_L1_error)
-                    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-
-                    /* "ai_minimax_alpha_beta.py":236
- *                                         if board_[ring_][stelle_] == (1 if player == 2 else 2) and muhlen_[ring_][stelle_] == 0:
- *                                             board_[ring_][stelle_] = 0
- *                                             break             # <<<<<<<<<<<<<<
- *                                     else:
- *                                         continue
- */
-                    goto __pyx_L88_break;
-
-                    /* "ai_minimax_alpha_beta.py":234
- *                                 for ring_ in range(3):
- *                                     for stelle_ in range(8):
- *                                         if board_[ring_][stelle_] == (1 if player == 2 else 2) and muhlen_[ring_][stelle_] == 0:             # <<<<<<<<<<<<<<
- *                                             board_[ring_][stelle_] = 0
- *                                             break
- */
-                  }
-                }
-                /*else*/ {
-
-                  /* "ai_minimax_alpha_beta.py":238
- *                                             break
- *                                     else:
- *                                         continue             # <<<<<<<<<<<<<<
- *                                     break
- * 
- */
-                  goto __pyx_L85_continue;
-                }
-                __pyx_L88_break:;
-
-                /* "ai_minimax_alpha_beta.py":239
- *                                     else:
- *                                         continue
- *                                     break             # <<<<<<<<<<<<<<
- * 
- *                             evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, alpha, best_score, remaining_set - 1, depth - 1)
- */
-                goto __pyx_L86_break;
-                __pyx_L85_continue:;
-              }
-              __pyx_L86_break:;
-
-              /* "ai_minimax_alpha_beta.py":231
- *                             muhlen_ = copy.deepcopy(board_muhlen)
- * 
- *                             if self.checkmuhle(ring, stelle, board_, player):             # <<<<<<<<<<<<<<
- *                                 for ring_ in range(3):
- *                                     for stelle_ in range(8):
- */
-            }
-
-            /* "ai_minimax_alpha_beta.py":241
- *                                     break
- * 
- *                             evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, alpha, best_score, remaining_set - 1, depth - 1)             # <<<<<<<<<<<<<<
- *                             if evaluation < best_score:
- *                                 best_score = evaluation
- */
-            __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_minimax); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 241, __pyx_L1_error)
-            __Pyx_GOTREF(__pyx_t_5);
-            __pyx_t_6 = __Pyx_PyInt_EqObjC(__pyx_v_player, __pyx_int_2, 2, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 241, __pyx_L1_error)
-            __Pyx_GOTREF(__pyx_t_6);
-            __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 241, __pyx_L1_error)
-            __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-            if (__pyx_t_12) {
-              __Pyx_INCREF(__pyx_int_1);
-              __pyx_t_7 = __pyx_int_1;
-            } else {
-              __Pyx_INCREF(__pyx_int_2);
-              __pyx_t_7 = __pyx_int_2;
-            }
-            __pyx_t_6 = __Pyx_PyInt_SubtractObjC(__pyx_v_remaining_set, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 241, __pyx_L1_error)
-            __Pyx_GOTREF(__pyx_t_6);
-            __pyx_t_11 = __Pyx_PyInt_SubtractObjC(__pyx_v_depth, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 241, __pyx_L1_error)
-            __Pyx_GOTREF(__pyx_t_11);
-            __pyx_t_8 = NULL;
-            __pyx_t_10 = 0;
-            if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_5))) {
-              __pyx_t_8 = PyMethod_GET_SELF(__pyx_t_5);
-              if (likely(__pyx_t_8)) {
-                PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_5);
-                __Pyx_INCREF(__pyx_t_8);
-                __Pyx_INCREF(function);
-                __Pyx_DECREF_SET(__pyx_t_5, function);
-                __pyx_t_10 = 1;
-              }
-            }
-            #if CYTHON_FAST_PYCALL
-            if (PyFunction_Check(__pyx_t_5)) {
-              PyObject *__pyx_temp[8] = {__pyx_t_8, __pyx_v_board_, __pyx_v_muhlen_, __pyx_t_7, __pyx_v_alpha, __pyx_v_best_score, __pyx_t_6, __pyx_t_11};
-              __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_10, 7+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 241, __pyx_L1_error)
-              __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-              __Pyx_GOTREF(__pyx_t_1);
-              __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-              __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-              __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-            } else
-            #endif
-            #if CYTHON_FAST_PYCCALL
-            if (__Pyx_PyFastCFunction_Check(__pyx_t_5)) {
-              PyObject *__pyx_temp[8] = {__pyx_t_8, __pyx_v_board_, __pyx_v_muhlen_, __pyx_t_7, __pyx_v_alpha, __pyx_v_best_score, __pyx_t_6, __pyx_t_11};
-              __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_10, 7+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 241, __pyx_L1_error)
-              __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-              __Pyx_GOTREF(__pyx_t_1);
-              __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-              __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-              __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-            } else
-            #endif
-            {
-              __pyx_t_9 = PyTuple_New(7+__pyx_t_10); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 241, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_9);
-              if (__pyx_t_8) {
-                __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_8); __pyx_t_8 = NULL;
-              }
-              __Pyx_INCREF(__pyx_v_board_);
-              __Pyx_GIVEREF(__pyx_v_board_);
-              PyTuple_SET_ITEM(__pyx_t_9, 0+__pyx_t_10, __pyx_v_board_);
-              __Pyx_INCREF(__pyx_v_muhlen_);
-              __Pyx_GIVEREF(__pyx_v_muhlen_);
-              PyTuple_SET_ITEM(__pyx_t_9, 1+__pyx_t_10, __pyx_v_muhlen_);
-              __Pyx_GIVEREF(__pyx_t_7);
-              PyTuple_SET_ITEM(__pyx_t_9, 2+__pyx_t_10, __pyx_t_7);
-              __Pyx_INCREF(__pyx_v_alpha);
-              __Pyx_GIVEREF(__pyx_v_alpha);
-              PyTuple_SET_ITEM(__pyx_t_9, 3+__pyx_t_10, __pyx_v_alpha);
-              __Pyx_INCREF(__pyx_v_best_score);
-              __Pyx_GIVEREF(__pyx_v_best_score);
-              PyTuple_SET_ITEM(__pyx_t_9, 4+__pyx_t_10, __pyx_v_best_score);
-              __Pyx_GIVEREF(__pyx_t_6);
-              PyTuple_SET_ITEM(__pyx_t_9, 5+__pyx_t_10, __pyx_t_6);
-              __Pyx_GIVEREF(__pyx_t_11);
-              PyTuple_SET_ITEM(__pyx_t_9, 6+__pyx_t_10, __pyx_t_11);
-              __pyx_t_7 = 0;
-              __pyx_t_6 = 0;
-              __pyx_t_11 = 0;
-              __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_9, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 241, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_1);
-              __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-            }
-            __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-            __Pyx_XDECREF_SET(__pyx_v_evaluation, __pyx_t_1);
-            __pyx_t_1 = 0;
-
-            /* "ai_minimax_alpha_beta.py":242
- * 
- *                             evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, alpha, best_score, remaining_set - 1, depth - 1)
- *                             if evaluation < best_score:             # <<<<<<<<<<<<<<
- *                                 best_score = evaluation
- *                                 if best_score <= alpha:
- */
-            __pyx_t_1 = PyObject_RichCompare(__pyx_v_evaluation, __pyx_v_best_score, Py_LT); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 242, __pyx_L1_error)
-            __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 242, __pyx_L1_error)
-            __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-            if (__pyx_t_12) {
-
-              /* "ai_minimax_alpha_beta.py":243
- *                             evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, alpha, best_score, remaining_set - 1, depth - 1)
- *                             if evaluation < best_score:
- *                                 best_score = evaluation             # <<<<<<<<<<<<<<
- *                                 if best_score <= alpha:
- *                                     break
- */
-              __Pyx_INCREF(__pyx_v_evaluation);
-              __Pyx_DECREF_SET(__pyx_v_best_score, __pyx_v_evaluation);
-
-              /* "ai_minimax_alpha_beta.py":244
- *                             if evaluation < best_score:
- *                                 best_score = evaluation
- *                                 if best_score <= alpha:             # <<<<<<<<<<<<<<
- *                                     break
- *                     else:
- */
-              __pyx_t_1 = PyObject_RichCompare(__pyx_v_best_score, __pyx_v_alpha, Py_LE); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 244, __pyx_L1_error)
-              __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 244, __pyx_L1_error)
-              __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-              if (__pyx_t_12) {
-
-                /* "ai_minimax_alpha_beta.py":245
- *                                 best_score = evaluation
- *                                 if best_score <= alpha:
- *                                     break             # <<<<<<<<<<<<<<
- *                     else:
- *                         continue
- */
-                goto __pyx_L82_break;
-
-                /* "ai_minimax_alpha_beta.py":244
- *                             if evaluation < best_score:
- *                                 best_score = evaluation
- *                                 if best_score <= alpha:             # <<<<<<<<<<<<<<
- *                                     break
- *                     else:
- */
-              }
-
-              /* "ai_minimax_alpha_beta.py":242
- * 
- *                             evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, alpha, best_score, remaining_set - 1, depth - 1)
- *                             if evaluation < best_score:             # <<<<<<<<<<<<<<
- *                                 best_score = evaluation
- *                                 if best_score <= alpha:
- */
-            }
-
-            /* "ai_minimax_alpha_beta.py":226
- *                 for ring in range(3):
- *                     for stelle in range(8):
- *                         if board[ring][stelle] == 0:             # <<<<<<<<<<<<<<
- *                             board_ = copy.deepcopy(board)
- *                             board_[ring][stelle] = player
- */
-          }
-        }
-        /*else*/ {
-
-          /* "ai_minimax_alpha_beta.py":247
- *                                     break
- *                     else:
- *                         continue             # <<<<<<<<<<<<<<
- *                     break
- *                 return best_score
- */
-          goto __pyx_L79_continue;
-        }
-        __pyx_L82_break:;
-
-        /* "ai_minimax_alpha_beta.py":248
- *                     else:
- *                         continue
- *                     break             # <<<<<<<<<<<<<<
- *                 return best_score
- *             else:
- */
-        goto __pyx_L80_break;
-        __pyx_L79_continue:;
-      }
-      __pyx_L80_break:;
-
-      /* "ai_minimax_alpha_beta.py":249
- *                         continue
- *                     break
- *                 return best_score             # <<<<<<<<<<<<<<
- *             else:
- *                 # Phase 2
- */
-      __Pyx_XDECREF(__pyx_r);
-      __Pyx_INCREF(__pyx_v_best_score);
-      __pyx_r = __pyx_v_best_score;
-      goto __pyx_L0;
-
-      /* "ai_minimax_alpha_beta.py":222
- *         else:
- *             best_score = beta
- *             if remaining_set:             # <<<<<<<<<<<<<<
- *                 # Phase 1
- *                 for ring in range(3):
- */
-    }
-
-    /* "ai_minimax_alpha_beta.py":252
- *             else:
- *                 # Phase 2
- *                 mymen = 0             # <<<<<<<<<<<<<<
- *                 theirmen = 0
- *                 for i in range(3):
- */
-    /*else*/ {
-      __Pyx_INCREF(__pyx_int_0);
-      __pyx_v_mymen = __pyx_int_0;
-
-      /* "ai_minimax_alpha_beta.py":253
- *                 # Phase 2
- *                 mymen = 0
- *                 theirmen = 0             # <<<<<<<<<<<<<<
- *                 for i in range(3):
- *                     for j in range(8):
- */
-      __Pyx_INCREF(__pyx_int_0);
-      __pyx_v_theirmen = __pyx_int_0;
-
-      /* "ai_minimax_alpha_beta.py":254
- *                 mymen = 0
- *                 theirmen = 0
- *                 for i in range(3):             # <<<<<<<<<<<<<<
- *                     for j in range(8):
- *                         if board[i][j] == player:
- */
-      for (__pyx_t_3 = 0; __pyx_t_3 < 3; __pyx_t_3+=1) {
-        __pyx_v_i = __pyx_t_3;
-
-        /* "ai_minimax_alpha_beta.py":255
- *                 theirmen = 0
- *                 for i in range(3):
- *                     for j in range(8):             # <<<<<<<<<<<<<<
- *                         if board[i][j] == player:
- *                             mymen += 1
- */
-        for (__pyx_t_4 = 0; __pyx_t_4 < 8; __pyx_t_4+=1) {
-          __pyx_v_j = __pyx_t_4;
-
-          /* "ai_minimax_alpha_beta.py":256
- *                 for i in range(3):
- *                     for j in range(8):
- *                         if board[i][j] == player:             # <<<<<<<<<<<<<<
- *                             mymen += 1
- *                         elif board[i][j] == 1 if player == 2 else 2:
- */
-          __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_board, __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 256, __pyx_L1_error)
-          __Pyx_GOTREF(__pyx_t_1);
-          __pyx_t_5 = __Pyx_GetItemInt(__pyx_t_1, __pyx_v_j, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 256, __pyx_L1_error)
-          __Pyx_GOTREF(__pyx_t_5);
-          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-          __pyx_t_1 = PyObject_RichCompare(__pyx_t_5, __pyx_v_player, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 256, __pyx_L1_error)
-          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-          __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 256, __pyx_L1_error)
-          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-          if (__pyx_t_12) {
-
-            /* "ai_minimax_alpha_beta.py":257
- *                     for j in range(8):
- *                         if board[i][j] == player:
- *                             mymen += 1             # <<<<<<<<<<<<<<
- *                         elif board[i][j] == 1 if player == 2 else 2:
- *                             theirmen += 1
- */
-            __pyx_t_1 = __Pyx_PyInt_AddObjC(__pyx_v_mymen, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 257, __pyx_L1_error)
-            __Pyx_GOTREF(__pyx_t_1);
-            __Pyx_DECREF_SET(__pyx_v_mymen, __pyx_t_1);
-            __pyx_t_1 = 0;
-
-            /* "ai_minimax_alpha_beta.py":256
- *                 for i in range(3):
- *                     for j in range(8):
- *                         if board[i][j] == player:             # <<<<<<<<<<<<<<
- *                             mymen += 1
- *                         elif board[i][j] == 1 if player == 2 else 2:
- */
-            goto __pyx_L98;
-          }
-
-          /* "ai_minimax_alpha_beta.py":258
- *                         if board[i][j] == player:
- *                             mymen += 1
- *                         elif board[i][j] == 1 if player == 2 else 2:             # <<<<<<<<<<<<<<
- *                             theirmen += 1
- * 
- */
-          __pyx_t_5 = __Pyx_PyInt_EqObjC(__pyx_v_player, __pyx_int_2, 2, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 258, __pyx_L1_error)
-          __Pyx_GOTREF(__pyx_t_5);
-          __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 258, __pyx_L1_error)
-          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-          if (__pyx_t_12) {
-            __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_board, __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 258, __pyx_L1_error)
-            __Pyx_GOTREF(__pyx_t_5);
-            __pyx_t_9 = __Pyx_GetItemInt(__pyx_t_5, __pyx_v_j, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 258, __pyx_L1_error)
-            __Pyx_GOTREF(__pyx_t_9);
-            __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-            __pyx_t_5 = __Pyx_PyInt_EqObjC(__pyx_t_9, __pyx_int_1, 1, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 258, __pyx_L1_error)
-            __Pyx_GOTREF(__pyx_t_5);
-            __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-            __pyx_t_1 = __pyx_t_5;
-            __pyx_t_5 = 0;
-          } else {
-            __Pyx_INCREF(__pyx_int_2);
-            __pyx_t_1 = __pyx_int_2;
-          }
-          __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 258, __pyx_L1_error)
-          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-          if (__pyx_t_12) {
-
-            /* "ai_minimax_alpha_beta.py":259
- *                             mymen += 1
- *                         elif board[i][j] == 1 if player == 2 else 2:
- *                             theirmen += 1             # <<<<<<<<<<<<<<
- * 
- *                 for ring in range(3):
- */
-            __pyx_t_1 = __Pyx_PyInt_AddObjC(__pyx_v_theirmen, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 259, __pyx_L1_error)
-            __Pyx_GOTREF(__pyx_t_1);
-            __Pyx_DECREF_SET(__pyx_v_theirmen, __pyx_t_1);
-            __pyx_t_1 = 0;
-
-            /* "ai_minimax_alpha_beta.py":258
- *                         if board[i][j] == player:
- *                             mymen += 1
- *                         elif board[i][j] == 1 if player == 2 else 2:             # <<<<<<<<<<<<<<
- *                             theirmen += 1
- * 
- */
-          }
-          __pyx_L98:;
-        }
-      }
-
-      /* "ai_minimax_alpha_beta.py":261
- *                             theirmen += 1
- * 
- *                 for ring in range(3):             # <<<<<<<<<<<<<<
- *                     for stelle in range(8):
- *                         if board[ring][stelle] == player:
- */
-      for (__pyx_t_3 = 0; __pyx_t_3 < 3; __pyx_t_3+=1) {
-        __pyx_v_ring = __pyx_t_3;
-
-        /* "ai_minimax_alpha_beta.py":262
- * 
- *                 for ring in range(3):
- *                     for stelle in range(8):             # <<<<<<<<<<<<<<
- *                         if board[ring][stelle] == player:
- *                             possiblemoves = self.possiblemoves(ring, stelle, board)
- */
-        for (__pyx_t_4 = 0; __pyx_t_4 < 8; __pyx_t_4+=1) {
-          __pyx_v_stelle = __pyx_t_4;
-
-          /* "ai_minimax_alpha_beta.py":263
- *                 for ring in range(3):
- *                     for stelle in range(8):
- *                         if board[ring][stelle] == player:             # <<<<<<<<<<<<<<
- *                             possiblemoves = self.possiblemoves(ring, stelle, board)
- *                             if not possiblemoves:
- */
-          __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_board, __pyx_v_ring, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 263, __pyx_L1_error)
-          __Pyx_GOTREF(__pyx_t_1);
-          __pyx_t_5 = __Pyx_GetItemInt(__pyx_t_1, __pyx_v_stelle, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 263, __pyx_L1_error)
-          __Pyx_GOTREF(__pyx_t_5);
-          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-          __pyx_t_1 = PyObject_RichCompare(__pyx_t_5, __pyx_v_player, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 263, __pyx_L1_error)
-          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-          __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 263, __pyx_L1_error)
-          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-          if (__pyx_t_12) {
-
-            /* "ai_minimax_alpha_beta.py":264
- *                     for stelle in range(8):
- *                         if board[ring][stelle] == player:
- *                             possiblemoves = self.possiblemoves(ring, stelle, board)             # <<<<<<<<<<<<<<
- *                             if not possiblemoves:
- *                                 continue
- */
-            __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_possiblemoves); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 264, __pyx_L1_error)
-            __Pyx_GOTREF(__pyx_t_5);
-            __pyx_t_9 = __Pyx_PyInt_From_long(__pyx_v_ring); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 264, __pyx_L1_error)
-            __Pyx_GOTREF(__pyx_t_9);
-            __pyx_t_11 = __Pyx_PyInt_From_long(__pyx_v_stelle); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 264, __pyx_L1_error)
-            __Pyx_GOTREF(__pyx_t_11);
-            __pyx_t_6 = NULL;
-            __pyx_t_10 = 0;
-            if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_5))) {
-              __pyx_t_6 = PyMethod_GET_SELF(__pyx_t_5);
-              if (likely(__pyx_t_6)) {
-                PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_5);
-                __Pyx_INCREF(__pyx_t_6);
-                __Pyx_INCREF(function);
-                __Pyx_DECREF_SET(__pyx_t_5, function);
-                __pyx_t_10 = 1;
-              }
-            }
-            #if CYTHON_FAST_PYCALL
-            if (PyFunction_Check(__pyx_t_5)) {
-              PyObject *__pyx_temp[4] = {__pyx_t_6, __pyx_t_9, __pyx_t_11, __pyx_v_board};
-              __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_10, 3+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 264, __pyx_L1_error)
-              __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-              __Pyx_GOTREF(__pyx_t_1);
-              __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-              __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-            } else
-            #endif
-            #if CYTHON_FAST_PYCCALL
-            if (__Pyx_PyFastCFunction_Check(__pyx_t_5)) {
-              PyObject *__pyx_temp[4] = {__pyx_t_6, __pyx_t_9, __pyx_t_11, __pyx_v_board};
-              __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_10, 3+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 264, __pyx_L1_error)
-              __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-              __Pyx_GOTREF(__pyx_t_1);
-              __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-              __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-            } else
-            #endif
-            {
-              __pyx_t_7 = PyTuple_New(3+__pyx_t_10); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 264, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_7);
-              if (__pyx_t_6) {
-                __Pyx_GIVEREF(__pyx_t_6); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_6); __pyx_t_6 = NULL;
-              }
-              __Pyx_GIVEREF(__pyx_t_9);
-              PyTuple_SET_ITEM(__pyx_t_7, 0+__pyx_t_10, __pyx_t_9);
-              __Pyx_GIVEREF(__pyx_t_11);
-              PyTuple_SET_ITEM(__pyx_t_7, 1+__pyx_t_10, __pyx_t_11);
-              __Pyx_INCREF(__pyx_v_board);
-              __Pyx_GIVEREF(__pyx_v_board);
-              PyTuple_SET_ITEM(__pyx_t_7, 2+__pyx_t_10, __pyx_v_board);
-              __pyx_t_9 = 0;
-              __pyx_t_11 = 0;
-              __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_7, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 264, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_1);
-              __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-            }
-            __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-            __Pyx_XDECREF_SET(__pyx_v_possiblemoves, __pyx_t_1);
-            __pyx_t_1 = 0;
-
-            /* "ai_minimax_alpha_beta.py":265
- *                         if board[ring][stelle] == player:
- *                             possiblemoves = self.possiblemoves(ring, stelle, board)
- *                             if not possiblemoves:             # <<<<<<<<<<<<<<
- *                                 continue
- *                             for move in possiblemoves:
- */
-            __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_v_possiblemoves); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 265, __pyx_L1_error)
-            __pyx_t_2 = ((!__pyx_t_12) != 0);
-            if (__pyx_t_2) {
-
-              /* "ai_minimax_alpha_beta.py":266
- *                             possiblemoves = self.possiblemoves(ring, stelle, board)
- *                             if not possiblemoves:
- *                                 continue             # <<<<<<<<<<<<<<
- *                             for move in possiblemoves:
- *                                 board_ = copy.deepcopy(board)
- */
-              goto __pyx_L101_continue;
-
-              /* "ai_minimax_alpha_beta.py":265
- *                         if board[ring][stelle] == player:
- *                             possiblemoves = self.possiblemoves(ring, stelle, board)
- *                             if not possiblemoves:             # <<<<<<<<<<<<<<
- *                                 continue
- *                             for move in possiblemoves:
- */
-            }
-
-            /* "ai_minimax_alpha_beta.py":267
- *                             if not possiblemoves:
- *                                 continue
- *                             for move in possiblemoves:             # <<<<<<<<<<<<<<
- *                                 board_ = copy.deepcopy(board)
- *                                 muhlen_ = copy.deepcopy(board_muhlen)
- */
-            if (likely(PyList_CheckExact(__pyx_v_possiblemoves)) || PyTuple_CheckExact(__pyx_v_possiblemoves)) {
-              __pyx_t_1 = __pyx_v_possiblemoves; __Pyx_INCREF(__pyx_t_1); __pyx_t_15 = 0;
-              __pyx_t_16 = NULL;
-            } else {
-              __pyx_t_15 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_v_possiblemoves); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 267, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_1);
-              __pyx_t_16 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 267, __pyx_L1_error)
-            }
-            for (;;) {
-              if (likely(!__pyx_t_16)) {
-                if (likely(PyList_CheckExact(__pyx_t_1))) {
-                  if (__pyx_t_15 >= PyList_GET_SIZE(__pyx_t_1)) break;
-                  #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-                  __pyx_t_5 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_15); __Pyx_INCREF(__pyx_t_5); __pyx_t_15++; if (unlikely(0 < 0)) __PYX_ERR(0, 267, __pyx_L1_error)
-                  #else
-                  __pyx_t_5 = PySequence_ITEM(__pyx_t_1, __pyx_t_15); __pyx_t_15++; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 267, __pyx_L1_error)
-                  __Pyx_GOTREF(__pyx_t_5);
-                  #endif
-                } else {
-                  if (__pyx_t_15 >= PyTuple_GET_SIZE(__pyx_t_1)) break;
-                  #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-                  __pyx_t_5 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_15); __Pyx_INCREF(__pyx_t_5); __pyx_t_15++; if (unlikely(0 < 0)) __PYX_ERR(0, 267, __pyx_L1_error)
-                  #else
-                  __pyx_t_5 = PySequence_ITEM(__pyx_t_1, __pyx_t_15); __pyx_t_15++; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 267, __pyx_L1_error)
-                  __Pyx_GOTREF(__pyx_t_5);
-                  #endif
-                }
-              } else {
-                __pyx_t_5 = __pyx_t_16(__pyx_t_1);
-                if (unlikely(!__pyx_t_5)) {
-                  PyObject* exc_type = PyErr_Occurred();
-                  if (exc_type) {
-                    if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-                    else __PYX_ERR(0, 267, __pyx_L1_error)
-                  }
-                  break;
-                }
-                __Pyx_GOTREF(__pyx_t_5);
-              }
-              __Pyx_XDECREF_SET(__pyx_v_move, __pyx_t_5);
-              __pyx_t_5 = 0;
-
-              /* "ai_minimax_alpha_beta.py":268
- *                                 continue
- *                             for move in possiblemoves:
- *                                 board_ = copy.deepcopy(board)             # <<<<<<<<<<<<<<
- *                                 muhlen_ = copy.deepcopy(board_muhlen)
- *                                 board_[ring][stelle] = 0
- */
-              __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_copy); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 268, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_7);
-              __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_deepcopy); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 268, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_11);
-              __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-              __pyx_t_7 = NULL;
-              if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_11))) {
-                __pyx_t_7 = PyMethod_GET_SELF(__pyx_t_11);
-                if (likely(__pyx_t_7)) {
-                  PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_11);
-                  __Pyx_INCREF(__pyx_t_7);
-                  __Pyx_INCREF(function);
-                  __Pyx_DECREF_SET(__pyx_t_11, function);
-                }
-              }
-              __pyx_t_5 = (__pyx_t_7) ? __Pyx_PyObject_Call2Args(__pyx_t_11, __pyx_t_7, __pyx_v_board) : __Pyx_PyObject_CallOneArg(__pyx_t_11, __pyx_v_board);
-              __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-              if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 268, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_5);
-              __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-              __Pyx_XDECREF_SET(__pyx_v_board_, __pyx_t_5);
-              __pyx_t_5 = 0;
-
-              /* "ai_minimax_alpha_beta.py":269
- *                             for move in possiblemoves:
- *                                 board_ = copy.deepcopy(board)
- *                                 muhlen_ = copy.deepcopy(board_muhlen)             # <<<<<<<<<<<<<<
- *                                 board_[ring][stelle] = 0
- *                                 try:
- */
-              __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_n_s_copy); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 269, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_11);
-              __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_11, __pyx_n_s_deepcopy); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 269, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_7);
-              __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-              __pyx_t_11 = NULL;
-              if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_7))) {
-                __pyx_t_11 = PyMethod_GET_SELF(__pyx_t_7);
-                if (likely(__pyx_t_11)) {
-                  PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
-                  __Pyx_INCREF(__pyx_t_11);
-                  __Pyx_INCREF(function);
-                  __Pyx_DECREF_SET(__pyx_t_7, function);
-                }
-              }
-              __pyx_t_5 = (__pyx_t_11) ? __Pyx_PyObject_Call2Args(__pyx_t_7, __pyx_t_11, __pyx_v_board_muhlen) : __Pyx_PyObject_CallOneArg(__pyx_t_7, __pyx_v_board_muhlen);
-              __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
-              if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 269, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_5);
-              __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-              __Pyx_XDECREF_SET(__pyx_v_muhlen_, __pyx_t_5);
-              __pyx_t_5 = 0;
-
-              /* "ai_minimax_alpha_beta.py":270
- *                                 board_ = copy.deepcopy(board)
- *                                 muhlen_ = copy.deepcopy(board_muhlen)
- *                                 board_[ring][stelle] = 0             # <<<<<<<<<<<<<<
- *                                 try:
- *                                     board_[move[0]][move[1]] = player
- */
-              __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_board_, __pyx_v_ring, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 270, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_5);
-              if (unlikely(__Pyx_SetItemInt(__pyx_t_5, __pyx_v_stelle, __pyx_int_0, long, 1, __Pyx_PyInt_From_long, 0, 1, 1) < 0)) __PYX_ERR(0, 270, __pyx_L1_error)
-              __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-
-              /* "ai_minimax_alpha_beta.py":271
- *                                 muhlen_ = copy.deepcopy(board_muhlen)
- *                                 board_[ring][stelle] = 0
- *                                 try:             # <<<<<<<<<<<<<<
- *                                     board_[move[0]][move[1]] = player
- *                                 except:
- */
-              {
-                __Pyx_PyThreadState_declare
-                __Pyx_PyThreadState_assign
-                __Pyx_ExceptionSave(&__pyx_t_19, &__pyx_t_18, &__pyx_t_17);
-                __Pyx_XGOTREF(__pyx_t_19);
-                __Pyx_XGOTREF(__pyx_t_18);
-                __Pyx_XGOTREF(__pyx_t_17);
-                /*try:*/ {
-
-                  /* "ai_minimax_alpha_beta.py":272
- *                                 board_[ring][stelle] = 0
- *                                 try:
- *                                     board_[move[0]][move[1]] = player             # <<<<<<<<<<<<<<
- *                                 except:
- *                                     print("ERROR"+str(move))
- */
-                  __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_move, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 272, __pyx_L107_error)
-                  __Pyx_GOTREF(__pyx_t_5);
-                  __pyx_t_7 = __Pyx_PyObject_GetItem(__pyx_v_board_, __pyx_t_5); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 272, __pyx_L107_error)
-                  __Pyx_GOTREF(__pyx_t_7);
-                  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-                  __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_move, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 272, __pyx_L107_error)
-                  __Pyx_GOTREF(__pyx_t_5);
-                  if (unlikely(PyObject_SetItem(__pyx_t_7, __pyx_t_5, __pyx_v_player) < 0)) __PYX_ERR(0, 272, __pyx_L107_error)
-                  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-                  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-
-                  /* "ai_minimax_alpha_beta.py":271
- *                                 muhlen_ = copy.deepcopy(board_muhlen)
- *                                 board_[ring][stelle] = 0
- *                                 try:             # <<<<<<<<<<<<<<
- *                                     board_[move[0]][move[1]] = player
- *                                 except:
- */
-                }
-                __Pyx_XDECREF(__pyx_t_19); __pyx_t_19 = 0;
-                __Pyx_XDECREF(__pyx_t_18); __pyx_t_18 = 0;
-                __Pyx_XDECREF(__pyx_t_17); __pyx_t_17 = 0;
-                goto __pyx_L114_try_end;
-                __pyx_L107_error:;
-                __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
-                __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-                __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-                __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-                __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-                __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
-
-                /* "ai_minimax_alpha_beta.py":273
- *                                 try:
- *                                     board_[move[0]][move[1]] = player
- *                                 except:             # <<<<<<<<<<<<<<
- *                                     print("ERROR"+str(move))
- *                                 # check if new mill has been generated / zwickmuehle
- */
-                /*except:*/ {
-                  __Pyx_AddTraceback("ai_minimax_alpha_beta.Morris.minimax", __pyx_clineno, __pyx_lineno, __pyx_filename);
-                  if (__Pyx_GetException(&__pyx_t_5, &__pyx_t_7, &__pyx_t_11) < 0) __PYX_ERR(0, 273, __pyx_L109_except_error)
-                  __Pyx_GOTREF(__pyx_t_5);
-                  __Pyx_GOTREF(__pyx_t_7);
-                  __Pyx_GOTREF(__pyx_t_11);
-
-                  /* "ai_minimax_alpha_beta.py":274
- *                                     board_[move[0]][move[1]] = player
- *                                 except:
- *                                     print("ERROR"+str(move))             # <<<<<<<<<<<<<<
- *                                 # check if new mill has been generated / zwickmuehle
- *                                 # TODO: kinda whack
- */
-                  __pyx_t_9 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyString_Type)), __pyx_v_move); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 274, __pyx_L109_except_error)
-                  __Pyx_GOTREF(__pyx_t_9);
-                  __pyx_t_6 = PyNumber_Add(__pyx_n_s_ERROR, __pyx_t_9); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 274, __pyx_L109_except_error)
-                  __Pyx_GOTREF(__pyx_t_6);
-                  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-                  if (__Pyx_PrintOne(0, __pyx_t_6) < 0) __PYX_ERR(0, 274, __pyx_L109_except_error)
-                  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-                  __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-                  __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-                  __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
-                  goto __pyx_L108_exception_handled;
-                }
-                __pyx_L109_except_error:;
-
-                /* "ai_minimax_alpha_beta.py":271
- *                                 muhlen_ = copy.deepcopy(board_muhlen)
- *                                 board_[ring][stelle] = 0
- *                                 try:             # <<<<<<<<<<<<<<
- *                                     board_[move[0]][move[1]] = player
- *                                 except:
- */
-                __Pyx_XGIVEREF(__pyx_t_19);
-                __Pyx_XGIVEREF(__pyx_t_18);
-                __Pyx_XGIVEREF(__pyx_t_17);
-                __Pyx_ExceptionReset(__pyx_t_19, __pyx_t_18, __pyx_t_17);
-                goto __pyx_L1_error;
-                __pyx_L108_exception_handled:;
-                __Pyx_XGIVEREF(__pyx_t_19);
-                __Pyx_XGIVEREF(__pyx_t_18);
-                __Pyx_XGIVEREF(__pyx_t_17);
-                __Pyx_ExceptionReset(__pyx_t_19, __pyx_t_18, __pyx_t_17);
-                __pyx_L114_try_end:;
-              }
-
-              /* "ai_minimax_alpha_beta.py":277
- *                                 # check if new mill has been generated / zwickmuehle
- *                                 # TODO: kinda whack
- *                                 score_addition = 0             # <<<<<<<<<<<<<<
- *                                 if self.checkmuhle(move[0], move[1], board_, player):
- *                                     # New mill generated
- */
-              __Pyx_INCREF(__pyx_int_0);
-              __Pyx_XDECREF_SET(__pyx_v_score_addition, __pyx_int_0);
-
-              /* "ai_minimax_alpha_beta.py":278
- *                                 # TODO: kinda whack
- *                                 score_addition = 0
- *                                 if self.checkmuhle(move[0], move[1], board_, player):             # <<<<<<<<<<<<<<
- *                                     # New mill generated
- *                                     score_addition += 20
- */
-              __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_checkmuhle); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 278, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_7);
-              __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_move, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 278, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_5);
-              __pyx_t_6 = __Pyx_GetItemInt(__pyx_v_move, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 278, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_6);
-              __pyx_t_9 = NULL;
-              __pyx_t_10 = 0;
-              if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_7))) {
-                __pyx_t_9 = PyMethod_GET_SELF(__pyx_t_7);
-                if (likely(__pyx_t_9)) {
-                  PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
-                  __Pyx_INCREF(__pyx_t_9);
-                  __Pyx_INCREF(function);
-                  __Pyx_DECREF_SET(__pyx_t_7, function);
-                  __pyx_t_10 = 1;
-                }
-              }
-              #if CYTHON_FAST_PYCALL
-              if (PyFunction_Check(__pyx_t_7)) {
-                PyObject *__pyx_temp[5] = {__pyx_t_9, __pyx_t_5, __pyx_t_6, __pyx_v_board_, __pyx_v_player};
-                __pyx_t_11 = __Pyx_PyFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_10, 4+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 278, __pyx_L1_error)
-                __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
-                __Pyx_GOTREF(__pyx_t_11);
-                __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-                __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-              } else
-              #endif
-              #if CYTHON_FAST_PYCCALL
-              if (__Pyx_PyFastCFunction_Check(__pyx_t_7)) {
-                PyObject *__pyx_temp[5] = {__pyx_t_9, __pyx_t_5, __pyx_t_6, __pyx_v_board_, __pyx_v_player};
-                __pyx_t_11 = __Pyx_PyCFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_10, 4+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 278, __pyx_L1_error)
-                __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
-                __Pyx_GOTREF(__pyx_t_11);
-                __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-                __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-              } else
-              #endif
-              {
-                __pyx_t_8 = PyTuple_New(4+__pyx_t_10); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 278, __pyx_L1_error)
-                __Pyx_GOTREF(__pyx_t_8);
-                if (__pyx_t_9) {
-                  __Pyx_GIVEREF(__pyx_t_9); PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_9); __pyx_t_9 = NULL;
-                }
-                __Pyx_GIVEREF(__pyx_t_5);
-                PyTuple_SET_ITEM(__pyx_t_8, 0+__pyx_t_10, __pyx_t_5);
-                __Pyx_GIVEREF(__pyx_t_6);
-                PyTuple_SET_ITEM(__pyx_t_8, 1+__pyx_t_10, __pyx_t_6);
-                __Pyx_INCREF(__pyx_v_board_);
-                __Pyx_GIVEREF(__pyx_v_board_);
-                PyTuple_SET_ITEM(__pyx_t_8, 2+__pyx_t_10, __pyx_v_board_);
-                __Pyx_INCREF(__pyx_v_player);
-                __Pyx_GIVEREF(__pyx_v_player);
-                PyTuple_SET_ITEM(__pyx_t_8, 3+__pyx_t_10, __pyx_v_player);
-                __pyx_t_5 = 0;
-                __pyx_t_6 = 0;
-                __pyx_t_11 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_8, NULL); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 278, __pyx_L1_error)
-                __Pyx_GOTREF(__pyx_t_11);
-                __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-              }
-              __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-              __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_11); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 278, __pyx_L1_error)
-              __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-              if (__pyx_t_2) {
-
-                /* "ai_minimax_alpha_beta.py":280
- *                                 if self.checkmuhle(move[0], move[1], board_, player):
- *                                     # New mill generated
- *                                     score_addition += 20             # <<<<<<<<<<<<<<
- *                                     if self.checkmuhle(ring, stelle, board, player):
- *                                         # Zwickmuehle
- */
-                __pyx_t_11 = __Pyx_PyInt_AddObjC(__pyx_v_score_addition, __pyx_int_20, 20, 1, 0); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 280, __pyx_L1_error)
-                __Pyx_GOTREF(__pyx_t_11);
-                __Pyx_DECREF_SET(__pyx_v_score_addition, __pyx_t_11);
-                __pyx_t_11 = 0;
-
-                /* "ai_minimax_alpha_beta.py":281
- *                                     # New mill generated
- *                                     score_addition += 20
- *                                     if self.checkmuhle(ring, stelle, board, player):             # <<<<<<<<<<<<<<
- *                                         # Zwickmuehle
- *                                         score_addition += 60
- */
-                __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_checkmuhle); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 281, __pyx_L1_error)
-                __Pyx_GOTREF(__pyx_t_7);
-                __pyx_t_8 = __Pyx_PyInt_From_long(__pyx_v_ring); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 281, __pyx_L1_error)
-                __Pyx_GOTREF(__pyx_t_8);
-                __pyx_t_6 = __Pyx_PyInt_From_long(__pyx_v_stelle); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 281, __pyx_L1_error)
-                __Pyx_GOTREF(__pyx_t_6);
-                __pyx_t_5 = NULL;
-                __pyx_t_10 = 0;
-                if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_7))) {
-                  __pyx_t_5 = PyMethod_GET_SELF(__pyx_t_7);
-                  if (likely(__pyx_t_5)) {
-                    PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
-                    __Pyx_INCREF(__pyx_t_5);
-                    __Pyx_INCREF(function);
-                    __Pyx_DECREF_SET(__pyx_t_7, function);
-                    __pyx_t_10 = 1;
-                  }
-                }
-                #if CYTHON_FAST_PYCALL
-                if (PyFunction_Check(__pyx_t_7)) {
-                  PyObject *__pyx_temp[5] = {__pyx_t_5, __pyx_t_8, __pyx_t_6, __pyx_v_board, __pyx_v_player};
-                  __pyx_t_11 = __Pyx_PyFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_10, 4+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 281, __pyx_L1_error)
-                  __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-                  __Pyx_GOTREF(__pyx_t_11);
-                  __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-                  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-                } else
-                #endif
-                #if CYTHON_FAST_PYCCALL
-                if (__Pyx_PyFastCFunction_Check(__pyx_t_7)) {
-                  PyObject *__pyx_temp[5] = {__pyx_t_5, __pyx_t_8, __pyx_t_6, __pyx_v_board, __pyx_v_player};
-                  __pyx_t_11 = __Pyx_PyCFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_10, 4+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 281, __pyx_L1_error)
-                  __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-                  __Pyx_GOTREF(__pyx_t_11);
-                  __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-                  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-                } else
-                #endif
-                {
-                  __pyx_t_9 = PyTuple_New(4+__pyx_t_10); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 281, __pyx_L1_error)
-                  __Pyx_GOTREF(__pyx_t_9);
-                  if (__pyx_t_5) {
-                    __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_5); __pyx_t_5 = NULL;
-                  }
-                  __Pyx_GIVEREF(__pyx_t_8);
-                  PyTuple_SET_ITEM(__pyx_t_9, 0+__pyx_t_10, __pyx_t_8);
-                  __Pyx_GIVEREF(__pyx_t_6);
-                  PyTuple_SET_ITEM(__pyx_t_9, 1+__pyx_t_10, __pyx_t_6);
-                  __Pyx_INCREF(__pyx_v_board);
-                  __Pyx_GIVEREF(__pyx_v_board);
-                  PyTuple_SET_ITEM(__pyx_t_9, 2+__pyx_t_10, __pyx_v_board);
-                  __Pyx_INCREF(__pyx_v_player);
-                  __Pyx_GIVEREF(__pyx_v_player);
-                  PyTuple_SET_ITEM(__pyx_t_9, 3+__pyx_t_10, __pyx_v_player);
-                  __pyx_t_8 = 0;
-                  __pyx_t_6 = 0;
-                  __pyx_t_11 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_9, NULL); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 281, __pyx_L1_error)
-                  __Pyx_GOTREF(__pyx_t_11);
-                  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-                }
-                __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-                __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_11); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 281, __pyx_L1_error)
-                __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-                if (__pyx_t_2) {
-
-                  /* "ai_minimax_alpha_beta.py":283
- *                                     if self.checkmuhle(ring, stelle, board, player):
- *                                         # Zwickmuehle
- *                                         score_addition += 60             # <<<<<<<<<<<<<<
- * 
- *                                     # Finally, remove one enemy man
- */
-                  __pyx_t_11 = __Pyx_PyInt_AddObjC(__pyx_v_score_addition, __pyx_int_60, 60, 1, 0); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 283, __pyx_L1_error)
-                  __Pyx_GOTREF(__pyx_t_11);
-                  __Pyx_DECREF_SET(__pyx_v_score_addition, __pyx_t_11);
-                  __pyx_t_11 = 0;
-
-                  /* "ai_minimax_alpha_beta.py":281
- *                                     # New mill generated
- *                                     score_addition += 20
- *                                     if self.checkmuhle(ring, stelle, board, player):             # <<<<<<<<<<<<<<
- *                                         # Zwickmuehle
- *                                         score_addition += 60
- */
-                }
-
-                /* "ai_minimax_alpha_beta.py":286
- * 
- *                                     # Finally, remove one enemy man
- *                                     for ring_ in range(3):             # <<<<<<<<<<<<<<
- *                                         for stelle_ in range(8):
- *                                             if board_[ring_][stelle_] == (1 if player == 2 else 2) and muhlen_[ring_][stelle_] == 0:
- */
-                for (__pyx_t_13 = 0; __pyx_t_13 < 3; __pyx_t_13+=1) {
-                  __pyx_v_ring_ = __pyx_t_13;
-
-                  /* "ai_minimax_alpha_beta.py":287
- *                                     # Finally, remove one enemy man
- *                                     for ring_ in range(3):
- *                                         for stelle_ in range(8):             # <<<<<<<<<<<<<<
- *                                             if board_[ring_][stelle_] == (1 if player == 2 else 2) and muhlen_[ring_][stelle_] == 0:
- *                                                 board_[ring_][stelle_] = 0
- */
-                  for (__pyx_t_14 = 0; __pyx_t_14 < 8; __pyx_t_14+=1) {
-                    __pyx_v_stelle_ = __pyx_t_14;
-
-                    /* "ai_minimax_alpha_beta.py":288
- *                                     for ring_ in range(3):
- *                                         for stelle_ in range(8):
- *                                             if board_[ring_][stelle_] == (1 if player == 2 else 2) and muhlen_[ring_][stelle_] == 0:             # <<<<<<<<<<<<<<
- *                                                 board_[ring_][stelle_] = 0
- *                                                 break
- */
-                    __pyx_t_11 = __Pyx_GetItemInt(__pyx_v_board_, __pyx_v_ring_, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 288, __pyx_L1_error)
-                    __Pyx_GOTREF(__pyx_t_11);
-                    __pyx_t_7 = __Pyx_GetItemInt(__pyx_t_11, __pyx_v_stelle_, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 288, __pyx_L1_error)
-                    __Pyx_GOTREF(__pyx_t_7);
-                    __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-                    __pyx_t_9 = __Pyx_PyInt_EqObjC(__pyx_v_player, __pyx_int_2, 2, 0); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 288, __pyx_L1_error)
-                    __Pyx_GOTREF(__pyx_t_9);
-                    __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_9); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 288, __pyx_L1_error)
-                    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-                    if (__pyx_t_12) {
-                      __Pyx_INCREF(__pyx_int_1);
-                      __pyx_t_11 = __pyx_int_1;
-                    } else {
-                      __Pyx_INCREF(__pyx_int_2);
-                      __pyx_t_11 = __pyx_int_2;
-                    }
-                    __pyx_t_9 = PyObject_RichCompare(__pyx_t_7, __pyx_t_11, Py_EQ); __Pyx_XGOTREF(__pyx_t_9); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 288, __pyx_L1_error)
-                    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-                    __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-                    __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_9); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 288, __pyx_L1_error)
-                    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-                    if (__pyx_t_12) {
-                    } else {
-                      __pyx_t_2 = __pyx_t_12;
-                      goto __pyx_L124_bool_binop_done;
-                    }
-                    __pyx_t_9 = __Pyx_GetItemInt(__pyx_v_muhlen_, __pyx_v_ring_, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 288, __pyx_L1_error)
-                    __Pyx_GOTREF(__pyx_t_9);
-                    __pyx_t_11 = __Pyx_GetItemInt(__pyx_t_9, __pyx_v_stelle_, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 288, __pyx_L1_error)
-                    __Pyx_GOTREF(__pyx_t_11);
-                    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-                    __pyx_t_9 = __Pyx_PyInt_EqObjC(__pyx_t_11, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 288, __pyx_L1_error)
-                    __Pyx_GOTREF(__pyx_t_9);
-                    __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-                    __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_9); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 288, __pyx_L1_error)
-                    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-                    __pyx_t_2 = __pyx_t_12;
-                    __pyx_L124_bool_binop_done:;
-                    if (__pyx_t_2) {
-
-                      /* "ai_minimax_alpha_beta.py":289
- *                                         for stelle_ in range(8):
- *                                             if board_[ring_][stelle_] == (1 if player == 2 else 2) and muhlen_[ring_][stelle_] == 0:
- *                                                 board_[ring_][stelle_] = 0             # <<<<<<<<<<<<<<
- *                                                 break
- *                                         else:
- */
-                      __pyx_t_9 = __Pyx_GetItemInt(__pyx_v_board_, __pyx_v_ring_, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 289, __pyx_L1_error)
-                      __Pyx_GOTREF(__pyx_t_9);
-                      if (unlikely(__Pyx_SetItemInt(__pyx_t_9, __pyx_v_stelle_, __pyx_int_0, long, 1, __Pyx_PyInt_From_long, 0, 1, 1) < 0)) __PYX_ERR(0, 289, __pyx_L1_error)
-                      __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-
-                      /* "ai_minimax_alpha_beta.py":290
- *                                             if board_[ring_][stelle_] == (1 if player == 2 else 2) and muhlen_[ring_][stelle_] == 0:
- *                                                 board_[ring_][stelle_] = 0
- *                                                 break             # <<<<<<<<<<<<<<
- *                                         else:
- *                                             continue
- */
-                      goto __pyx_L122_break;
-
-                      /* "ai_minimax_alpha_beta.py":288
- *                                     for ring_ in range(3):
- *                                         for stelle_ in range(8):
- *                                             if board_[ring_][stelle_] == (1 if player == 2 else 2) and muhlen_[ring_][stelle_] == 0:             # <<<<<<<<<<<<<<
- *                                                 board_[ring_][stelle_] = 0
- *                                                 break
- */
-                    }
-                  }
-                  /*else*/ {
-
-                    /* "ai_minimax_alpha_beta.py":292
- *                                                 break
- *                                         else:
- *                                             continue             # <<<<<<<<<<<<<<
- *                                         break
- * 
- */
-                    goto __pyx_L119_continue;
-                  }
-                  __pyx_L122_break:;
-
-                  /* "ai_minimax_alpha_beta.py":293
- *                                         else:
- *                                             continue
- *                                         break             # <<<<<<<<<<<<<<
- * 
- *                                 evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, alpha, best_score,
- */
-                  goto __pyx_L120_break;
-                  __pyx_L119_continue:;
-                }
-                __pyx_L120_break:;
-
-                /* "ai_minimax_alpha_beta.py":278
- *                                 # TODO: kinda whack
- *                                 score_addition = 0
- *                                 if self.checkmuhle(move[0], move[1], board_, player):             # <<<<<<<<<<<<<<
- *                                     # New mill generated
- *                                     score_addition += 20
- */
-              }
-
-              /* "ai_minimax_alpha_beta.py":295
- *                                         break
- * 
- *                                 evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, alpha, best_score,             # <<<<<<<<<<<<<<
- *                                                           remaining_set, depth - 1)
- *                                 evaluation += score_addition
- */
-              __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_minimax); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 295, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_11);
-              __pyx_t_6 = __Pyx_PyInt_EqObjC(__pyx_v_player, __pyx_int_2, 2, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 295, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_6);
-              __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 295, __pyx_L1_error)
-              __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
               if (__pyx_t_2) {
                 __Pyx_INCREF(__pyx_int_1);
-                __pyx_t_7 = __pyx_int_1;
+                __pyx_t_5 = __pyx_int_1;
               } else {
                 __Pyx_INCREF(__pyx_int_2);
-                __pyx_t_7 = __pyx_int_2;
+                __pyx_t_5 = __pyx_int_2;
               }
-
-              /* "ai_minimax_alpha_beta.py":296
- * 
- *                                 evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, alpha, best_score,
- *                                                           remaining_set, depth - 1)             # <<<<<<<<<<<<<<
- *                                 evaluation += score_addition
- *                                 if evaluation < best_score:
- */
-              __pyx_t_6 = __Pyx_PyInt_SubtractObjC(__pyx_v_depth, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 296, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_6);
               __pyx_t_8 = NULL;
               __pyx_t_10 = 0;
               if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_11))) {
@@ -7601,84 +4985,3234 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
               }
               #if CYTHON_FAST_PYCALL
               if (PyFunction_Check(__pyx_t_11)) {
-                PyObject *__pyx_temp[8] = {__pyx_t_8, __pyx_v_board_, __pyx_v_muhlen_, __pyx_t_7, __pyx_v_alpha, __pyx_v_best_score, __pyx_v_remaining_set, __pyx_t_6};
-                __pyx_t_9 = __Pyx_PyFunction_FastCall(__pyx_t_11, __pyx_temp+1-__pyx_t_10, 7+__pyx_t_10); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 295, __pyx_L1_error)
+                PyObject *__pyx_temp[3] = {__pyx_t_8, __pyx_v_board_, __pyx_t_5};
+                __pyx_t_6 = __Pyx_PyFunction_FastCall(__pyx_t_11, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 145, __pyx_L1_error)
                 __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-                __Pyx_GOTREF(__pyx_t_9);
-                __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-                __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+                __Pyx_GOTREF(__pyx_t_6);
+                __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
               } else
               #endif
               #if CYTHON_FAST_PYCCALL
               if (__Pyx_PyFastCFunction_Check(__pyx_t_11)) {
-                PyObject *__pyx_temp[8] = {__pyx_t_8, __pyx_v_board_, __pyx_v_muhlen_, __pyx_t_7, __pyx_v_alpha, __pyx_v_best_score, __pyx_v_remaining_set, __pyx_t_6};
-                __pyx_t_9 = __Pyx_PyCFunction_FastCall(__pyx_t_11, __pyx_temp+1-__pyx_t_10, 7+__pyx_t_10); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 295, __pyx_L1_error)
+                PyObject *__pyx_temp[3] = {__pyx_t_8, __pyx_v_board_, __pyx_t_5};
+                __pyx_t_6 = __Pyx_PyCFunction_FastCall(__pyx_t_11, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 145, __pyx_L1_error)
                 __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-                __Pyx_GOTREF(__pyx_t_9);
-                __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+                __Pyx_GOTREF(__pyx_t_6);
+                __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+              } else
+              #endif
+              {
+                __pyx_t_1 = PyTuple_New(2+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 145, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_1);
+                if (__pyx_t_8) {
+                  __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_8); __pyx_t_8 = NULL;
+                }
+                __Pyx_INCREF(__pyx_v_board_);
+                __Pyx_GIVEREF(__pyx_v_board_);
+                PyTuple_SET_ITEM(__pyx_t_1, 0+__pyx_t_10, __pyx_v_board_);
+                __Pyx_GIVEREF(__pyx_t_5);
+                PyTuple_SET_ITEM(__pyx_t_1, 1+__pyx_t_10, __pyx_t_5);
+                __pyx_t_5 = 0;
+                __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_11, __pyx_t_1, NULL); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 145, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_6);
+                __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+              }
+              __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+              __Pyx_XDECREF_SET(__pyx_v_to_remove, __pyx_t_6);
+              __pyx_t_6 = 0;
+
+              /* "ai_minimax_alpha_beta.py":146
+ *                             if self.checkmuhle(ring, stelle, board_, player):
+ *                                 to_remove = self.toremove(board_, 1 if player == 2 else 2)
+ *                                 if board_[to_remove[0]][to_remove[1]] == (1 if player == 2 else 2) and not muhlen_[to_remove[0]][to_remove[1]] == 0:             # <<<<<<<<<<<<<<
+ *                                     board_[to_remove[0]][to_remove[1]] = 0
+ *                                     muhlen_ = self.update_board_muhlen(board_, muhlen_)
+ */
+              __pyx_t_6 = __Pyx_GetItemInt(__pyx_v_to_remove, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 146, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_6);
+              __pyx_t_11 = __Pyx_PyObject_GetItem(__pyx_v_board_, __pyx_t_6); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 146, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_11);
+              __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+              __pyx_t_6 = __Pyx_GetItemInt(__pyx_v_to_remove, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 146, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_6);
+              __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_t_11, __pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 146, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_1);
+              __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+              __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+              __pyx_t_11 = __Pyx_PyInt_EqObjC(__pyx_v_player, __pyx_int_2, 2, 0); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 146, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_11);
+              __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_11); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 146, __pyx_L1_error)
+              __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+              if (__pyx_t_12) {
+                __Pyx_INCREF(__pyx_int_1);
+                __pyx_t_6 = __pyx_int_1;
+              } else {
+                __Pyx_INCREF(__pyx_int_2);
+                __pyx_t_6 = __pyx_int_2;
+              }
+              __pyx_t_11 = PyObject_RichCompare(__pyx_t_1, __pyx_t_6, Py_EQ); __Pyx_XGOTREF(__pyx_t_11); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 146, __pyx_L1_error)
+              __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+              __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+              __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_11); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 146, __pyx_L1_error)
+              __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+              if (__pyx_t_12) {
+              } else {
+                __pyx_t_2 = __pyx_t_12;
+                goto __pyx_L36_bool_binop_done;
+              }
+              __pyx_t_11 = __Pyx_GetItemInt(__pyx_v_to_remove, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 146, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_11);
+              __pyx_t_6 = __Pyx_PyObject_GetItem(__pyx_v_muhlen_, __pyx_t_11); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 146, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_6);
+              __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+              __pyx_t_11 = __Pyx_GetItemInt(__pyx_v_to_remove, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 146, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_11);
+              __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_t_6, __pyx_t_11); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 146, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_1);
+              __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+              __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+              __pyx_t_11 = __Pyx_PyInt_EqObjC(__pyx_t_1, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 146, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_11);
+              __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+              __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_11); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 146, __pyx_L1_error)
+              __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+              __pyx_t_13 = ((!__pyx_t_12) != 0);
+              __pyx_t_2 = __pyx_t_13;
+              __pyx_L36_bool_binop_done:;
+              if (__pyx_t_2) {
+
+                /* "ai_minimax_alpha_beta.py":147
+ *                                 to_remove = self.toremove(board_, 1 if player == 2 else 2)
+ *                                 if board_[to_remove[0]][to_remove[1]] == (1 if player == 2 else 2) and not muhlen_[to_remove[0]][to_remove[1]] == 0:
+ *                                     board_[to_remove[0]][to_remove[1]] = 0             # <<<<<<<<<<<<<<
+ *                                     muhlen_ = self.update_board_muhlen(board_, muhlen_)
+ * 
+ */
+                __pyx_t_11 = __Pyx_GetItemInt(__pyx_v_to_remove, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 147, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_11);
+                __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_v_board_, __pyx_t_11); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 147, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_1);
+                __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+                __pyx_t_11 = __Pyx_GetItemInt(__pyx_v_to_remove, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 147, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_11);
+                if (unlikely(PyObject_SetItem(__pyx_t_1, __pyx_t_11, __pyx_int_0) < 0)) __PYX_ERR(0, 147, __pyx_L1_error)
+                __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+                __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+
+                /* "ai_minimax_alpha_beta.py":148
+ *                                 if board_[to_remove[0]][to_remove[1]] == (1 if player == 2 else 2) and not muhlen_[to_remove[0]][to_remove[1]] == 0:
+ *                                     board_[to_remove[0]][to_remove[1]] = 0
+ *                                     muhlen_ = self.update_board_muhlen(board_, muhlen_)             # <<<<<<<<<<<<<<
+ * 
+ *                             evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, best_score, beta, remaining_set - 1, depth-1)
+ */
+                __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_update_board_muhlen); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 148, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_1);
+                __pyx_t_6 = NULL;
+                __pyx_t_10 = 0;
+                if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_1))) {
+                  __pyx_t_6 = PyMethod_GET_SELF(__pyx_t_1);
+                  if (likely(__pyx_t_6)) {
+                    PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
+                    __Pyx_INCREF(__pyx_t_6);
+                    __Pyx_INCREF(function);
+                    __Pyx_DECREF_SET(__pyx_t_1, function);
+                    __pyx_t_10 = 1;
+                  }
+                }
+                #if CYTHON_FAST_PYCALL
+                if (PyFunction_Check(__pyx_t_1)) {
+                  PyObject *__pyx_temp[3] = {__pyx_t_6, __pyx_v_board_, __pyx_v_muhlen_};
+                  __pyx_t_11 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 148, __pyx_L1_error)
+                  __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
+                  __Pyx_GOTREF(__pyx_t_11);
+                } else
+                #endif
+                #if CYTHON_FAST_PYCCALL
+                if (__Pyx_PyFastCFunction_Check(__pyx_t_1)) {
+                  PyObject *__pyx_temp[3] = {__pyx_t_6, __pyx_v_board_, __pyx_v_muhlen_};
+                  __pyx_t_11 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 148, __pyx_L1_error)
+                  __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
+                  __Pyx_GOTREF(__pyx_t_11);
+                } else
+                #endif
+                {
+                  __pyx_t_5 = PyTuple_New(2+__pyx_t_10); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 148, __pyx_L1_error)
+                  __Pyx_GOTREF(__pyx_t_5);
+                  if (__pyx_t_6) {
+                    __Pyx_GIVEREF(__pyx_t_6); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_6); __pyx_t_6 = NULL;
+                  }
+                  __Pyx_INCREF(__pyx_v_board_);
+                  __Pyx_GIVEREF(__pyx_v_board_);
+                  PyTuple_SET_ITEM(__pyx_t_5, 0+__pyx_t_10, __pyx_v_board_);
+                  __Pyx_INCREF(__pyx_v_muhlen_);
+                  __Pyx_GIVEREF(__pyx_v_muhlen_);
+                  PyTuple_SET_ITEM(__pyx_t_5, 1+__pyx_t_10, __pyx_v_muhlen_);
+                  __pyx_t_11 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_5, NULL); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 148, __pyx_L1_error)
+                  __Pyx_GOTREF(__pyx_t_11);
+                  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+                }
+                __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+                __Pyx_DECREF_SET(__pyx_v_muhlen_, __pyx_t_11);
+                __pyx_t_11 = 0;
+
+                /* "ai_minimax_alpha_beta.py":146
+ *                             if self.checkmuhle(ring, stelle, board_, player):
+ *                                 to_remove = self.toremove(board_, 1 if player == 2 else 2)
+ *                                 if board_[to_remove[0]][to_remove[1]] == (1 if player == 2 else 2) and not muhlen_[to_remove[0]][to_remove[1]] == 0:             # <<<<<<<<<<<<<<
+ *                                     board_[to_remove[0]][to_remove[1]] = 0
+ *                                     muhlen_ = self.update_board_muhlen(board_, muhlen_)
+ */
+              }
+
+              /* "ai_minimax_alpha_beta.py":144
+ *                             muhlen_ = copy.deepcopy(board_muhlen)
+ * 
+ *                             if self.checkmuhle(ring, stelle, board_, player):             # <<<<<<<<<<<<<<
+ *                                 to_remove = self.toremove(board_, 1 if player == 2 else 2)
+ *                                 if board_[to_remove[0]][to_remove[1]] == (1 if player == 2 else 2) and not muhlen_[to_remove[0]][to_remove[1]] == 0:
+ */
+            }
+
+            /* "ai_minimax_alpha_beta.py":150
+ *                                     muhlen_ = self.update_board_muhlen(board_, muhlen_)
+ * 
+ *                             evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, best_score, beta, remaining_set - 1, depth-1)             # <<<<<<<<<<<<<<
+ *                             if evaluation > best_score:
+ *                                 best_score = evaluation
+ */
+            __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_minimax); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 150, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_1);
+            __pyx_t_6 = __Pyx_PyInt_EqObjC(__pyx_v_player, __pyx_int_2, 2, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 150, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_6);
+            __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 150, __pyx_L1_error)
+            __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+            if (__pyx_t_2) {
+              __Pyx_INCREF(__pyx_int_1);
+              __pyx_t_5 = __pyx_int_1;
+            } else {
+              __Pyx_INCREF(__pyx_int_2);
+              __pyx_t_5 = __pyx_int_2;
+            }
+            __pyx_t_6 = __Pyx_PyInt_SubtractObjC(__pyx_v_remaining_set, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 150, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_6);
+            __pyx_t_8 = __Pyx_PyInt_SubtractObjC(__pyx_v_depth, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 150, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_8);
+            __pyx_t_9 = NULL;
+            __pyx_t_10 = 0;
+            if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_1))) {
+              __pyx_t_9 = PyMethod_GET_SELF(__pyx_t_1);
+              if (likely(__pyx_t_9)) {
+                PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
+                __Pyx_INCREF(__pyx_t_9);
+                __Pyx_INCREF(function);
+                __Pyx_DECREF_SET(__pyx_t_1, function);
+                __pyx_t_10 = 1;
+              }
+            }
+            #if CYTHON_FAST_PYCALL
+            if (PyFunction_Check(__pyx_t_1)) {
+              PyObject *__pyx_temp[8] = {__pyx_t_9, __pyx_v_board_, __pyx_v_muhlen_, __pyx_t_5, __pyx_v_best_score, __pyx_v_beta, __pyx_t_6, __pyx_t_8};
+              __pyx_t_11 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_10, 7+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 150, __pyx_L1_error)
+              __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
+              __Pyx_GOTREF(__pyx_t_11);
+              __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+              __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+              __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+            } else
+            #endif
+            #if CYTHON_FAST_PYCCALL
+            if (__Pyx_PyFastCFunction_Check(__pyx_t_1)) {
+              PyObject *__pyx_temp[8] = {__pyx_t_9, __pyx_v_board_, __pyx_v_muhlen_, __pyx_t_5, __pyx_v_best_score, __pyx_v_beta, __pyx_t_6, __pyx_t_8};
+              __pyx_t_11 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_10, 7+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 150, __pyx_L1_error)
+              __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
+              __Pyx_GOTREF(__pyx_t_11);
+              __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+              __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+              __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+            } else
+            #endif
+            {
+              __pyx_t_7 = PyTuple_New(7+__pyx_t_10); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 150, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_7);
+              if (__pyx_t_9) {
+                __Pyx_GIVEREF(__pyx_t_9); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_9); __pyx_t_9 = NULL;
+              }
+              __Pyx_INCREF(__pyx_v_board_);
+              __Pyx_GIVEREF(__pyx_v_board_);
+              PyTuple_SET_ITEM(__pyx_t_7, 0+__pyx_t_10, __pyx_v_board_);
+              __Pyx_INCREF(__pyx_v_muhlen_);
+              __Pyx_GIVEREF(__pyx_v_muhlen_);
+              PyTuple_SET_ITEM(__pyx_t_7, 1+__pyx_t_10, __pyx_v_muhlen_);
+              __Pyx_GIVEREF(__pyx_t_5);
+              PyTuple_SET_ITEM(__pyx_t_7, 2+__pyx_t_10, __pyx_t_5);
+              __Pyx_INCREF(__pyx_v_best_score);
+              __Pyx_GIVEREF(__pyx_v_best_score);
+              PyTuple_SET_ITEM(__pyx_t_7, 3+__pyx_t_10, __pyx_v_best_score);
+              __Pyx_INCREF(__pyx_v_beta);
+              __Pyx_GIVEREF(__pyx_v_beta);
+              PyTuple_SET_ITEM(__pyx_t_7, 4+__pyx_t_10, __pyx_v_beta);
+              __Pyx_GIVEREF(__pyx_t_6);
+              PyTuple_SET_ITEM(__pyx_t_7, 5+__pyx_t_10, __pyx_t_6);
+              __Pyx_GIVEREF(__pyx_t_8);
+              PyTuple_SET_ITEM(__pyx_t_7, 6+__pyx_t_10, __pyx_t_8);
+              __pyx_t_5 = 0;
+              __pyx_t_6 = 0;
+              __pyx_t_8 = 0;
+              __pyx_t_11 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_7, NULL); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 150, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_11);
+              __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+            }
+            __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+            __Pyx_XDECREF_SET(__pyx_v_evaluation, __pyx_t_11);
+            __pyx_t_11 = 0;
+
+            /* "ai_minimax_alpha_beta.py":151
+ * 
+ *                             evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, best_score, beta, remaining_set - 1, depth-1)
+ *                             if evaluation > best_score:             # <<<<<<<<<<<<<<
+ *                                 best_score = evaluation
+ *                                 if best_score >= beta:
+ */
+            __pyx_t_11 = PyObject_RichCompare(__pyx_v_evaluation, __pyx_v_best_score, Py_GT); __Pyx_XGOTREF(__pyx_t_11); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 151, __pyx_L1_error)
+            __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_11); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 151, __pyx_L1_error)
+            __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+            if (__pyx_t_2) {
+
+              /* "ai_minimax_alpha_beta.py":152
+ *                             evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, best_score, beta, remaining_set - 1, depth-1)
+ *                             if evaluation > best_score:
+ *                                 best_score = evaluation             # <<<<<<<<<<<<<<
+ *                                 if best_score >= beta:
+ *                                     break
+ */
+              __Pyx_INCREF(__pyx_v_evaluation);
+              __Pyx_DECREF_SET(__pyx_v_best_score, __pyx_v_evaluation);
+
+              /* "ai_minimax_alpha_beta.py":153
+ *                             if evaluation > best_score:
+ *                                 best_score = evaluation
+ *                                 if best_score >= beta:             # <<<<<<<<<<<<<<
+ *                                     break
+ *                     else:
+ */
+              __pyx_t_11 = PyObject_RichCompare(__pyx_v_best_score, __pyx_v_beta, Py_GE); __Pyx_XGOTREF(__pyx_t_11); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 153, __pyx_L1_error)
+              __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_11); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 153, __pyx_L1_error)
+              __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+              if (__pyx_t_2) {
+
+                /* "ai_minimax_alpha_beta.py":154
+ *                                 best_score = evaluation
+ *                                 if best_score >= beta:
+ *                                     break             # <<<<<<<<<<<<<<
+ *                     else:
+ *                         continue
+ */
+                goto __pyx_L32_break;
+
+                /* "ai_minimax_alpha_beta.py":153
+ *                             if evaluation > best_score:
+ *                                 best_score = evaluation
+ *                                 if best_score >= beta:             # <<<<<<<<<<<<<<
+ *                                     break
+ *                     else:
+ */
+              }
+
+              /* "ai_minimax_alpha_beta.py":151
+ * 
+ *                             evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, best_score, beta, remaining_set - 1, depth-1)
+ *                             if evaluation > best_score:             # <<<<<<<<<<<<<<
+ *                                 best_score = evaluation
+ *                                 if best_score >= beta:
+ */
+            }
+
+            /* "ai_minimax_alpha_beta.py":139
+ *                 for ring in range(3):
+ *                     for stelle in range(8):
+ *                         if board[ring][stelle] == 0:             # <<<<<<<<<<<<<<
+ *                             board_ = copy.deepcopy(board)
+ *                             board_[ring][stelle] = player
+ */
+          }
+        }
+        /*else*/ {
+
+          /* "ai_minimax_alpha_beta.py":156
+ *                                     break
+ *                     else:
+ *                         continue             # <<<<<<<<<<<<<<
+ *                     break
+ *                 return best_score
+ */
+          goto __pyx_L29_continue;
+        }
+        __pyx_L32_break:;
+
+        /* "ai_minimax_alpha_beta.py":157
+ *                     else:
+ *                         continue
+ *                     break             # <<<<<<<<<<<<<<
+ *                 return best_score
+ *             else:
+ */
+        goto __pyx_L30_break;
+        __pyx_L29_continue:;
+      }
+      __pyx_L30_break:;
+
+      /* "ai_minimax_alpha_beta.py":158
+ *                         continue
+ *                     break
+ *                 return best_score             # <<<<<<<<<<<<<<
+ *             else:
+ *                 # Phase 2
+ */
+      __Pyx_XDECREF(__pyx_r);
+      __Pyx_INCREF(__pyx_v_best_score);
+      __pyx_r = __pyx_v_best_score;
+      goto __pyx_L0;
+
+      /* "ai_minimax_alpha_beta.py":136
+ *             best_score = alpha
+ *             # Phase 1
+ *             if remaining_set:             # <<<<<<<<<<<<<<
+ *                 for ring in range(3):
+ *                     for stelle in range(8):
+ */
+    }
+
+    /* "ai_minimax_alpha_beta.py":161
+ *             else:
+ *                 # Phase 2
+ *                 mymen = 0             # <<<<<<<<<<<<<<
+ *                 theirmen = 0
+ *                 for i in range(3):
+ */
+    /*else*/ {
+      __Pyx_INCREF(__pyx_int_0);
+      __pyx_v_mymen = __pyx_int_0;
+
+      /* "ai_minimax_alpha_beta.py":162
+ *                 # Phase 2
+ *                 mymen = 0
+ *                 theirmen = 0             # <<<<<<<<<<<<<<
+ *                 for i in range(3):
+ *                     for j in range(8):
+ */
+      __Pyx_INCREF(__pyx_int_0);
+      __pyx_v_theirmen = __pyx_int_0;
+
+      /* "ai_minimax_alpha_beta.py":163
+ *                 mymen = 0
+ *                 theirmen = 0
+ *                 for i in range(3):             # <<<<<<<<<<<<<<
+ *                     for j in range(8):
+ *                         if board[i][j] == player:
+ */
+      for (__pyx_t_3 = 0; __pyx_t_3 < 3; __pyx_t_3+=1) {
+        __pyx_v_i = __pyx_t_3;
+
+        /* "ai_minimax_alpha_beta.py":164
+ *                 theirmen = 0
+ *                 for i in range(3):
+ *                     for j in range(8):             # <<<<<<<<<<<<<<
+ *                         if board[i][j] == player:
+ *                             mymen += 1
+ */
+        for (__pyx_t_4 = 0; __pyx_t_4 < 8; __pyx_t_4+=1) {
+          __pyx_v_j = __pyx_t_4;
+
+          /* "ai_minimax_alpha_beta.py":165
+ *                 for i in range(3):
+ *                     for j in range(8):
+ *                         if board[i][j] == player:             # <<<<<<<<<<<<<<
+ *                             mymen += 1
+ *                         elif board[i][j] == 1 if player == 2 else 2:
+ */
+          __pyx_t_11 = __Pyx_GetItemInt(__pyx_v_board, __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 165, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_11);
+          __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_11, __pyx_v_j, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 165, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_1);
+          __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+          __pyx_t_11 = PyObject_RichCompare(__pyx_t_1, __pyx_v_player, Py_EQ); __Pyx_XGOTREF(__pyx_t_11); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 165, __pyx_L1_error)
+          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_11); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 165, __pyx_L1_error)
+          __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+          if (__pyx_t_2) {
+
+            /* "ai_minimax_alpha_beta.py":166
+ *                     for j in range(8):
+ *                         if board[i][j] == player:
+ *                             mymen += 1             # <<<<<<<<<<<<<<
+ *                         elif board[i][j] == 1 if player == 2 else 2:
+ *                             theirmen += 1
+ */
+            __pyx_t_11 = __Pyx_PyInt_AddObjC(__pyx_v_mymen, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 166, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_11);
+            __Pyx_DECREF_SET(__pyx_v_mymen, __pyx_t_11);
+            __pyx_t_11 = 0;
+
+            /* "ai_minimax_alpha_beta.py":165
+ *                 for i in range(3):
+ *                     for j in range(8):
+ *                         if board[i][j] == player:             # <<<<<<<<<<<<<<
+ *                             mymen += 1
+ *                         elif board[i][j] == 1 if player == 2 else 2:
+ */
+            goto __pyx_L44;
+          }
+
+          /* "ai_minimax_alpha_beta.py":167
+ *                         if board[i][j] == player:
+ *                             mymen += 1
+ *                         elif board[i][j] == 1 if player == 2 else 2:             # <<<<<<<<<<<<<<
+ *                             theirmen += 1
+ * 
+ */
+          __pyx_t_1 = __Pyx_PyInt_EqObjC(__pyx_v_player, __pyx_int_2, 2, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 167, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_1);
+          __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 167, __pyx_L1_error)
+          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          if (__pyx_t_2) {
+            __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_board, __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 167, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_1);
+            __pyx_t_7 = __Pyx_GetItemInt(__pyx_t_1, __pyx_v_j, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 167, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_7);
+            __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+            __pyx_t_1 = __Pyx_PyInt_EqObjC(__pyx_t_7, __pyx_int_1, 1, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 167, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_1);
+            __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+            __pyx_t_11 = __pyx_t_1;
+            __pyx_t_1 = 0;
+          } else {
+            __Pyx_INCREF(__pyx_int_2);
+            __pyx_t_11 = __pyx_int_2;
+          }
+          __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_11); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 167, __pyx_L1_error)
+          __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+          if (__pyx_t_2) {
+
+            /* "ai_minimax_alpha_beta.py":168
+ *                             mymen += 1
+ *                         elif board[i][j] == 1 if player == 2 else 2:
+ *                             theirmen += 1             # <<<<<<<<<<<<<<
+ * 
+ *                 for ring in range(3):
+ */
+            __pyx_t_11 = __Pyx_PyInt_AddObjC(__pyx_v_theirmen, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 168, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_11);
+            __Pyx_DECREF_SET(__pyx_v_theirmen, __pyx_t_11);
+            __pyx_t_11 = 0;
+
+            /* "ai_minimax_alpha_beta.py":167
+ *                         if board[i][j] == player:
+ *                             mymen += 1
+ *                         elif board[i][j] == 1 if player == 2 else 2:             # <<<<<<<<<<<<<<
+ *                             theirmen += 1
+ * 
+ */
+          }
+          __pyx_L44:;
+        }
+      }
+
+      /* "ai_minimax_alpha_beta.py":170
+ *                             theirmen += 1
+ * 
+ *                 for ring in range(3):             # <<<<<<<<<<<<<<
+ *                     for stelle in range(8):
+ *                         if board[ring][stelle] == player:
+ */
+      for (__pyx_t_3 = 0; __pyx_t_3 < 3; __pyx_t_3+=1) {
+        __pyx_v_ring = __pyx_t_3;
+
+        /* "ai_minimax_alpha_beta.py":171
+ * 
+ *                 for ring in range(3):
+ *                     for stelle in range(8):             # <<<<<<<<<<<<<<
+ *                         if board[ring][stelle] == player:
+ *                             possiblemoves = self.possiblemoves(ring, stelle, board)
+ */
+        for (__pyx_t_4 = 0; __pyx_t_4 < 8; __pyx_t_4+=1) {
+          __pyx_v_stelle = __pyx_t_4;
+
+          /* "ai_minimax_alpha_beta.py":172
+ *                 for ring in range(3):
+ *                     for stelle in range(8):
+ *                         if board[ring][stelle] == player:             # <<<<<<<<<<<<<<
+ *                             possiblemoves = self.possiblemoves(ring, stelle, board)
+ *                             if not possiblemoves:
+ */
+          __pyx_t_11 = __Pyx_GetItemInt(__pyx_v_board, __pyx_v_ring, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 172, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_11);
+          __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_11, __pyx_v_stelle, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 172, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_1);
+          __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+          __pyx_t_11 = PyObject_RichCompare(__pyx_t_1, __pyx_v_player, Py_EQ); __Pyx_XGOTREF(__pyx_t_11); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 172, __pyx_L1_error)
+          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_11); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 172, __pyx_L1_error)
+          __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+          if (__pyx_t_2) {
+
+            /* "ai_minimax_alpha_beta.py":173
+ *                     for stelle in range(8):
+ *                         if board[ring][stelle] == player:
+ *                             possiblemoves = self.possiblemoves(ring, stelle, board)             # <<<<<<<<<<<<<<
+ *                             if not possiblemoves:
+ *                                 continue
+ */
+            __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_possiblemoves); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 173, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_1);
+            __pyx_t_7 = __Pyx_PyInt_From_long(__pyx_v_ring); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 173, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_7);
+            __pyx_t_8 = __Pyx_PyInt_From_long(__pyx_v_stelle); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 173, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_8);
+            __pyx_t_6 = NULL;
+            __pyx_t_10 = 0;
+            if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_1))) {
+              __pyx_t_6 = PyMethod_GET_SELF(__pyx_t_1);
+              if (likely(__pyx_t_6)) {
+                PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
+                __Pyx_INCREF(__pyx_t_6);
+                __Pyx_INCREF(function);
+                __Pyx_DECREF_SET(__pyx_t_1, function);
+                __pyx_t_10 = 1;
+              }
+            }
+            #if CYTHON_FAST_PYCALL
+            if (PyFunction_Check(__pyx_t_1)) {
+              PyObject *__pyx_temp[4] = {__pyx_t_6, __pyx_t_7, __pyx_t_8, __pyx_v_board};
+              __pyx_t_11 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_10, 3+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 173, __pyx_L1_error)
+              __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
+              __Pyx_GOTREF(__pyx_t_11);
+              __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+              __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+            } else
+            #endif
+            #if CYTHON_FAST_PYCCALL
+            if (__Pyx_PyFastCFunction_Check(__pyx_t_1)) {
+              PyObject *__pyx_temp[4] = {__pyx_t_6, __pyx_t_7, __pyx_t_8, __pyx_v_board};
+              __pyx_t_11 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_10, 3+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 173, __pyx_L1_error)
+              __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
+              __Pyx_GOTREF(__pyx_t_11);
+              __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+              __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+            } else
+            #endif
+            {
+              __pyx_t_5 = PyTuple_New(3+__pyx_t_10); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 173, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_5);
+              if (__pyx_t_6) {
+                __Pyx_GIVEREF(__pyx_t_6); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_6); __pyx_t_6 = NULL;
+              }
+              __Pyx_GIVEREF(__pyx_t_7);
+              PyTuple_SET_ITEM(__pyx_t_5, 0+__pyx_t_10, __pyx_t_7);
+              __Pyx_GIVEREF(__pyx_t_8);
+              PyTuple_SET_ITEM(__pyx_t_5, 1+__pyx_t_10, __pyx_t_8);
+              __Pyx_INCREF(__pyx_v_board);
+              __Pyx_GIVEREF(__pyx_v_board);
+              PyTuple_SET_ITEM(__pyx_t_5, 2+__pyx_t_10, __pyx_v_board);
+              __pyx_t_7 = 0;
+              __pyx_t_8 = 0;
+              __pyx_t_11 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_5, NULL); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 173, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_11);
+              __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+            }
+            __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+            __Pyx_XDECREF_SET(__pyx_v_possiblemoves, __pyx_t_11);
+            __pyx_t_11 = 0;
+
+            /* "ai_minimax_alpha_beta.py":174
+ *                         if board[ring][stelle] == player:
+ *                             possiblemoves = self.possiblemoves(ring, stelle, board)
+ *                             if not possiblemoves:             # <<<<<<<<<<<<<<
+ *                                 continue
+ *                             for move in possiblemoves:
+ */
+            __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_v_possiblemoves); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 174, __pyx_L1_error)
+            __pyx_t_13 = ((!__pyx_t_2) != 0);
+            if (__pyx_t_13) {
+
+              /* "ai_minimax_alpha_beta.py":175
+ *                             possiblemoves = self.possiblemoves(ring, stelle, board)
+ *                             if not possiblemoves:
+ *                                 continue             # <<<<<<<<<<<<<<
+ *                             for move in possiblemoves:
+ *                                 board_ = copy.deepcopy(board)
+ */
+              goto __pyx_L47_continue;
+
+              /* "ai_minimax_alpha_beta.py":174
+ *                         if board[ring][stelle] == player:
+ *                             possiblemoves = self.possiblemoves(ring, stelle, board)
+ *                             if not possiblemoves:             # <<<<<<<<<<<<<<
+ *                                 continue
+ *                             for move in possiblemoves:
+ */
+            }
+
+            /* "ai_minimax_alpha_beta.py":176
+ *                             if not possiblemoves:
+ *                                 continue
+ *                             for move in possiblemoves:             # <<<<<<<<<<<<<<
+ *                                 board_ = copy.deepcopy(board)
+ *                                 muhlen_ = copy.deepcopy(board_muhlen)
+ */
+            if (likely(PyList_CheckExact(__pyx_v_possiblemoves)) || PyTuple_CheckExact(__pyx_v_possiblemoves)) {
+              __pyx_t_11 = __pyx_v_possiblemoves; __Pyx_INCREF(__pyx_t_11); __pyx_t_14 = 0;
+              __pyx_t_15 = NULL;
+            } else {
+              __pyx_t_14 = -1; __pyx_t_11 = PyObject_GetIter(__pyx_v_possiblemoves); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 176, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_11);
+              __pyx_t_15 = Py_TYPE(__pyx_t_11)->tp_iternext; if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 176, __pyx_L1_error)
+            }
+            for (;;) {
+              if (likely(!__pyx_t_15)) {
+                if (likely(PyList_CheckExact(__pyx_t_11))) {
+                  if (__pyx_t_14 >= PyList_GET_SIZE(__pyx_t_11)) break;
+                  #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+                  __pyx_t_1 = PyList_GET_ITEM(__pyx_t_11, __pyx_t_14); __Pyx_INCREF(__pyx_t_1); __pyx_t_14++; if (unlikely(0 < 0)) __PYX_ERR(0, 176, __pyx_L1_error)
+                  #else
+                  __pyx_t_1 = PySequence_ITEM(__pyx_t_11, __pyx_t_14); __pyx_t_14++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 176, __pyx_L1_error)
+                  __Pyx_GOTREF(__pyx_t_1);
+                  #endif
+                } else {
+                  if (__pyx_t_14 >= PyTuple_GET_SIZE(__pyx_t_11)) break;
+                  #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+                  __pyx_t_1 = PyTuple_GET_ITEM(__pyx_t_11, __pyx_t_14); __Pyx_INCREF(__pyx_t_1); __pyx_t_14++; if (unlikely(0 < 0)) __PYX_ERR(0, 176, __pyx_L1_error)
+                  #else
+                  __pyx_t_1 = PySequence_ITEM(__pyx_t_11, __pyx_t_14); __pyx_t_14++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 176, __pyx_L1_error)
+                  __Pyx_GOTREF(__pyx_t_1);
+                  #endif
+                }
+              } else {
+                __pyx_t_1 = __pyx_t_15(__pyx_t_11);
+                if (unlikely(!__pyx_t_1)) {
+                  PyObject* exc_type = PyErr_Occurred();
+                  if (exc_type) {
+                    if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
+                    else __PYX_ERR(0, 176, __pyx_L1_error)
+                  }
+                  break;
+                }
+                __Pyx_GOTREF(__pyx_t_1);
+              }
+              __Pyx_XDECREF_SET(__pyx_v_move, __pyx_t_1);
+              __pyx_t_1 = 0;
+
+              /* "ai_minimax_alpha_beta.py":177
+ *                                 continue
+ *                             for move in possiblemoves:
+ *                                 board_ = copy.deepcopy(board)             # <<<<<<<<<<<<<<
+ *                                 muhlen_ = copy.deepcopy(board_muhlen)
+ *                                 board_[ring][stelle] = 0
+ */
+              __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_copy); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 177, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_5);
+              __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_deepcopy); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 177, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_8);
+              __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+              __pyx_t_5 = NULL;
+              if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_8))) {
+                __pyx_t_5 = PyMethod_GET_SELF(__pyx_t_8);
+                if (likely(__pyx_t_5)) {
+                  PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_8);
+                  __Pyx_INCREF(__pyx_t_5);
+                  __Pyx_INCREF(function);
+                  __Pyx_DECREF_SET(__pyx_t_8, function);
+                }
+              }
+              __pyx_t_1 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_8, __pyx_t_5, __pyx_v_board) : __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_v_board);
+              __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
+              if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 177, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_1);
+              __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+              __Pyx_XDECREF_SET(__pyx_v_board_, __pyx_t_1);
+              __pyx_t_1 = 0;
+
+              /* "ai_minimax_alpha_beta.py":178
+ *                             for move in possiblemoves:
+ *                                 board_ = copy.deepcopy(board)
+ *                                 muhlen_ = copy.deepcopy(board_muhlen)             # <<<<<<<<<<<<<<
+ *                                 board_[ring][stelle] = 0
+ *                                 try:
+ */
+              __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_n_s_copy); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 178, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_8);
+              __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_deepcopy); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 178, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_5);
+              __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+              __pyx_t_8 = NULL;
+              if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_5))) {
+                __pyx_t_8 = PyMethod_GET_SELF(__pyx_t_5);
+                if (likely(__pyx_t_8)) {
+                  PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_5);
+                  __Pyx_INCREF(__pyx_t_8);
+                  __Pyx_INCREF(function);
+                  __Pyx_DECREF_SET(__pyx_t_5, function);
+                }
+              }
+              __pyx_t_1 = (__pyx_t_8) ? __Pyx_PyObject_Call2Args(__pyx_t_5, __pyx_t_8, __pyx_v_board_muhlen) : __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_v_board_muhlen);
+              __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
+              if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 178, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_1);
+              __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+              __Pyx_XDECREF_SET(__pyx_v_muhlen_, __pyx_t_1);
+              __pyx_t_1 = 0;
+
+              /* "ai_minimax_alpha_beta.py":179
+ *                                 board_ = copy.deepcopy(board)
+ *                                 muhlen_ = copy.deepcopy(board_muhlen)
+ *                                 board_[ring][stelle] = 0             # <<<<<<<<<<<<<<
+ *                                 try:
+ *                                     board_[move[0]][move[1]] = player
+ */
+              __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_board_, __pyx_v_ring, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 179, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_1);
+              if (unlikely(__Pyx_SetItemInt(__pyx_t_1, __pyx_v_stelle, __pyx_int_0, long, 1, __Pyx_PyInt_From_long, 0, 1, 1) < 0)) __PYX_ERR(0, 179, __pyx_L1_error)
+              __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+              /* "ai_minimax_alpha_beta.py":180
+ *                                 muhlen_ = copy.deepcopy(board_muhlen)
+ *                                 board_[ring][stelle] = 0
+ *                                 try:             # <<<<<<<<<<<<<<
+ *                                     board_[move[0]][move[1]] = player
+ *                                 except:
+ */
+              {
+                __Pyx_PyThreadState_declare
+                __Pyx_PyThreadState_assign
+                __Pyx_ExceptionSave(&__pyx_t_16, &__pyx_t_17, &__pyx_t_18);
+                __Pyx_XGOTREF(__pyx_t_16);
+                __Pyx_XGOTREF(__pyx_t_17);
+                __Pyx_XGOTREF(__pyx_t_18);
+                /*try:*/ {
+
+                  /* "ai_minimax_alpha_beta.py":181
+ *                                 board_[ring][stelle] = 0
+ *                                 try:
+ *                                     board_[move[0]][move[1]] = player             # <<<<<<<<<<<<<<
+ *                                 except:
+ *                                     print("ERROR"+str(move))
+ */
+                  __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_move, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 181, __pyx_L53_error)
+                  __Pyx_GOTREF(__pyx_t_1);
+                  __pyx_t_5 = __Pyx_PyObject_GetItem(__pyx_v_board_, __pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 181, __pyx_L53_error)
+                  __Pyx_GOTREF(__pyx_t_5);
+                  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+                  __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_move, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 181, __pyx_L53_error)
+                  __Pyx_GOTREF(__pyx_t_1);
+                  if (unlikely(PyObject_SetItem(__pyx_t_5, __pyx_t_1, __pyx_v_player) < 0)) __PYX_ERR(0, 181, __pyx_L53_error)
+                  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+                  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+                  /* "ai_minimax_alpha_beta.py":180
+ *                                 muhlen_ = copy.deepcopy(board_muhlen)
+ *                                 board_[ring][stelle] = 0
+ *                                 try:             # <<<<<<<<<<<<<<
+ *                                     board_[move[0]][move[1]] = player
+ *                                 except:
+ */
+                }
+                __Pyx_XDECREF(__pyx_t_16); __pyx_t_16 = 0;
+                __Pyx_XDECREF(__pyx_t_17); __pyx_t_17 = 0;
+                __Pyx_XDECREF(__pyx_t_18); __pyx_t_18 = 0;
+                goto __pyx_L60_try_end;
+                __pyx_L53_error:;
+                __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+                __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
+                __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
+                __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
+                __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
+                __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
+
+                /* "ai_minimax_alpha_beta.py":182
+ *                                 try:
+ *                                     board_[move[0]][move[1]] = player
+ *                                 except:             # <<<<<<<<<<<<<<
+ *                                     print("ERROR"+str(move))
+ *                                 # check if new mill has been generated / zwickmuehle
+ */
+                /*except:*/ {
+                  __Pyx_AddTraceback("ai_minimax_alpha_beta.Morris.minimax", __pyx_clineno, __pyx_lineno, __pyx_filename);
+                  if (__Pyx_GetException(&__pyx_t_1, &__pyx_t_5, &__pyx_t_8) < 0) __PYX_ERR(0, 182, __pyx_L55_except_error)
+                  __Pyx_GOTREF(__pyx_t_1);
+                  __Pyx_GOTREF(__pyx_t_5);
+                  __Pyx_GOTREF(__pyx_t_8);
+
+                  /* "ai_minimax_alpha_beta.py":183
+ *                                     board_[move[0]][move[1]] = player
+ *                                 except:
+ *                                     print("ERROR"+str(move))             # <<<<<<<<<<<<<<
+ *                                 # check if new mill has been generated / zwickmuehle
+ *                                 score_addition = 0
+ */
+                  __pyx_t_7 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyString_Type)), __pyx_v_move); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 183, __pyx_L55_except_error)
+                  __Pyx_GOTREF(__pyx_t_7);
+                  __pyx_t_6 = PyNumber_Add(__pyx_n_s_ERROR, __pyx_t_7); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 183, __pyx_L55_except_error)
+                  __Pyx_GOTREF(__pyx_t_6);
+                  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+                  if (__Pyx_PrintOne(0, __pyx_t_6) < 0) __PYX_ERR(0, 183, __pyx_L55_except_error)
+                  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+                  __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+                  __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
+                  __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
+                  goto __pyx_L54_exception_handled;
+                }
+                __pyx_L55_except_error:;
+
+                /* "ai_minimax_alpha_beta.py":180
+ *                                 muhlen_ = copy.deepcopy(board_muhlen)
+ *                                 board_[ring][stelle] = 0
+ *                                 try:             # <<<<<<<<<<<<<<
+ *                                     board_[move[0]][move[1]] = player
+ *                                 except:
+ */
+                __Pyx_XGIVEREF(__pyx_t_16);
+                __Pyx_XGIVEREF(__pyx_t_17);
+                __Pyx_XGIVEREF(__pyx_t_18);
+                __Pyx_ExceptionReset(__pyx_t_16, __pyx_t_17, __pyx_t_18);
+                goto __pyx_L1_error;
+                __pyx_L54_exception_handled:;
+                __Pyx_XGIVEREF(__pyx_t_16);
+                __Pyx_XGIVEREF(__pyx_t_17);
+                __Pyx_XGIVEREF(__pyx_t_18);
+                __Pyx_ExceptionReset(__pyx_t_16, __pyx_t_17, __pyx_t_18);
+                __pyx_L60_try_end:;
+              }
+
+              /* "ai_minimax_alpha_beta.py":185
+ *                                     print("ERROR"+str(move))
+ *                                 # check if new mill has been generated / zwickmuehle
+ *                                 score_addition = 0             # <<<<<<<<<<<<<<
+ *                                 if self.checkmuhle(move[0], move[1], board_, player):
+ *                                     score_addition += 100
+ */
+              __Pyx_INCREF(__pyx_int_0);
+              __Pyx_XDECREF_SET(__pyx_v_score_addition, __pyx_int_0);
+
+              /* "ai_minimax_alpha_beta.py":186
+ *                                 # check if new mill has been generated / zwickmuehle
+ *                                 score_addition = 0
+ *                                 if self.checkmuhle(move[0], move[1], board_, player):             # <<<<<<<<<<<<<<
+ *                                     score_addition += 100
+ *                                     # New mill generated
+ */
+              __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_checkmuhle); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 186, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_5);
+              __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_move, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 186, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_1);
+              __pyx_t_6 = __Pyx_GetItemInt(__pyx_v_move, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 186, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_6);
+              __pyx_t_7 = NULL;
+              __pyx_t_10 = 0;
+              if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_5))) {
+                __pyx_t_7 = PyMethod_GET_SELF(__pyx_t_5);
+                if (likely(__pyx_t_7)) {
+                  PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_5);
+                  __Pyx_INCREF(__pyx_t_7);
+                  __Pyx_INCREF(function);
+                  __Pyx_DECREF_SET(__pyx_t_5, function);
+                  __pyx_t_10 = 1;
+                }
+              }
+              #if CYTHON_FAST_PYCALL
+              if (PyFunction_Check(__pyx_t_5)) {
+                PyObject *__pyx_temp[5] = {__pyx_t_7, __pyx_t_1, __pyx_t_6, __pyx_v_board_, __pyx_v_player};
+                __pyx_t_8 = __Pyx_PyFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_10, 4+__pyx_t_10); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 186, __pyx_L1_error)
+                __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
+                __Pyx_GOTREF(__pyx_t_8);
+                __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+                __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+              } else
+              #endif
+              #if CYTHON_FAST_PYCCALL
+              if (__Pyx_PyFastCFunction_Check(__pyx_t_5)) {
+                PyObject *__pyx_temp[5] = {__pyx_t_7, __pyx_t_1, __pyx_t_6, __pyx_v_board_, __pyx_v_player};
+                __pyx_t_8 = __Pyx_PyCFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_10, 4+__pyx_t_10); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 186, __pyx_L1_error)
+                __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
+                __Pyx_GOTREF(__pyx_t_8);
+                __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
                 __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
               } else
               #endif
               {
-                __pyx_t_5 = PyTuple_New(7+__pyx_t_10); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 295, __pyx_L1_error)
+                __pyx_t_9 = PyTuple_New(4+__pyx_t_10); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 186, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_9);
+                if (__pyx_t_7) {
+                  __Pyx_GIVEREF(__pyx_t_7); PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_7); __pyx_t_7 = NULL;
+                }
+                __Pyx_GIVEREF(__pyx_t_1);
+                PyTuple_SET_ITEM(__pyx_t_9, 0+__pyx_t_10, __pyx_t_1);
+                __Pyx_GIVEREF(__pyx_t_6);
+                PyTuple_SET_ITEM(__pyx_t_9, 1+__pyx_t_10, __pyx_t_6);
+                __Pyx_INCREF(__pyx_v_board_);
+                __Pyx_GIVEREF(__pyx_v_board_);
+                PyTuple_SET_ITEM(__pyx_t_9, 2+__pyx_t_10, __pyx_v_board_);
+                __Pyx_INCREF(__pyx_v_player);
+                __Pyx_GIVEREF(__pyx_v_player);
+                PyTuple_SET_ITEM(__pyx_t_9, 3+__pyx_t_10, __pyx_v_player);
+                __pyx_t_1 = 0;
+                __pyx_t_6 = 0;
+                __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_9, NULL); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 186, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_8);
+                __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+              }
+              __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+              __pyx_t_13 = __Pyx_PyObject_IsTrue(__pyx_t_8); if (unlikely(__pyx_t_13 < 0)) __PYX_ERR(0, 186, __pyx_L1_error)
+              __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+              if (__pyx_t_13) {
+
+                /* "ai_minimax_alpha_beta.py":187
+ *                                 score_addition = 0
+ *                                 if self.checkmuhle(move[0], move[1], board_, player):
+ *                                     score_addition += 100             # <<<<<<<<<<<<<<
+ *                                     # New mill generated
+ *                                     if self.checkmuhle(ring, stelle, board, player):
+ */
+                __pyx_t_8 = __Pyx_PyInt_AddObjC(__pyx_v_score_addition, __pyx_int_100, 0x64, 1, 0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 187, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_8);
+                __Pyx_DECREF_SET(__pyx_v_score_addition, __pyx_t_8);
+                __pyx_t_8 = 0;
+
+                /* "ai_minimax_alpha_beta.py":189
+ *                                     score_addition += 100
+ *                                     # New mill generated
+ *                                     if self.checkmuhle(ring, stelle, board, player):             # <<<<<<<<<<<<<<
+ *                                         # Zwickmuehle
+ *                                         score_addition += 500
+ */
+                __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_checkmuhle); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 189, __pyx_L1_error)
                 __Pyx_GOTREF(__pyx_t_5);
-                if (__pyx_t_8) {
-                  __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_8); __pyx_t_8 = NULL;
+                __pyx_t_9 = __Pyx_PyInt_From_long(__pyx_v_ring); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 189, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_9);
+                __pyx_t_6 = __Pyx_PyInt_From_long(__pyx_v_stelle); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 189, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_6);
+                __pyx_t_1 = NULL;
+                __pyx_t_10 = 0;
+                if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_5))) {
+                  __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_5);
+                  if (likely(__pyx_t_1)) {
+                    PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_5);
+                    __Pyx_INCREF(__pyx_t_1);
+                    __Pyx_INCREF(function);
+                    __Pyx_DECREF_SET(__pyx_t_5, function);
+                    __pyx_t_10 = 1;
+                  }
+                }
+                #if CYTHON_FAST_PYCALL
+                if (PyFunction_Check(__pyx_t_5)) {
+                  PyObject *__pyx_temp[5] = {__pyx_t_1, __pyx_t_9, __pyx_t_6, __pyx_v_board, __pyx_v_player};
+                  __pyx_t_8 = __Pyx_PyFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_10, 4+__pyx_t_10); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 189, __pyx_L1_error)
+                  __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+                  __Pyx_GOTREF(__pyx_t_8);
+                  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+                  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+                } else
+                #endif
+                #if CYTHON_FAST_PYCCALL
+                if (__Pyx_PyFastCFunction_Check(__pyx_t_5)) {
+                  PyObject *__pyx_temp[5] = {__pyx_t_1, __pyx_t_9, __pyx_t_6, __pyx_v_board, __pyx_v_player};
+                  __pyx_t_8 = __Pyx_PyCFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_10, 4+__pyx_t_10); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 189, __pyx_L1_error)
+                  __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+                  __Pyx_GOTREF(__pyx_t_8);
+                  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+                  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+                } else
+                #endif
+                {
+                  __pyx_t_7 = PyTuple_New(4+__pyx_t_10); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 189, __pyx_L1_error)
+                  __Pyx_GOTREF(__pyx_t_7);
+                  if (__pyx_t_1) {
+                    __Pyx_GIVEREF(__pyx_t_1); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_1); __pyx_t_1 = NULL;
+                  }
+                  __Pyx_GIVEREF(__pyx_t_9);
+                  PyTuple_SET_ITEM(__pyx_t_7, 0+__pyx_t_10, __pyx_t_9);
+                  __Pyx_GIVEREF(__pyx_t_6);
+                  PyTuple_SET_ITEM(__pyx_t_7, 1+__pyx_t_10, __pyx_t_6);
+                  __Pyx_INCREF(__pyx_v_board);
+                  __Pyx_GIVEREF(__pyx_v_board);
+                  PyTuple_SET_ITEM(__pyx_t_7, 2+__pyx_t_10, __pyx_v_board);
+                  __Pyx_INCREF(__pyx_v_player);
+                  __Pyx_GIVEREF(__pyx_v_player);
+                  PyTuple_SET_ITEM(__pyx_t_7, 3+__pyx_t_10, __pyx_v_player);
+                  __pyx_t_9 = 0;
+                  __pyx_t_6 = 0;
+                  __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_7, NULL); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 189, __pyx_L1_error)
+                  __Pyx_GOTREF(__pyx_t_8);
+                  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+                }
+                __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+                __pyx_t_13 = __Pyx_PyObject_IsTrue(__pyx_t_8); if (unlikely(__pyx_t_13 < 0)) __PYX_ERR(0, 189, __pyx_L1_error)
+                __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+                if (__pyx_t_13) {
+
+                  /* "ai_minimax_alpha_beta.py":191
+ *                                     if self.checkmuhle(ring, stelle, board, player):
+ *                                         # Zwickmuehle
+ *                                         score_addition += 500             # <<<<<<<<<<<<<<
+ * 
+ *                                     # Finally, remove one random enemy man
+ */
+                  __pyx_t_8 = __Pyx_PyInt_AddObjC(__pyx_v_score_addition, __pyx_int_500, 0x1F4, 1, 0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 191, __pyx_L1_error)
+                  __Pyx_GOTREF(__pyx_t_8);
+                  __Pyx_DECREF_SET(__pyx_v_score_addition, __pyx_t_8);
+                  __pyx_t_8 = 0;
+
+                  /* "ai_minimax_alpha_beta.py":189
+ *                                     score_addition += 100
+ *                                     # New mill generated
+ *                                     if self.checkmuhle(ring, stelle, board, player):             # <<<<<<<<<<<<<<
+ *                                         # Zwickmuehle
+ *                                         score_addition += 500
+ */
+                }
+
+                /* "ai_minimax_alpha_beta.py":194
+ * 
+ *                                     # Finally, remove one random enemy man
+ *                                     to_remove = self.toremove(board_, 1 if player == 2 else 2)             # <<<<<<<<<<<<<<
+ *                                     if board_[to_remove[0]][to_remove[1]] == (1 if player == 2 else 2) and muhlen_[to_remove[0]][to_remove[1]] == 0:
+ *                                         board_[to_remove[0]][to_remove[1]] = 0
+ */
+                __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_toremove); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 194, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_5);
+                __pyx_t_6 = __Pyx_PyInt_EqObjC(__pyx_v_player, __pyx_int_2, 2, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 194, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_6);
+                __pyx_t_13 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_13 < 0)) __PYX_ERR(0, 194, __pyx_L1_error)
+                __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+                if (__pyx_t_13) {
+                  __Pyx_INCREF(__pyx_int_1);
+                  __pyx_t_7 = __pyx_int_1;
+                } else {
+                  __Pyx_INCREF(__pyx_int_2);
+                  __pyx_t_7 = __pyx_int_2;
+                }
+                __pyx_t_6 = NULL;
+                __pyx_t_10 = 0;
+                if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_5))) {
+                  __pyx_t_6 = PyMethod_GET_SELF(__pyx_t_5);
+                  if (likely(__pyx_t_6)) {
+                    PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_5);
+                    __Pyx_INCREF(__pyx_t_6);
+                    __Pyx_INCREF(function);
+                    __Pyx_DECREF_SET(__pyx_t_5, function);
+                    __pyx_t_10 = 1;
+                  }
+                }
+                #if CYTHON_FAST_PYCALL
+                if (PyFunction_Check(__pyx_t_5)) {
+                  PyObject *__pyx_temp[3] = {__pyx_t_6, __pyx_v_board_, __pyx_t_7};
+                  __pyx_t_8 = __Pyx_PyFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 194, __pyx_L1_error)
+                  __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
+                  __Pyx_GOTREF(__pyx_t_8);
+                  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+                } else
+                #endif
+                #if CYTHON_FAST_PYCCALL
+                if (__Pyx_PyFastCFunction_Check(__pyx_t_5)) {
+                  PyObject *__pyx_temp[3] = {__pyx_t_6, __pyx_v_board_, __pyx_t_7};
+                  __pyx_t_8 = __Pyx_PyCFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 194, __pyx_L1_error)
+                  __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
+                  __Pyx_GOTREF(__pyx_t_8);
+                  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+                } else
+                #endif
+                {
+                  __pyx_t_9 = PyTuple_New(2+__pyx_t_10); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 194, __pyx_L1_error)
+                  __Pyx_GOTREF(__pyx_t_9);
+                  if (__pyx_t_6) {
+                    __Pyx_GIVEREF(__pyx_t_6); PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_6); __pyx_t_6 = NULL;
+                  }
+                  __Pyx_INCREF(__pyx_v_board_);
+                  __Pyx_GIVEREF(__pyx_v_board_);
+                  PyTuple_SET_ITEM(__pyx_t_9, 0+__pyx_t_10, __pyx_v_board_);
+                  __Pyx_GIVEREF(__pyx_t_7);
+                  PyTuple_SET_ITEM(__pyx_t_9, 1+__pyx_t_10, __pyx_t_7);
+                  __pyx_t_7 = 0;
+                  __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_9, NULL); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 194, __pyx_L1_error)
+                  __Pyx_GOTREF(__pyx_t_8);
+                  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+                }
+                __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+                __Pyx_XDECREF_SET(__pyx_v_to_remove, __pyx_t_8);
+                __pyx_t_8 = 0;
+
+                /* "ai_minimax_alpha_beta.py":195
+ *                                     # Finally, remove one random enemy man
+ *                                     to_remove = self.toremove(board_, 1 if player == 2 else 2)
+ *                                     if board_[to_remove[0]][to_remove[1]] == (1 if player == 2 else 2) and muhlen_[to_remove[0]][to_remove[1]] == 0:             # <<<<<<<<<<<<<<
+ *                                         board_[to_remove[0]][to_remove[1]] = 0
+ *                                         muhlen_ = self.update_board_muhlen(board_, muhlen_)
+ */
+                __pyx_t_8 = __Pyx_GetItemInt(__pyx_v_to_remove, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 195, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_8);
+                __pyx_t_5 = __Pyx_PyObject_GetItem(__pyx_v_board_, __pyx_t_8); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 195, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_5);
+                __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+                __pyx_t_8 = __Pyx_GetItemInt(__pyx_v_to_remove, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 195, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_8);
+                __pyx_t_9 = __Pyx_PyObject_GetItem(__pyx_t_5, __pyx_t_8); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 195, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_9);
+                __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+                __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+                __pyx_t_5 = __Pyx_PyInt_EqObjC(__pyx_v_player, __pyx_int_2, 2, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 195, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_5);
+                __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 195, __pyx_L1_error)
+                __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+                if (__pyx_t_2) {
+                  __Pyx_INCREF(__pyx_int_1);
+                  __pyx_t_8 = __pyx_int_1;
+                } else {
+                  __Pyx_INCREF(__pyx_int_2);
+                  __pyx_t_8 = __pyx_int_2;
+                }
+                __pyx_t_5 = PyObject_RichCompare(__pyx_t_9, __pyx_t_8, Py_EQ); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 195, __pyx_L1_error)
+                __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+                __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+                __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 195, __pyx_L1_error)
+                __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+                if (__pyx_t_2) {
+                } else {
+                  __pyx_t_13 = __pyx_t_2;
+                  goto __pyx_L66_bool_binop_done;
+                }
+                __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_to_remove, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 195, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_5);
+                __pyx_t_8 = __Pyx_PyObject_GetItem(__pyx_v_muhlen_, __pyx_t_5); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 195, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_8);
+                __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+                __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_to_remove, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 195, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_5);
+                __pyx_t_9 = __Pyx_PyObject_GetItem(__pyx_t_8, __pyx_t_5); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 195, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_9);
+                __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+                __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+                __pyx_t_5 = __Pyx_PyInt_EqObjC(__pyx_t_9, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 195, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_5);
+                __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+                __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 195, __pyx_L1_error)
+                __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+                __pyx_t_13 = __pyx_t_2;
+                __pyx_L66_bool_binop_done:;
+                if (__pyx_t_13) {
+
+                  /* "ai_minimax_alpha_beta.py":196
+ *                                     to_remove = self.toremove(board_, 1 if player == 2 else 2)
+ *                                     if board_[to_remove[0]][to_remove[1]] == (1 if player == 2 else 2) and muhlen_[to_remove[0]][to_remove[1]] == 0:
+ *                                         board_[to_remove[0]][to_remove[1]] = 0             # <<<<<<<<<<<<<<
+ *                                         muhlen_ = self.update_board_muhlen(board_, muhlen_)
+ * 
+ */
+                  __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_to_remove, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 196, __pyx_L1_error)
+                  __Pyx_GOTREF(__pyx_t_5);
+                  __pyx_t_9 = __Pyx_PyObject_GetItem(__pyx_v_board_, __pyx_t_5); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 196, __pyx_L1_error)
+                  __Pyx_GOTREF(__pyx_t_9);
+                  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+                  __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_to_remove, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 196, __pyx_L1_error)
+                  __Pyx_GOTREF(__pyx_t_5);
+                  if (unlikely(PyObject_SetItem(__pyx_t_9, __pyx_t_5, __pyx_int_0) < 0)) __PYX_ERR(0, 196, __pyx_L1_error)
+                  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+                  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+
+                  /* "ai_minimax_alpha_beta.py":197
+ *                                     if board_[to_remove[0]][to_remove[1]] == (1 if player == 2 else 2) and muhlen_[to_remove[0]][to_remove[1]] == 0:
+ *                                         board_[to_remove[0]][to_remove[1]] = 0
+ *                                         muhlen_ = self.update_board_muhlen(board_, muhlen_)             # <<<<<<<<<<<<<<
+ * 
+ *                                 evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, best_score, beta,
+ */
+                  __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_update_board_muhlen); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 197, __pyx_L1_error)
+                  __Pyx_GOTREF(__pyx_t_9);
+                  __pyx_t_8 = NULL;
+                  __pyx_t_10 = 0;
+                  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_9))) {
+                    __pyx_t_8 = PyMethod_GET_SELF(__pyx_t_9);
+                    if (likely(__pyx_t_8)) {
+                      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_9);
+                      __Pyx_INCREF(__pyx_t_8);
+                      __Pyx_INCREF(function);
+                      __Pyx_DECREF_SET(__pyx_t_9, function);
+                      __pyx_t_10 = 1;
+                    }
+                  }
+                  #if CYTHON_FAST_PYCALL
+                  if (PyFunction_Check(__pyx_t_9)) {
+                    PyObject *__pyx_temp[3] = {__pyx_t_8, __pyx_v_board_, __pyx_v_muhlen_};
+                    __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_9, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 197, __pyx_L1_error)
+                    __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
+                    __Pyx_GOTREF(__pyx_t_5);
+                  } else
+                  #endif
+                  #if CYTHON_FAST_PYCCALL
+                  if (__Pyx_PyFastCFunction_Check(__pyx_t_9)) {
+                    PyObject *__pyx_temp[3] = {__pyx_t_8, __pyx_v_board_, __pyx_v_muhlen_};
+                    __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_9, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 197, __pyx_L1_error)
+                    __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
+                    __Pyx_GOTREF(__pyx_t_5);
+                  } else
+                  #endif
+                  {
+                    __pyx_t_7 = PyTuple_New(2+__pyx_t_10); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 197, __pyx_L1_error)
+                    __Pyx_GOTREF(__pyx_t_7);
+                    if (__pyx_t_8) {
+                      __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_8); __pyx_t_8 = NULL;
+                    }
+                    __Pyx_INCREF(__pyx_v_board_);
+                    __Pyx_GIVEREF(__pyx_v_board_);
+                    PyTuple_SET_ITEM(__pyx_t_7, 0+__pyx_t_10, __pyx_v_board_);
+                    __Pyx_INCREF(__pyx_v_muhlen_);
+                    __Pyx_GIVEREF(__pyx_v_muhlen_);
+                    PyTuple_SET_ITEM(__pyx_t_7, 1+__pyx_t_10, __pyx_v_muhlen_);
+                    __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_9, __pyx_t_7, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 197, __pyx_L1_error)
+                    __Pyx_GOTREF(__pyx_t_5);
+                    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+                  }
+                  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+                  __Pyx_DECREF_SET(__pyx_v_muhlen_, __pyx_t_5);
+                  __pyx_t_5 = 0;
+
+                  /* "ai_minimax_alpha_beta.py":195
+ *                                     # Finally, remove one random enemy man
+ *                                     to_remove = self.toremove(board_, 1 if player == 2 else 2)
+ *                                     if board_[to_remove[0]][to_remove[1]] == (1 if player == 2 else 2) and muhlen_[to_remove[0]][to_remove[1]] == 0:             # <<<<<<<<<<<<<<
+ *                                         board_[to_remove[0]][to_remove[1]] = 0
+ *                                         muhlen_ = self.update_board_muhlen(board_, muhlen_)
+ */
+                }
+
+                /* "ai_minimax_alpha_beta.py":186
+ *                                 # check if new mill has been generated / zwickmuehle
+ *                                 score_addition = 0
+ *                                 if self.checkmuhle(move[0], move[1], board_, player):             # <<<<<<<<<<<<<<
+ *                                     score_addition += 100
+ *                                     # New mill generated
+ */
+              }
+
+              /* "ai_minimax_alpha_beta.py":199
+ *                                         muhlen_ = self.update_board_muhlen(board_, muhlen_)
+ * 
+ *                                 evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, best_score, beta,             # <<<<<<<<<<<<<<
+ *                                                           remaining_set, depth - 1)
+ *                                 evaluation += score_addition
+ */
+              __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_minimax); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 199, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_9);
+              __pyx_t_8 = __Pyx_PyInt_EqObjC(__pyx_v_player, __pyx_int_2, 2, 0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 199, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_8);
+              __pyx_t_13 = __Pyx_PyObject_IsTrue(__pyx_t_8); if (unlikely(__pyx_t_13 < 0)) __PYX_ERR(0, 199, __pyx_L1_error)
+              __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+              if (__pyx_t_13) {
+                __Pyx_INCREF(__pyx_int_1);
+                __pyx_t_7 = __pyx_int_1;
+              } else {
+                __Pyx_INCREF(__pyx_int_2);
+                __pyx_t_7 = __pyx_int_2;
+              }
+
+              /* "ai_minimax_alpha_beta.py":200
+ * 
+ *                                 evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, best_score, beta,
+ *                                                           remaining_set, depth - 1)             # <<<<<<<<<<<<<<
+ *                                 evaluation += score_addition
+ *                                 if evaluation > best_score:
+ */
+              __pyx_t_8 = __Pyx_PyInt_SubtractObjC(__pyx_v_depth, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 200, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_8);
+              __pyx_t_6 = NULL;
+              __pyx_t_10 = 0;
+              if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_9))) {
+                __pyx_t_6 = PyMethod_GET_SELF(__pyx_t_9);
+                if (likely(__pyx_t_6)) {
+                  PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_9);
+                  __Pyx_INCREF(__pyx_t_6);
+                  __Pyx_INCREF(function);
+                  __Pyx_DECREF_SET(__pyx_t_9, function);
+                  __pyx_t_10 = 1;
+                }
+              }
+              #if CYTHON_FAST_PYCALL
+              if (PyFunction_Check(__pyx_t_9)) {
+                PyObject *__pyx_temp[8] = {__pyx_t_6, __pyx_v_board_, __pyx_v_muhlen_, __pyx_t_7, __pyx_v_best_score, __pyx_v_beta, __pyx_v_remaining_set, __pyx_t_8};
+                __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_9, __pyx_temp+1-__pyx_t_10, 7+__pyx_t_10); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 199, __pyx_L1_error)
+                __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
+                __Pyx_GOTREF(__pyx_t_5);
+                __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+                __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+              } else
+              #endif
+              #if CYTHON_FAST_PYCCALL
+              if (__Pyx_PyFastCFunction_Check(__pyx_t_9)) {
+                PyObject *__pyx_temp[8] = {__pyx_t_6, __pyx_v_board_, __pyx_v_muhlen_, __pyx_t_7, __pyx_v_best_score, __pyx_v_beta, __pyx_v_remaining_set, __pyx_t_8};
+                __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_9, __pyx_temp+1-__pyx_t_10, 7+__pyx_t_10); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 199, __pyx_L1_error)
+                __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
+                __Pyx_GOTREF(__pyx_t_5);
+                __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+                __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+              } else
+              #endif
+              {
+                __pyx_t_1 = PyTuple_New(7+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 199, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_1);
+                if (__pyx_t_6) {
+                  __Pyx_GIVEREF(__pyx_t_6); PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_6); __pyx_t_6 = NULL;
                 }
                 __Pyx_INCREF(__pyx_v_board_);
                 __Pyx_GIVEREF(__pyx_v_board_);
-                PyTuple_SET_ITEM(__pyx_t_5, 0+__pyx_t_10, __pyx_v_board_);
+                PyTuple_SET_ITEM(__pyx_t_1, 0+__pyx_t_10, __pyx_v_board_);
                 __Pyx_INCREF(__pyx_v_muhlen_);
                 __Pyx_GIVEREF(__pyx_v_muhlen_);
-                PyTuple_SET_ITEM(__pyx_t_5, 1+__pyx_t_10, __pyx_v_muhlen_);
+                PyTuple_SET_ITEM(__pyx_t_1, 1+__pyx_t_10, __pyx_v_muhlen_);
                 __Pyx_GIVEREF(__pyx_t_7);
-                PyTuple_SET_ITEM(__pyx_t_5, 2+__pyx_t_10, __pyx_t_7);
-                __Pyx_INCREF(__pyx_v_alpha);
-                __Pyx_GIVEREF(__pyx_v_alpha);
-                PyTuple_SET_ITEM(__pyx_t_5, 3+__pyx_t_10, __pyx_v_alpha);
+                PyTuple_SET_ITEM(__pyx_t_1, 2+__pyx_t_10, __pyx_t_7);
                 __Pyx_INCREF(__pyx_v_best_score);
                 __Pyx_GIVEREF(__pyx_v_best_score);
-                PyTuple_SET_ITEM(__pyx_t_5, 4+__pyx_t_10, __pyx_v_best_score);
+                PyTuple_SET_ITEM(__pyx_t_1, 3+__pyx_t_10, __pyx_v_best_score);
+                __Pyx_INCREF(__pyx_v_beta);
+                __Pyx_GIVEREF(__pyx_v_beta);
+                PyTuple_SET_ITEM(__pyx_t_1, 4+__pyx_t_10, __pyx_v_beta);
                 __Pyx_INCREF(__pyx_v_remaining_set);
                 __Pyx_GIVEREF(__pyx_v_remaining_set);
-                PyTuple_SET_ITEM(__pyx_t_5, 5+__pyx_t_10, __pyx_v_remaining_set);
-                __Pyx_GIVEREF(__pyx_t_6);
-                PyTuple_SET_ITEM(__pyx_t_5, 6+__pyx_t_10, __pyx_t_6);
+                PyTuple_SET_ITEM(__pyx_t_1, 5+__pyx_t_10, __pyx_v_remaining_set);
+                __Pyx_GIVEREF(__pyx_t_8);
+                PyTuple_SET_ITEM(__pyx_t_1, 6+__pyx_t_10, __pyx_t_8);
                 __pyx_t_7 = 0;
-                __pyx_t_6 = 0;
-                __pyx_t_9 = __Pyx_PyObject_Call(__pyx_t_11, __pyx_t_5, NULL); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 295, __pyx_L1_error)
+                __pyx_t_8 = 0;
+                __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_9, __pyx_t_1, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 199, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_5);
+                __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+              }
+              __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+              __Pyx_XDECREF_SET(__pyx_v_evaluation, __pyx_t_5);
+              __pyx_t_5 = 0;
+
+              /* "ai_minimax_alpha_beta.py":201
+ *                                 evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, best_score, beta,
+ *                                                           remaining_set, depth - 1)
+ *                                 evaluation += score_addition             # <<<<<<<<<<<<<<
+ *                                 if evaluation > best_score:
+ *                                     best_score = evaluation
+ */
+              __pyx_t_5 = PyNumber_InPlaceAdd(__pyx_v_evaluation, __pyx_v_score_addition); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 201, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_5);
+              __Pyx_DECREF_SET(__pyx_v_evaluation, __pyx_t_5);
+              __pyx_t_5 = 0;
+
+              /* "ai_minimax_alpha_beta.py":202
+ *                                                           remaining_set, depth - 1)
+ *                                 evaluation += score_addition
+ *                                 if evaluation > best_score:             # <<<<<<<<<<<<<<
+ *                                     best_score = evaluation
+ *                                     if best_score >= beta:
+ */
+              __pyx_t_5 = PyObject_RichCompare(__pyx_v_evaluation, __pyx_v_best_score, Py_GT); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 202, __pyx_L1_error)
+              __pyx_t_13 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_13 < 0)) __PYX_ERR(0, 202, __pyx_L1_error)
+              __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+              if (__pyx_t_13) {
+
+                /* "ai_minimax_alpha_beta.py":203
+ *                                 evaluation += score_addition
+ *                                 if evaluation > best_score:
+ *                                     best_score = evaluation             # <<<<<<<<<<<<<<
+ *                                     if best_score >= beta:
+ *                                         break
+ */
+                __Pyx_INCREF(__pyx_v_evaluation);
+                __Pyx_DECREF_SET(__pyx_v_best_score, __pyx_v_evaluation);
+
+                /* "ai_minimax_alpha_beta.py":204
+ *                                 if evaluation > best_score:
+ *                                     best_score = evaluation
+ *                                     if best_score >= beta:             # <<<<<<<<<<<<<<
+ *                                         break
+ *                         else:
+ */
+                __pyx_t_5 = PyObject_RichCompare(__pyx_v_best_score, __pyx_v_beta, Py_GE); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 204, __pyx_L1_error)
+                __pyx_t_13 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_13 < 0)) __PYX_ERR(0, 204, __pyx_L1_error)
+                __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+                if (__pyx_t_13) {
+
+                  /* "ai_minimax_alpha_beta.py":205
+ *                                     best_score = evaluation
+ *                                     if best_score >= beta:
+ *                                         break             # <<<<<<<<<<<<<<
+ *                         else:
+ *                             continue
+ */
+                  goto __pyx_L52_break;
+
+                  /* "ai_minimax_alpha_beta.py":204
+ *                                 if evaluation > best_score:
+ *                                     best_score = evaluation
+ *                                     if best_score >= beta:             # <<<<<<<<<<<<<<
+ *                                         break
+ *                         else:
+ */
+                }
+
+                /* "ai_minimax_alpha_beta.py":202
+ *                                                           remaining_set, depth - 1)
+ *                                 evaluation += score_addition
+ *                                 if evaluation > best_score:             # <<<<<<<<<<<<<<
+ *                                     best_score = evaluation
+ *                                     if best_score >= beta:
+ */
+              }
+
+              /* "ai_minimax_alpha_beta.py":176
+ *                             if not possiblemoves:
+ *                                 continue
+ *                             for move in possiblemoves:             # <<<<<<<<<<<<<<
+ *                                 board_ = copy.deepcopy(board)
+ *                                 muhlen_ = copy.deepcopy(board_muhlen)
+ */
+            }
+            __pyx_L52_break:;
+            __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+
+            /* "ai_minimax_alpha_beta.py":172
+ *                 for ring in range(3):
+ *                     for stelle in range(8):
+ *                         if board[ring][stelle] == player:             # <<<<<<<<<<<<<<
+ *                             possiblemoves = self.possiblemoves(ring, stelle, board)
+ *                             if not possiblemoves:
+ */
+            goto __pyx_L49;
+          }
+
+          /* "ai_minimax_alpha_beta.py":207
+ *                                         break
+ *                         else:
+ *                             continue             # <<<<<<<<<<<<<<
+ *                         break
+ *                 return best_score
+ */
+          /*else*/ {
+            goto __pyx_L47_continue;
+          }
+          __pyx_L49:;
+
+          /* "ai_minimax_alpha_beta.py":208
+ *                         else:
+ *                             continue
+ *                         break             # <<<<<<<<<<<<<<
+ *                 return best_score
+ * 
+ */
+          goto __pyx_L48_break;
+          __pyx_L47_continue:;
+        }
+        __pyx_L48_break:;
+      }
+
+      /* "ai_minimax_alpha_beta.py":209
+ *                             continue
+ *                         break
+ *                 return best_score             # <<<<<<<<<<<<<<
+ * 
+ * 
+ */
+      __Pyx_XDECREF(__pyx_r);
+      __Pyx_INCREF(__pyx_v_best_score);
+      __pyx_r = __pyx_v_best_score;
+      goto __pyx_L0;
+    }
+
+    /* "ai_minimax_alpha_beta.py":133
+ * 
+ *         # MAX
+ *         if player == self.player:             # <<<<<<<<<<<<<<
+ *             best_score = alpha
+ *             # Phase 1
+ */
+  }
+
+  /* "ai_minimax_alpha_beta.py":214
+ *         # MIN
+ *         else:
+ *             best_score = beta             # <<<<<<<<<<<<<<
+ *             if remaining_set:
+ *                 # Phase 1
+ */
+  /*else*/ {
+    __Pyx_INCREF(__pyx_v_beta);
+    __pyx_v_best_score = __pyx_v_beta;
+
+    /* "ai_minimax_alpha_beta.py":215
+ *         else:
+ *             best_score = beta
+ *             if remaining_set:             # <<<<<<<<<<<<<<
+ *                 # Phase 1
+ *                 for ring in range(3):
+ */
+    __pyx_t_13 = __Pyx_PyObject_IsTrue(__pyx_v_remaining_set); if (unlikely(__pyx_t_13 < 0)) __PYX_ERR(0, 215, __pyx_L1_error)
+    if (__pyx_t_13) {
+
+      /* "ai_minimax_alpha_beta.py":217
+ *             if remaining_set:
+ *                 # Phase 1
+ *                 for ring in range(3):             # <<<<<<<<<<<<<<
+ *                     for stelle in range(8):
+ *                         if board[ring][stelle] == 0:
+ */
+      for (__pyx_t_3 = 0; __pyx_t_3 < 3; __pyx_t_3+=1) {
+        __pyx_v_ring = __pyx_t_3;
+
+        /* "ai_minimax_alpha_beta.py":218
+ *                 # Phase 1
+ *                 for ring in range(3):
+ *                     for stelle in range(8):             # <<<<<<<<<<<<<<
+ *                         if board[ring][stelle] == 0:
+ *                             board_ = copy.deepcopy(board)
+ */
+        for (__pyx_t_4 = 0; __pyx_t_4 < 8; __pyx_t_4+=1) {
+          __pyx_v_stelle = __pyx_t_4;
+
+          /* "ai_minimax_alpha_beta.py":219
+ *                 for ring in range(3):
+ *                     for stelle in range(8):
+ *                         if board[ring][stelle] == 0:             # <<<<<<<<<<<<<<
+ *                             board_ = copy.deepcopy(board)
+ *                             board_[ring][stelle] = player
+ */
+          __pyx_t_11 = __Pyx_GetItemInt(__pyx_v_board, __pyx_v_ring, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 219, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_11);
+          __pyx_t_5 = __Pyx_GetItemInt(__pyx_t_11, __pyx_v_stelle, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 219, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_5);
+          __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+          __pyx_t_11 = __Pyx_PyInt_EqObjC(__pyx_t_5, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 219, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_11);
+          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+          __pyx_t_13 = __Pyx_PyObject_IsTrue(__pyx_t_11); if (unlikely(__pyx_t_13 < 0)) __PYX_ERR(0, 219, __pyx_L1_error)
+          __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+          if (__pyx_t_13) {
+
+            /* "ai_minimax_alpha_beta.py":220
+ *                     for stelle in range(8):
+ *                         if board[ring][stelle] == 0:
+ *                             board_ = copy.deepcopy(board)             # <<<<<<<<<<<<<<
+ *                             board_[ring][stelle] = player
+ *                             muhlen_ = copy.deepcopy(board_muhlen)
+ */
+            __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_copy); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 220, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_5);
+            __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_deepcopy); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 220, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_9);
+            __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+            __pyx_t_5 = NULL;
+            if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_9))) {
+              __pyx_t_5 = PyMethod_GET_SELF(__pyx_t_9);
+              if (likely(__pyx_t_5)) {
+                PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_9);
+                __Pyx_INCREF(__pyx_t_5);
+                __Pyx_INCREF(function);
+                __Pyx_DECREF_SET(__pyx_t_9, function);
+              }
+            }
+            __pyx_t_11 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_9, __pyx_t_5, __pyx_v_board) : __Pyx_PyObject_CallOneArg(__pyx_t_9, __pyx_v_board);
+            __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
+            if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 220, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_11);
+            __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+            __Pyx_XDECREF_SET(__pyx_v_board_, __pyx_t_11);
+            __pyx_t_11 = 0;
+
+            /* "ai_minimax_alpha_beta.py":221
+ *                         if board[ring][stelle] == 0:
+ *                             board_ = copy.deepcopy(board)
+ *                             board_[ring][stelle] = player             # <<<<<<<<<<<<<<
+ *                             muhlen_ = copy.deepcopy(board_muhlen)
+ * 
+ */
+            __pyx_t_11 = __Pyx_GetItemInt(__pyx_v_board_, __pyx_v_ring, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 221, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_11);
+            if (unlikely(__Pyx_SetItemInt(__pyx_t_11, __pyx_v_stelle, __pyx_v_player, long, 1, __Pyx_PyInt_From_long, 0, 1, 1) < 0)) __PYX_ERR(0, 221, __pyx_L1_error)
+            __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+
+            /* "ai_minimax_alpha_beta.py":222
+ *                             board_ = copy.deepcopy(board)
+ *                             board_[ring][stelle] = player
+ *                             muhlen_ = copy.deepcopy(board_muhlen)             # <<<<<<<<<<<<<<
+ * 
+ *                             if self.checkmuhle(ring, stelle, board_, player):
+ */
+            __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_copy); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 222, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_9);
+            __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_deepcopy); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 222, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_5);
+            __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+            __pyx_t_9 = NULL;
+            if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_5))) {
+              __pyx_t_9 = PyMethod_GET_SELF(__pyx_t_5);
+              if (likely(__pyx_t_9)) {
+                PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_5);
+                __Pyx_INCREF(__pyx_t_9);
+                __Pyx_INCREF(function);
+                __Pyx_DECREF_SET(__pyx_t_5, function);
+              }
+            }
+            __pyx_t_11 = (__pyx_t_9) ? __Pyx_PyObject_Call2Args(__pyx_t_5, __pyx_t_9, __pyx_v_board_muhlen) : __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_v_board_muhlen);
+            __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
+            if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 222, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_11);
+            __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+            __Pyx_XDECREF_SET(__pyx_v_muhlen_, __pyx_t_11);
+            __pyx_t_11 = 0;
+
+            /* "ai_minimax_alpha_beta.py":224
+ *                             muhlen_ = copy.deepcopy(board_muhlen)
+ * 
+ *                             if self.checkmuhle(ring, stelle, board_, player):             # <<<<<<<<<<<<<<
+ *                                 to_remove = self.toremove(board_, 1 if player == 2 else 2)
+ *                                 if board_[to_remove[0]][to_remove[1]] == (1 if player == 2 else 2) and muhlen_[to_remove[0]][to_remove[1]] == 0:
+ */
+            __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_checkmuhle); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 224, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_5);
+            __pyx_t_9 = __Pyx_PyInt_From_long(__pyx_v_ring); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 224, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_9);
+            __pyx_t_1 = __Pyx_PyInt_From_long(__pyx_v_stelle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 224, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_1);
+            __pyx_t_8 = NULL;
+            __pyx_t_10 = 0;
+            if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_5))) {
+              __pyx_t_8 = PyMethod_GET_SELF(__pyx_t_5);
+              if (likely(__pyx_t_8)) {
+                PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_5);
+                __Pyx_INCREF(__pyx_t_8);
+                __Pyx_INCREF(function);
+                __Pyx_DECREF_SET(__pyx_t_5, function);
+                __pyx_t_10 = 1;
+              }
+            }
+            #if CYTHON_FAST_PYCALL
+            if (PyFunction_Check(__pyx_t_5)) {
+              PyObject *__pyx_temp[5] = {__pyx_t_8, __pyx_t_9, __pyx_t_1, __pyx_v_board_, __pyx_v_player};
+              __pyx_t_11 = __Pyx_PyFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_10, 4+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 224, __pyx_L1_error)
+              __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
+              __Pyx_GOTREF(__pyx_t_11);
+              __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+              __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+            } else
+            #endif
+            #if CYTHON_FAST_PYCCALL
+            if (__Pyx_PyFastCFunction_Check(__pyx_t_5)) {
+              PyObject *__pyx_temp[5] = {__pyx_t_8, __pyx_t_9, __pyx_t_1, __pyx_v_board_, __pyx_v_player};
+              __pyx_t_11 = __Pyx_PyCFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_10, 4+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 224, __pyx_L1_error)
+              __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
+              __Pyx_GOTREF(__pyx_t_11);
+              __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+              __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+            } else
+            #endif
+            {
+              __pyx_t_7 = PyTuple_New(4+__pyx_t_10); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 224, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_7);
+              if (__pyx_t_8) {
+                __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_8); __pyx_t_8 = NULL;
+              }
+              __Pyx_GIVEREF(__pyx_t_9);
+              PyTuple_SET_ITEM(__pyx_t_7, 0+__pyx_t_10, __pyx_t_9);
+              __Pyx_GIVEREF(__pyx_t_1);
+              PyTuple_SET_ITEM(__pyx_t_7, 1+__pyx_t_10, __pyx_t_1);
+              __Pyx_INCREF(__pyx_v_board_);
+              __Pyx_GIVEREF(__pyx_v_board_);
+              PyTuple_SET_ITEM(__pyx_t_7, 2+__pyx_t_10, __pyx_v_board_);
+              __Pyx_INCREF(__pyx_v_player);
+              __Pyx_GIVEREF(__pyx_v_player);
+              PyTuple_SET_ITEM(__pyx_t_7, 3+__pyx_t_10, __pyx_v_player);
+              __pyx_t_9 = 0;
+              __pyx_t_1 = 0;
+              __pyx_t_11 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_7, NULL); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 224, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_11);
+              __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+            }
+            __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+            __pyx_t_13 = __Pyx_PyObject_IsTrue(__pyx_t_11); if (unlikely(__pyx_t_13 < 0)) __PYX_ERR(0, 224, __pyx_L1_error)
+            __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+            if (__pyx_t_13) {
+
+              /* "ai_minimax_alpha_beta.py":225
+ * 
+ *                             if self.checkmuhle(ring, stelle, board_, player):
+ *                                 to_remove = self.toremove(board_, 1 if player == 2 else 2)             # <<<<<<<<<<<<<<
+ *                                 if board_[to_remove[0]][to_remove[1]] == (1 if player == 2 else 2) and muhlen_[to_remove[0]][to_remove[1]] == 0:
+ *                                     board_[to_remove[0]][to_remove[1]] = 0
+ */
+              __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_toremove); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 225, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_5);
+              __pyx_t_1 = __Pyx_PyInt_EqObjC(__pyx_v_player, __pyx_int_2, 2, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 225, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_1);
+              __pyx_t_13 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_13 < 0)) __PYX_ERR(0, 225, __pyx_L1_error)
+              __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+              if (__pyx_t_13) {
+                __Pyx_INCREF(__pyx_int_1);
+                __pyx_t_7 = __pyx_int_1;
+              } else {
+                __Pyx_INCREF(__pyx_int_2);
+                __pyx_t_7 = __pyx_int_2;
+              }
+              __pyx_t_1 = NULL;
+              __pyx_t_10 = 0;
+              if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_5))) {
+                __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_5);
+                if (likely(__pyx_t_1)) {
+                  PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_5);
+                  __Pyx_INCREF(__pyx_t_1);
+                  __Pyx_INCREF(function);
+                  __Pyx_DECREF_SET(__pyx_t_5, function);
+                  __pyx_t_10 = 1;
+                }
+              }
+              #if CYTHON_FAST_PYCALL
+              if (PyFunction_Check(__pyx_t_5)) {
+                PyObject *__pyx_temp[3] = {__pyx_t_1, __pyx_v_board_, __pyx_t_7};
+                __pyx_t_11 = __Pyx_PyFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 225, __pyx_L1_error)
+                __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+                __Pyx_GOTREF(__pyx_t_11);
+                __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+              } else
+              #endif
+              #if CYTHON_FAST_PYCCALL
+              if (__Pyx_PyFastCFunction_Check(__pyx_t_5)) {
+                PyObject *__pyx_temp[3] = {__pyx_t_1, __pyx_v_board_, __pyx_t_7};
+                __pyx_t_11 = __Pyx_PyCFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 225, __pyx_L1_error)
+                __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+                __Pyx_GOTREF(__pyx_t_11);
+                __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+              } else
+              #endif
+              {
+                __pyx_t_9 = PyTuple_New(2+__pyx_t_10); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 225, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_9);
+                if (__pyx_t_1) {
+                  __Pyx_GIVEREF(__pyx_t_1); PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_1); __pyx_t_1 = NULL;
+                }
+                __Pyx_INCREF(__pyx_v_board_);
+                __Pyx_GIVEREF(__pyx_v_board_);
+                PyTuple_SET_ITEM(__pyx_t_9, 0+__pyx_t_10, __pyx_v_board_);
+                __Pyx_GIVEREF(__pyx_t_7);
+                PyTuple_SET_ITEM(__pyx_t_9, 1+__pyx_t_10, __pyx_t_7);
+                __pyx_t_7 = 0;
+                __pyx_t_11 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_9, NULL); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 225, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_11);
+                __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+              }
+              __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+              __Pyx_XDECREF_SET(__pyx_v_to_remove, __pyx_t_11);
+              __pyx_t_11 = 0;
+
+              /* "ai_minimax_alpha_beta.py":226
+ *                             if self.checkmuhle(ring, stelle, board_, player):
+ *                                 to_remove = self.toremove(board_, 1 if player == 2 else 2)
+ *                                 if board_[to_remove[0]][to_remove[1]] == (1 if player == 2 else 2) and muhlen_[to_remove[0]][to_remove[1]] == 0:             # <<<<<<<<<<<<<<
+ *                                     board_[to_remove[0]][to_remove[1]] = 0
+ *                                     muhlen_ = self.update_board_muhlen(board_, muhlen_)
+ */
+              __pyx_t_11 = __Pyx_GetItemInt(__pyx_v_to_remove, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 226, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_11);
+              __pyx_t_5 = __Pyx_PyObject_GetItem(__pyx_v_board_, __pyx_t_11); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 226, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_5);
+              __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+              __pyx_t_11 = __Pyx_GetItemInt(__pyx_v_to_remove, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 226, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_11);
+              __pyx_t_9 = __Pyx_PyObject_GetItem(__pyx_t_5, __pyx_t_11); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 226, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_9);
+              __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+              __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+              __pyx_t_5 = __Pyx_PyInt_EqObjC(__pyx_v_player, __pyx_int_2, 2, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 226, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_5);
+              __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 226, __pyx_L1_error)
+              __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+              if (__pyx_t_2) {
+                __Pyx_INCREF(__pyx_int_1);
+                __pyx_t_11 = __pyx_int_1;
+              } else {
+                __Pyx_INCREF(__pyx_int_2);
+                __pyx_t_11 = __pyx_int_2;
+              }
+              __pyx_t_5 = PyObject_RichCompare(__pyx_t_9, __pyx_t_11, Py_EQ); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 226, __pyx_L1_error)
+              __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+              __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+              __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 226, __pyx_L1_error)
+              __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+              if (__pyx_t_2) {
+              } else {
+                __pyx_t_13 = __pyx_t_2;
+                goto __pyx_L78_bool_binop_done;
+              }
+              __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_to_remove, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 226, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_5);
+              __pyx_t_11 = __Pyx_PyObject_GetItem(__pyx_v_muhlen_, __pyx_t_5); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 226, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_11);
+              __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+              __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_to_remove, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 226, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_5);
+              __pyx_t_9 = __Pyx_PyObject_GetItem(__pyx_t_11, __pyx_t_5); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 226, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_9);
+              __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+              __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+              __pyx_t_5 = __Pyx_PyInt_EqObjC(__pyx_t_9, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 226, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_5);
+              __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+              __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 226, __pyx_L1_error)
+              __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+              __pyx_t_13 = __pyx_t_2;
+              __pyx_L78_bool_binop_done:;
+              if (__pyx_t_13) {
+
+                /* "ai_minimax_alpha_beta.py":227
+ *                                 to_remove = self.toremove(board_, 1 if player == 2 else 2)
+ *                                 if board_[to_remove[0]][to_remove[1]] == (1 if player == 2 else 2) and muhlen_[to_remove[0]][to_remove[1]] == 0:
+ *                                     board_[to_remove[0]][to_remove[1]] = 0             # <<<<<<<<<<<<<<
+ *                                     muhlen_ = self.update_board_muhlen(board_, muhlen_)
+ * 
+ */
+                __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_to_remove, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 227, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_5);
+                __pyx_t_9 = __Pyx_PyObject_GetItem(__pyx_v_board_, __pyx_t_5); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 227, __pyx_L1_error)
                 __Pyx_GOTREF(__pyx_t_9);
                 __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+                __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_to_remove, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 227, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_5);
+                if (unlikely(PyObject_SetItem(__pyx_t_9, __pyx_t_5, __pyx_int_0) < 0)) __PYX_ERR(0, 227, __pyx_L1_error)
+                __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+                __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+
+                /* "ai_minimax_alpha_beta.py":228
+ *                                 if board_[to_remove[0]][to_remove[1]] == (1 if player == 2 else 2) and muhlen_[to_remove[0]][to_remove[1]] == 0:
+ *                                     board_[to_remove[0]][to_remove[1]] = 0
+ *                                     muhlen_ = self.update_board_muhlen(board_, muhlen_)             # <<<<<<<<<<<<<<
+ * 
+ *                             evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, alpha, best_score, remaining_set - 1, depth - 1)
+ */
+                __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_update_board_muhlen); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 228, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_9);
+                __pyx_t_11 = NULL;
+                __pyx_t_10 = 0;
+                if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_9))) {
+                  __pyx_t_11 = PyMethod_GET_SELF(__pyx_t_9);
+                  if (likely(__pyx_t_11)) {
+                    PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_9);
+                    __Pyx_INCREF(__pyx_t_11);
+                    __Pyx_INCREF(function);
+                    __Pyx_DECREF_SET(__pyx_t_9, function);
+                    __pyx_t_10 = 1;
+                  }
+                }
+                #if CYTHON_FAST_PYCALL
+                if (PyFunction_Check(__pyx_t_9)) {
+                  PyObject *__pyx_temp[3] = {__pyx_t_11, __pyx_v_board_, __pyx_v_muhlen_};
+                  __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_9, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 228, __pyx_L1_error)
+                  __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
+                  __Pyx_GOTREF(__pyx_t_5);
+                } else
+                #endif
+                #if CYTHON_FAST_PYCCALL
+                if (__Pyx_PyFastCFunction_Check(__pyx_t_9)) {
+                  PyObject *__pyx_temp[3] = {__pyx_t_11, __pyx_v_board_, __pyx_v_muhlen_};
+                  __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_9, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 228, __pyx_L1_error)
+                  __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
+                  __Pyx_GOTREF(__pyx_t_5);
+                } else
+                #endif
+                {
+                  __pyx_t_7 = PyTuple_New(2+__pyx_t_10); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 228, __pyx_L1_error)
+                  __Pyx_GOTREF(__pyx_t_7);
+                  if (__pyx_t_11) {
+                    __Pyx_GIVEREF(__pyx_t_11); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_11); __pyx_t_11 = NULL;
+                  }
+                  __Pyx_INCREF(__pyx_v_board_);
+                  __Pyx_GIVEREF(__pyx_v_board_);
+                  PyTuple_SET_ITEM(__pyx_t_7, 0+__pyx_t_10, __pyx_v_board_);
+                  __Pyx_INCREF(__pyx_v_muhlen_);
+                  __Pyx_GIVEREF(__pyx_v_muhlen_);
+                  PyTuple_SET_ITEM(__pyx_t_7, 1+__pyx_t_10, __pyx_v_muhlen_);
+                  __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_9, __pyx_t_7, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 228, __pyx_L1_error)
+                  __Pyx_GOTREF(__pyx_t_5);
+                  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+                }
+                __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+                __Pyx_DECREF_SET(__pyx_v_muhlen_, __pyx_t_5);
+                __pyx_t_5 = 0;
+
+                /* "ai_minimax_alpha_beta.py":226
+ *                             if self.checkmuhle(ring, stelle, board_, player):
+ *                                 to_remove = self.toremove(board_, 1 if player == 2 else 2)
+ *                                 if board_[to_remove[0]][to_remove[1]] == (1 if player == 2 else 2) and muhlen_[to_remove[0]][to_remove[1]] == 0:             # <<<<<<<<<<<<<<
+ *                                     board_[to_remove[0]][to_remove[1]] = 0
+ *                                     muhlen_ = self.update_board_muhlen(board_, muhlen_)
+ */
               }
+
+              /* "ai_minimax_alpha_beta.py":224
+ *                             muhlen_ = copy.deepcopy(board_muhlen)
+ * 
+ *                             if self.checkmuhle(ring, stelle, board_, player):             # <<<<<<<<<<<<<<
+ *                                 to_remove = self.toremove(board_, 1 if player == 2 else 2)
+ *                                 if board_[to_remove[0]][to_remove[1]] == (1 if player == 2 else 2) and muhlen_[to_remove[0]][to_remove[1]] == 0:
+ */
+            }
+
+            /* "ai_minimax_alpha_beta.py":230
+ *                                     muhlen_ = self.update_board_muhlen(board_, muhlen_)
+ * 
+ *                             evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, alpha, best_score, remaining_set - 1, depth - 1)             # <<<<<<<<<<<<<<
+ *                             if evaluation < best_score:
+ *                                 best_score = evaluation
+ */
+            __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_minimax); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 230, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_9);
+            __pyx_t_11 = __Pyx_PyInt_EqObjC(__pyx_v_player, __pyx_int_2, 2, 0); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 230, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_11);
+            __pyx_t_13 = __Pyx_PyObject_IsTrue(__pyx_t_11); if (unlikely(__pyx_t_13 < 0)) __PYX_ERR(0, 230, __pyx_L1_error)
+            __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+            if (__pyx_t_13) {
+              __Pyx_INCREF(__pyx_int_1);
+              __pyx_t_7 = __pyx_int_1;
+            } else {
+              __Pyx_INCREF(__pyx_int_2);
+              __pyx_t_7 = __pyx_int_2;
+            }
+            __pyx_t_11 = __Pyx_PyInt_SubtractObjC(__pyx_v_remaining_set, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 230, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_11);
+            __pyx_t_1 = __Pyx_PyInt_SubtractObjC(__pyx_v_depth, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 230, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_1);
+            __pyx_t_8 = NULL;
+            __pyx_t_10 = 0;
+            if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_9))) {
+              __pyx_t_8 = PyMethod_GET_SELF(__pyx_t_9);
+              if (likely(__pyx_t_8)) {
+                PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_9);
+                __Pyx_INCREF(__pyx_t_8);
+                __Pyx_INCREF(function);
+                __Pyx_DECREF_SET(__pyx_t_9, function);
+                __pyx_t_10 = 1;
+              }
+            }
+            #if CYTHON_FAST_PYCALL
+            if (PyFunction_Check(__pyx_t_9)) {
+              PyObject *__pyx_temp[8] = {__pyx_t_8, __pyx_v_board_, __pyx_v_muhlen_, __pyx_t_7, __pyx_v_alpha, __pyx_v_best_score, __pyx_t_11, __pyx_t_1};
+              __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_9, __pyx_temp+1-__pyx_t_10, 7+__pyx_t_10); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 230, __pyx_L1_error)
+              __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
+              __Pyx_GOTREF(__pyx_t_5);
+              __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
               __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-              __Pyx_XDECREF_SET(__pyx_v_evaluation, __pyx_t_9);
+              __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+            } else
+            #endif
+            #if CYTHON_FAST_PYCCALL
+            if (__Pyx_PyFastCFunction_Check(__pyx_t_9)) {
+              PyObject *__pyx_temp[8] = {__pyx_t_8, __pyx_v_board_, __pyx_v_muhlen_, __pyx_t_7, __pyx_v_alpha, __pyx_v_best_score, __pyx_t_11, __pyx_t_1};
+              __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_9, __pyx_temp+1-__pyx_t_10, 7+__pyx_t_10); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 230, __pyx_L1_error)
+              __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
+              __Pyx_GOTREF(__pyx_t_5);
+              __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+              __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+              __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+            } else
+            #endif
+            {
+              __pyx_t_6 = PyTuple_New(7+__pyx_t_10); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 230, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_6);
+              if (__pyx_t_8) {
+                __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_8); __pyx_t_8 = NULL;
+              }
+              __Pyx_INCREF(__pyx_v_board_);
+              __Pyx_GIVEREF(__pyx_v_board_);
+              PyTuple_SET_ITEM(__pyx_t_6, 0+__pyx_t_10, __pyx_v_board_);
+              __Pyx_INCREF(__pyx_v_muhlen_);
+              __Pyx_GIVEREF(__pyx_v_muhlen_);
+              PyTuple_SET_ITEM(__pyx_t_6, 1+__pyx_t_10, __pyx_v_muhlen_);
+              __Pyx_GIVEREF(__pyx_t_7);
+              PyTuple_SET_ITEM(__pyx_t_6, 2+__pyx_t_10, __pyx_t_7);
+              __Pyx_INCREF(__pyx_v_alpha);
+              __Pyx_GIVEREF(__pyx_v_alpha);
+              PyTuple_SET_ITEM(__pyx_t_6, 3+__pyx_t_10, __pyx_v_alpha);
+              __Pyx_INCREF(__pyx_v_best_score);
+              __Pyx_GIVEREF(__pyx_v_best_score);
+              PyTuple_SET_ITEM(__pyx_t_6, 4+__pyx_t_10, __pyx_v_best_score);
+              __Pyx_GIVEREF(__pyx_t_11);
+              PyTuple_SET_ITEM(__pyx_t_6, 5+__pyx_t_10, __pyx_t_11);
+              __Pyx_GIVEREF(__pyx_t_1);
+              PyTuple_SET_ITEM(__pyx_t_6, 6+__pyx_t_10, __pyx_t_1);
+              __pyx_t_7 = 0;
+              __pyx_t_11 = 0;
+              __pyx_t_1 = 0;
+              __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_9, __pyx_t_6, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 230, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_5);
+              __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+            }
+            __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+            __Pyx_XDECREF_SET(__pyx_v_evaluation, __pyx_t_5);
+            __pyx_t_5 = 0;
+
+            /* "ai_minimax_alpha_beta.py":231
+ * 
+ *                             evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, alpha, best_score, remaining_set - 1, depth - 1)
+ *                             if evaluation < best_score:             # <<<<<<<<<<<<<<
+ *                                 best_score = evaluation
+ *                                 if best_score <= alpha:
+ */
+            __pyx_t_5 = PyObject_RichCompare(__pyx_v_evaluation, __pyx_v_best_score, Py_LT); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 231, __pyx_L1_error)
+            __pyx_t_13 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_13 < 0)) __PYX_ERR(0, 231, __pyx_L1_error)
+            __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+            if (__pyx_t_13) {
+
+              /* "ai_minimax_alpha_beta.py":232
+ *                             evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, alpha, best_score, remaining_set - 1, depth - 1)
+ *                             if evaluation < best_score:
+ *                                 best_score = evaluation             # <<<<<<<<<<<<<<
+ *                                 if best_score <= alpha:
+ *                                     break
+ */
+              __Pyx_INCREF(__pyx_v_evaluation);
+              __Pyx_DECREF_SET(__pyx_v_best_score, __pyx_v_evaluation);
+
+              /* "ai_minimax_alpha_beta.py":233
+ *                             if evaluation < best_score:
+ *                                 best_score = evaluation
+ *                                 if best_score <= alpha:             # <<<<<<<<<<<<<<
+ *                                     break
+ *                     else:
+ */
+              __pyx_t_5 = PyObject_RichCompare(__pyx_v_best_score, __pyx_v_alpha, Py_LE); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 233, __pyx_L1_error)
+              __pyx_t_13 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_13 < 0)) __PYX_ERR(0, 233, __pyx_L1_error)
+              __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+              if (__pyx_t_13) {
+
+                /* "ai_minimax_alpha_beta.py":234
+ *                                 best_score = evaluation
+ *                                 if best_score <= alpha:
+ *                                     break             # <<<<<<<<<<<<<<
+ *                     else:
+ *                         continue
+ */
+                goto __pyx_L74_break;
+
+                /* "ai_minimax_alpha_beta.py":233
+ *                             if evaluation < best_score:
+ *                                 best_score = evaluation
+ *                                 if best_score <= alpha:             # <<<<<<<<<<<<<<
+ *                                     break
+ *                     else:
+ */
+              }
+
+              /* "ai_minimax_alpha_beta.py":231
+ * 
+ *                             evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, alpha, best_score, remaining_set - 1, depth - 1)
+ *                             if evaluation < best_score:             # <<<<<<<<<<<<<<
+ *                                 best_score = evaluation
+ *                                 if best_score <= alpha:
+ */
+            }
+
+            /* "ai_minimax_alpha_beta.py":219
+ *                 for ring in range(3):
+ *                     for stelle in range(8):
+ *                         if board[ring][stelle] == 0:             # <<<<<<<<<<<<<<
+ *                             board_ = copy.deepcopy(board)
+ *                             board_[ring][stelle] = player
+ */
+          }
+        }
+        /*else*/ {
+
+          /* "ai_minimax_alpha_beta.py":236
+ *                                     break
+ *                     else:
+ *                         continue             # <<<<<<<<<<<<<<
+ *                     break
+ *                 return best_score
+ */
+          goto __pyx_L71_continue;
+        }
+        __pyx_L74_break:;
+
+        /* "ai_minimax_alpha_beta.py":237
+ *                     else:
+ *                         continue
+ *                     break             # <<<<<<<<<<<<<<
+ *                 return best_score
+ *             else:
+ */
+        goto __pyx_L72_break;
+        __pyx_L71_continue:;
+      }
+      __pyx_L72_break:;
+
+      /* "ai_minimax_alpha_beta.py":238
+ *                         continue
+ *                     break
+ *                 return best_score             # <<<<<<<<<<<<<<
+ *             else:
+ *                 # Phase 2
+ */
+      __Pyx_XDECREF(__pyx_r);
+      __Pyx_INCREF(__pyx_v_best_score);
+      __pyx_r = __pyx_v_best_score;
+      goto __pyx_L0;
+
+      /* "ai_minimax_alpha_beta.py":215
+ *         else:
+ *             best_score = beta
+ *             if remaining_set:             # <<<<<<<<<<<<<<
+ *                 # Phase 1
+ *                 for ring in range(3):
+ */
+    }
+
+    /* "ai_minimax_alpha_beta.py":241
+ *             else:
+ *                 # Phase 2
+ *                 mymen = 0             # <<<<<<<<<<<<<<
+ *                 theirmen = 0
+ *                 for i in range(3):
+ */
+    /*else*/ {
+      __Pyx_INCREF(__pyx_int_0);
+      __pyx_v_mymen = __pyx_int_0;
+
+      /* "ai_minimax_alpha_beta.py":242
+ *                 # Phase 2
+ *                 mymen = 0
+ *                 theirmen = 0             # <<<<<<<<<<<<<<
+ *                 for i in range(3):
+ *                     for j in range(8):
+ */
+      __Pyx_INCREF(__pyx_int_0);
+      __pyx_v_theirmen = __pyx_int_0;
+
+      /* "ai_minimax_alpha_beta.py":243
+ *                 mymen = 0
+ *                 theirmen = 0
+ *                 for i in range(3):             # <<<<<<<<<<<<<<
+ *                     for j in range(8):
+ *                         if board[i][j] == player:
+ */
+      for (__pyx_t_3 = 0; __pyx_t_3 < 3; __pyx_t_3+=1) {
+        __pyx_v_i = __pyx_t_3;
+
+        /* "ai_minimax_alpha_beta.py":244
+ *                 theirmen = 0
+ *                 for i in range(3):
+ *                     for j in range(8):             # <<<<<<<<<<<<<<
+ *                         if board[i][j] == player:
+ *                             mymen += 1
+ */
+        for (__pyx_t_4 = 0; __pyx_t_4 < 8; __pyx_t_4+=1) {
+          __pyx_v_j = __pyx_t_4;
+
+          /* "ai_minimax_alpha_beta.py":245
+ *                 for i in range(3):
+ *                     for j in range(8):
+ *                         if board[i][j] == player:             # <<<<<<<<<<<<<<
+ *                             mymen += 1
+ *                         elif board[i][j] == 1 if player == 2 else 2:
+ */
+          __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_board, __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 245, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_5);
+          __pyx_t_9 = __Pyx_GetItemInt(__pyx_t_5, __pyx_v_j, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 245, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_9);
+          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+          __pyx_t_5 = PyObject_RichCompare(__pyx_t_9, __pyx_v_player, Py_EQ); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 245, __pyx_L1_error)
+          __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+          __pyx_t_13 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_13 < 0)) __PYX_ERR(0, 245, __pyx_L1_error)
+          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+          if (__pyx_t_13) {
+
+            /* "ai_minimax_alpha_beta.py":246
+ *                     for j in range(8):
+ *                         if board[i][j] == player:
+ *                             mymen += 1             # <<<<<<<<<<<<<<
+ *                         elif board[i][j] == 1 if player == 2 else 2:
+ *                             theirmen += 1
+ */
+            __pyx_t_5 = __Pyx_PyInt_AddObjC(__pyx_v_mymen, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 246, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_5);
+            __Pyx_DECREF_SET(__pyx_v_mymen, __pyx_t_5);
+            __pyx_t_5 = 0;
+
+            /* "ai_minimax_alpha_beta.py":245
+ *                 for i in range(3):
+ *                     for j in range(8):
+ *                         if board[i][j] == player:             # <<<<<<<<<<<<<<
+ *                             mymen += 1
+ *                         elif board[i][j] == 1 if player == 2 else 2:
+ */
+            goto __pyx_L86;
+          }
+
+          /* "ai_minimax_alpha_beta.py":247
+ *                         if board[i][j] == player:
+ *                             mymen += 1
+ *                         elif board[i][j] == 1 if player == 2 else 2:             # <<<<<<<<<<<<<<
+ *                             theirmen += 1
+ * 
+ */
+          __pyx_t_9 = __Pyx_PyInt_EqObjC(__pyx_v_player, __pyx_int_2, 2, 0); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 247, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_9);
+          __pyx_t_13 = __Pyx_PyObject_IsTrue(__pyx_t_9); if (unlikely(__pyx_t_13 < 0)) __PYX_ERR(0, 247, __pyx_L1_error)
+          __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+          if (__pyx_t_13) {
+            __pyx_t_9 = __Pyx_GetItemInt(__pyx_v_board, __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 247, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_9);
+            __pyx_t_6 = __Pyx_GetItemInt(__pyx_t_9, __pyx_v_j, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 247, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_6);
+            __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+            __pyx_t_9 = __Pyx_PyInt_EqObjC(__pyx_t_6, __pyx_int_1, 1, 0); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 247, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_9);
+            __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+            __pyx_t_5 = __pyx_t_9;
+            __pyx_t_9 = 0;
+          } else {
+            __Pyx_INCREF(__pyx_int_2);
+            __pyx_t_5 = __pyx_int_2;
+          }
+          __pyx_t_13 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_13 < 0)) __PYX_ERR(0, 247, __pyx_L1_error)
+          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+          if (__pyx_t_13) {
+
+            /* "ai_minimax_alpha_beta.py":248
+ *                             mymen += 1
+ *                         elif board[i][j] == 1 if player == 2 else 2:
+ *                             theirmen += 1             # <<<<<<<<<<<<<<
+ * 
+ *                 for ring in range(3):
+ */
+            __pyx_t_5 = __Pyx_PyInt_AddObjC(__pyx_v_theirmen, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 248, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_5);
+            __Pyx_DECREF_SET(__pyx_v_theirmen, __pyx_t_5);
+            __pyx_t_5 = 0;
+
+            /* "ai_minimax_alpha_beta.py":247
+ *                         if board[i][j] == player:
+ *                             mymen += 1
+ *                         elif board[i][j] == 1 if player == 2 else 2:             # <<<<<<<<<<<<<<
+ *                             theirmen += 1
+ * 
+ */
+          }
+          __pyx_L86:;
+        }
+      }
+
+      /* "ai_minimax_alpha_beta.py":250
+ *                             theirmen += 1
+ * 
+ *                 for ring in range(3):             # <<<<<<<<<<<<<<
+ *                     for stelle in range(8):
+ *                         if board[ring][stelle] == player:
+ */
+      for (__pyx_t_3 = 0; __pyx_t_3 < 3; __pyx_t_3+=1) {
+        __pyx_v_ring = __pyx_t_3;
+
+        /* "ai_minimax_alpha_beta.py":251
+ * 
+ *                 for ring in range(3):
+ *                     for stelle in range(8):             # <<<<<<<<<<<<<<
+ *                         if board[ring][stelle] == player:
+ *                             possiblemoves = self.possiblemoves(ring, stelle, board)
+ */
+        for (__pyx_t_4 = 0; __pyx_t_4 < 8; __pyx_t_4+=1) {
+          __pyx_v_stelle = __pyx_t_4;
+
+          /* "ai_minimax_alpha_beta.py":252
+ *                 for ring in range(3):
+ *                     for stelle in range(8):
+ *                         if board[ring][stelle] == player:             # <<<<<<<<<<<<<<
+ *                             possiblemoves = self.possiblemoves(ring, stelle, board)
+ *                             if not possiblemoves:
+ */
+          __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_board, __pyx_v_ring, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 252, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_5);
+          __pyx_t_9 = __Pyx_GetItemInt(__pyx_t_5, __pyx_v_stelle, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 252, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_9);
+          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+          __pyx_t_5 = PyObject_RichCompare(__pyx_t_9, __pyx_v_player, Py_EQ); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 252, __pyx_L1_error)
+          __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+          __pyx_t_13 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_13 < 0)) __PYX_ERR(0, 252, __pyx_L1_error)
+          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+          if (__pyx_t_13) {
+
+            /* "ai_minimax_alpha_beta.py":253
+ *                     for stelle in range(8):
+ *                         if board[ring][stelle] == player:
+ *                             possiblemoves = self.possiblemoves(ring, stelle, board)             # <<<<<<<<<<<<<<
+ *                             if not possiblemoves:
+ *                                 continue
+ */
+            __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_possiblemoves); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 253, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_9);
+            __pyx_t_6 = __Pyx_PyInt_From_long(__pyx_v_ring); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 253, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_6);
+            __pyx_t_1 = __Pyx_PyInt_From_long(__pyx_v_stelle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 253, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_1);
+            __pyx_t_11 = NULL;
+            __pyx_t_10 = 0;
+            if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_9))) {
+              __pyx_t_11 = PyMethod_GET_SELF(__pyx_t_9);
+              if (likely(__pyx_t_11)) {
+                PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_9);
+                __Pyx_INCREF(__pyx_t_11);
+                __Pyx_INCREF(function);
+                __Pyx_DECREF_SET(__pyx_t_9, function);
+                __pyx_t_10 = 1;
+              }
+            }
+            #if CYTHON_FAST_PYCALL
+            if (PyFunction_Check(__pyx_t_9)) {
+              PyObject *__pyx_temp[4] = {__pyx_t_11, __pyx_t_6, __pyx_t_1, __pyx_v_board};
+              __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_9, __pyx_temp+1-__pyx_t_10, 3+__pyx_t_10); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 253, __pyx_L1_error)
+              __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
+              __Pyx_GOTREF(__pyx_t_5);
+              __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+              __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+            } else
+            #endif
+            #if CYTHON_FAST_PYCCALL
+            if (__Pyx_PyFastCFunction_Check(__pyx_t_9)) {
+              PyObject *__pyx_temp[4] = {__pyx_t_11, __pyx_t_6, __pyx_t_1, __pyx_v_board};
+              __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_9, __pyx_temp+1-__pyx_t_10, 3+__pyx_t_10); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 253, __pyx_L1_error)
+              __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
+              __Pyx_GOTREF(__pyx_t_5);
+              __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+              __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+            } else
+            #endif
+            {
+              __pyx_t_7 = PyTuple_New(3+__pyx_t_10); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 253, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_7);
+              if (__pyx_t_11) {
+                __Pyx_GIVEREF(__pyx_t_11); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_11); __pyx_t_11 = NULL;
+              }
+              __Pyx_GIVEREF(__pyx_t_6);
+              PyTuple_SET_ITEM(__pyx_t_7, 0+__pyx_t_10, __pyx_t_6);
+              __Pyx_GIVEREF(__pyx_t_1);
+              PyTuple_SET_ITEM(__pyx_t_7, 1+__pyx_t_10, __pyx_t_1);
+              __Pyx_INCREF(__pyx_v_board);
+              __Pyx_GIVEREF(__pyx_v_board);
+              PyTuple_SET_ITEM(__pyx_t_7, 2+__pyx_t_10, __pyx_v_board);
+              __pyx_t_6 = 0;
+              __pyx_t_1 = 0;
+              __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_9, __pyx_t_7, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 253, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_5);
+              __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+            }
+            __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+            __Pyx_XDECREF_SET(__pyx_v_possiblemoves, __pyx_t_5);
+            __pyx_t_5 = 0;
+
+            /* "ai_minimax_alpha_beta.py":254
+ *                         if board[ring][stelle] == player:
+ *                             possiblemoves = self.possiblemoves(ring, stelle, board)
+ *                             if not possiblemoves:             # <<<<<<<<<<<<<<
+ *                                 continue
+ *                             for move in possiblemoves:
+ */
+            __pyx_t_13 = __Pyx_PyObject_IsTrue(__pyx_v_possiblemoves); if (unlikely(__pyx_t_13 < 0)) __PYX_ERR(0, 254, __pyx_L1_error)
+            __pyx_t_2 = ((!__pyx_t_13) != 0);
+            if (__pyx_t_2) {
+
+              /* "ai_minimax_alpha_beta.py":255
+ *                             possiblemoves = self.possiblemoves(ring, stelle, board)
+ *                             if not possiblemoves:
+ *                                 continue             # <<<<<<<<<<<<<<
+ *                             for move in possiblemoves:
+ *                                 board_ = copy.deepcopy(board)
+ */
+              goto __pyx_L89_continue;
+
+              /* "ai_minimax_alpha_beta.py":254
+ *                         if board[ring][stelle] == player:
+ *                             possiblemoves = self.possiblemoves(ring, stelle, board)
+ *                             if not possiblemoves:             # <<<<<<<<<<<<<<
+ *                                 continue
+ *                             for move in possiblemoves:
+ */
+            }
+
+            /* "ai_minimax_alpha_beta.py":256
+ *                             if not possiblemoves:
+ *                                 continue
+ *                             for move in possiblemoves:             # <<<<<<<<<<<<<<
+ *                                 board_ = copy.deepcopy(board)
+ *                                 muhlen_ = copy.deepcopy(board_muhlen)
+ */
+            if (likely(PyList_CheckExact(__pyx_v_possiblemoves)) || PyTuple_CheckExact(__pyx_v_possiblemoves)) {
+              __pyx_t_5 = __pyx_v_possiblemoves; __Pyx_INCREF(__pyx_t_5); __pyx_t_14 = 0;
+              __pyx_t_15 = NULL;
+            } else {
+              __pyx_t_14 = -1; __pyx_t_5 = PyObject_GetIter(__pyx_v_possiblemoves); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 256, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_5);
+              __pyx_t_15 = Py_TYPE(__pyx_t_5)->tp_iternext; if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 256, __pyx_L1_error)
+            }
+            for (;;) {
+              if (likely(!__pyx_t_15)) {
+                if (likely(PyList_CheckExact(__pyx_t_5))) {
+                  if (__pyx_t_14 >= PyList_GET_SIZE(__pyx_t_5)) break;
+                  #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+                  __pyx_t_9 = PyList_GET_ITEM(__pyx_t_5, __pyx_t_14); __Pyx_INCREF(__pyx_t_9); __pyx_t_14++; if (unlikely(0 < 0)) __PYX_ERR(0, 256, __pyx_L1_error)
+                  #else
+                  __pyx_t_9 = PySequence_ITEM(__pyx_t_5, __pyx_t_14); __pyx_t_14++; if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 256, __pyx_L1_error)
+                  __Pyx_GOTREF(__pyx_t_9);
+                  #endif
+                } else {
+                  if (__pyx_t_14 >= PyTuple_GET_SIZE(__pyx_t_5)) break;
+                  #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+                  __pyx_t_9 = PyTuple_GET_ITEM(__pyx_t_5, __pyx_t_14); __Pyx_INCREF(__pyx_t_9); __pyx_t_14++; if (unlikely(0 < 0)) __PYX_ERR(0, 256, __pyx_L1_error)
+                  #else
+                  __pyx_t_9 = PySequence_ITEM(__pyx_t_5, __pyx_t_14); __pyx_t_14++; if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 256, __pyx_L1_error)
+                  __Pyx_GOTREF(__pyx_t_9);
+                  #endif
+                }
+              } else {
+                __pyx_t_9 = __pyx_t_15(__pyx_t_5);
+                if (unlikely(!__pyx_t_9)) {
+                  PyObject* exc_type = PyErr_Occurred();
+                  if (exc_type) {
+                    if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
+                    else __PYX_ERR(0, 256, __pyx_L1_error)
+                  }
+                  break;
+                }
+                __Pyx_GOTREF(__pyx_t_9);
+              }
+              __Pyx_XDECREF_SET(__pyx_v_move, __pyx_t_9);
               __pyx_t_9 = 0;
 
-              /* "ai_minimax_alpha_beta.py":297
+              /* "ai_minimax_alpha_beta.py":257
+ *                                 continue
+ *                             for move in possiblemoves:
+ *                                 board_ = copy.deepcopy(board)             # <<<<<<<<<<<<<<
+ *                                 muhlen_ = copy.deepcopy(board_muhlen)
+ *                                 board_[ring][stelle] = 0
+ */
+              __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_copy); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 257, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_7);
+              __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_deepcopy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 257, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_1);
+              __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+              __pyx_t_7 = NULL;
+              if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_1))) {
+                __pyx_t_7 = PyMethod_GET_SELF(__pyx_t_1);
+                if (likely(__pyx_t_7)) {
+                  PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
+                  __Pyx_INCREF(__pyx_t_7);
+                  __Pyx_INCREF(function);
+                  __Pyx_DECREF_SET(__pyx_t_1, function);
+                }
+              }
+              __pyx_t_9 = (__pyx_t_7) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_7, __pyx_v_board) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_v_board);
+              __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
+              if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 257, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_9);
+              __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+              __Pyx_XDECREF_SET(__pyx_v_board_, __pyx_t_9);
+              __pyx_t_9 = 0;
+
+              /* "ai_minimax_alpha_beta.py":258
+ *                             for move in possiblemoves:
+ *                                 board_ = copy.deepcopy(board)
+ *                                 muhlen_ = copy.deepcopy(board_muhlen)             # <<<<<<<<<<<<<<
+ *                                 board_[ring][stelle] = 0
+ *                                 try:
+ */
+              __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_copy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 258, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_1);
+              __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_deepcopy); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 258, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_7);
+              __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+              __pyx_t_1 = NULL;
+              if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_7))) {
+                __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_7);
+                if (likely(__pyx_t_1)) {
+                  PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
+                  __Pyx_INCREF(__pyx_t_1);
+                  __Pyx_INCREF(function);
+                  __Pyx_DECREF_SET(__pyx_t_7, function);
+                }
+              }
+              __pyx_t_9 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_7, __pyx_t_1, __pyx_v_board_muhlen) : __Pyx_PyObject_CallOneArg(__pyx_t_7, __pyx_v_board_muhlen);
+              __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+              if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 258, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_9);
+              __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+              __Pyx_XDECREF_SET(__pyx_v_muhlen_, __pyx_t_9);
+              __pyx_t_9 = 0;
+
+              /* "ai_minimax_alpha_beta.py":259
+ *                                 board_ = copy.deepcopy(board)
+ *                                 muhlen_ = copy.deepcopy(board_muhlen)
+ *                                 board_[ring][stelle] = 0             # <<<<<<<<<<<<<<
+ *                                 try:
+ *                                     board_[move[0]][move[1]] = player
+ */
+              __pyx_t_9 = __Pyx_GetItemInt(__pyx_v_board_, __pyx_v_ring, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 259, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_9);
+              if (unlikely(__Pyx_SetItemInt(__pyx_t_9, __pyx_v_stelle, __pyx_int_0, long, 1, __Pyx_PyInt_From_long, 0, 1, 1) < 0)) __PYX_ERR(0, 259, __pyx_L1_error)
+              __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+
+              /* "ai_minimax_alpha_beta.py":260
+ *                                 muhlen_ = copy.deepcopy(board_muhlen)
+ *                                 board_[ring][stelle] = 0
+ *                                 try:             # <<<<<<<<<<<<<<
+ *                                     board_[move[0]][move[1]] = player
+ *                                 except:
+ */
+              {
+                __Pyx_PyThreadState_declare
+                __Pyx_PyThreadState_assign
+                __Pyx_ExceptionSave(&__pyx_t_18, &__pyx_t_17, &__pyx_t_16);
+                __Pyx_XGOTREF(__pyx_t_18);
+                __Pyx_XGOTREF(__pyx_t_17);
+                __Pyx_XGOTREF(__pyx_t_16);
+                /*try:*/ {
+
+                  /* "ai_minimax_alpha_beta.py":261
+ *                                 board_[ring][stelle] = 0
+ *                                 try:
+ *                                     board_[move[0]][move[1]] = player             # <<<<<<<<<<<<<<
+ *                                 except:
+ *                                     print("ERROR"+str(move))
+ */
+                  __pyx_t_9 = __Pyx_GetItemInt(__pyx_v_move, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 261, __pyx_L95_error)
+                  __Pyx_GOTREF(__pyx_t_9);
+                  __pyx_t_7 = __Pyx_PyObject_GetItem(__pyx_v_board_, __pyx_t_9); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 261, __pyx_L95_error)
+                  __Pyx_GOTREF(__pyx_t_7);
+                  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+                  __pyx_t_9 = __Pyx_GetItemInt(__pyx_v_move, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 261, __pyx_L95_error)
+                  __Pyx_GOTREF(__pyx_t_9);
+                  if (unlikely(PyObject_SetItem(__pyx_t_7, __pyx_t_9, __pyx_v_player) < 0)) __PYX_ERR(0, 261, __pyx_L95_error)
+                  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+                  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+
+                  /* "ai_minimax_alpha_beta.py":260
+ *                                 muhlen_ = copy.deepcopy(board_muhlen)
+ *                                 board_[ring][stelle] = 0
+ *                                 try:             # <<<<<<<<<<<<<<
+ *                                     board_[move[0]][move[1]] = player
+ *                                 except:
+ */
+                }
+                __Pyx_XDECREF(__pyx_t_18); __pyx_t_18 = 0;
+                __Pyx_XDECREF(__pyx_t_17); __pyx_t_17 = 0;
+                __Pyx_XDECREF(__pyx_t_16); __pyx_t_16 = 0;
+                goto __pyx_L102_try_end;
+                __pyx_L95_error:;
+                __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+                __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
+                __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
+                __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
+                __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
+                __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
+
+                /* "ai_minimax_alpha_beta.py":262
+ *                                 try:
+ *                                     board_[move[0]][move[1]] = player
+ *                                 except:             # <<<<<<<<<<<<<<
+ *                                     print("ERROR"+str(move))
+ *                                 # check if new mill has been generated / zwickmuehle
+ */
+                /*except:*/ {
+                  __Pyx_AddTraceback("ai_minimax_alpha_beta.Morris.minimax", __pyx_clineno, __pyx_lineno, __pyx_filename);
+                  if (__Pyx_GetException(&__pyx_t_9, &__pyx_t_7, &__pyx_t_1) < 0) __PYX_ERR(0, 262, __pyx_L97_except_error)
+                  __Pyx_GOTREF(__pyx_t_9);
+                  __Pyx_GOTREF(__pyx_t_7);
+                  __Pyx_GOTREF(__pyx_t_1);
+
+                  /* "ai_minimax_alpha_beta.py":263
+ *                                     board_[move[0]][move[1]] = player
+ *                                 except:
+ *                                     print("ERROR"+str(move))             # <<<<<<<<<<<<<<
+ *                                 # check if new mill has been generated / zwickmuehle
+ *                                 # TODO: kinda whack
+ */
+                  __pyx_t_6 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyString_Type)), __pyx_v_move); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 263, __pyx_L97_except_error)
+                  __Pyx_GOTREF(__pyx_t_6);
+                  __pyx_t_11 = PyNumber_Add(__pyx_n_s_ERROR, __pyx_t_6); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 263, __pyx_L97_except_error)
+                  __Pyx_GOTREF(__pyx_t_11);
+                  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+                  if (__Pyx_PrintOne(0, __pyx_t_11) < 0) __PYX_ERR(0, 263, __pyx_L97_except_error)
+                  __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+                  __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
+                  __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
+                  __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+                  goto __pyx_L96_exception_handled;
+                }
+                __pyx_L97_except_error:;
+
+                /* "ai_minimax_alpha_beta.py":260
+ *                                 muhlen_ = copy.deepcopy(board_muhlen)
+ *                                 board_[ring][stelle] = 0
+ *                                 try:             # <<<<<<<<<<<<<<
+ *                                     board_[move[0]][move[1]] = player
+ *                                 except:
+ */
+                __Pyx_XGIVEREF(__pyx_t_18);
+                __Pyx_XGIVEREF(__pyx_t_17);
+                __Pyx_XGIVEREF(__pyx_t_16);
+                __Pyx_ExceptionReset(__pyx_t_18, __pyx_t_17, __pyx_t_16);
+                goto __pyx_L1_error;
+                __pyx_L96_exception_handled:;
+                __Pyx_XGIVEREF(__pyx_t_18);
+                __Pyx_XGIVEREF(__pyx_t_17);
+                __Pyx_XGIVEREF(__pyx_t_16);
+                __Pyx_ExceptionReset(__pyx_t_18, __pyx_t_17, __pyx_t_16);
+                __pyx_L102_try_end:;
+              }
+
+              /* "ai_minimax_alpha_beta.py":266
+ *                                 # check if new mill has been generated / zwickmuehle
+ *                                 # TODO: kinda whack
+ *                                 score_addition = 0             # <<<<<<<<<<<<<<
+ *                                 if self.checkmuhle(move[0], move[1], board_, player):
+ *                                     # New mill generated
+ */
+              __Pyx_INCREF(__pyx_int_0);
+              __Pyx_XDECREF_SET(__pyx_v_score_addition, __pyx_int_0);
+
+              /* "ai_minimax_alpha_beta.py":267
+ *                                 # TODO: kinda whack
+ *                                 score_addition = 0
+ *                                 if self.checkmuhle(move[0], move[1], board_, player):             # <<<<<<<<<<<<<<
+ *                                     # New mill generated
+ *                                     score_addition += 100
+ */
+              __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_checkmuhle); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 267, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_7);
+              __pyx_t_9 = __Pyx_GetItemInt(__pyx_v_move, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 267, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_9);
+              __pyx_t_11 = __Pyx_GetItemInt(__pyx_v_move, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 267, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_11);
+              __pyx_t_6 = NULL;
+              __pyx_t_10 = 0;
+              if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_7))) {
+                __pyx_t_6 = PyMethod_GET_SELF(__pyx_t_7);
+                if (likely(__pyx_t_6)) {
+                  PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
+                  __Pyx_INCREF(__pyx_t_6);
+                  __Pyx_INCREF(function);
+                  __Pyx_DECREF_SET(__pyx_t_7, function);
+                  __pyx_t_10 = 1;
+                }
+              }
+              #if CYTHON_FAST_PYCALL
+              if (PyFunction_Check(__pyx_t_7)) {
+                PyObject *__pyx_temp[5] = {__pyx_t_6, __pyx_t_9, __pyx_t_11, __pyx_v_board_, __pyx_v_player};
+                __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_10, 4+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 267, __pyx_L1_error)
+                __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
+                __Pyx_GOTREF(__pyx_t_1);
+                __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+                __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+              } else
+              #endif
+              #if CYTHON_FAST_PYCCALL
+              if (__Pyx_PyFastCFunction_Check(__pyx_t_7)) {
+                PyObject *__pyx_temp[5] = {__pyx_t_6, __pyx_t_9, __pyx_t_11, __pyx_v_board_, __pyx_v_player};
+                __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_10, 4+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 267, __pyx_L1_error)
+                __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
+                __Pyx_GOTREF(__pyx_t_1);
+                __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+                __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+              } else
+              #endif
+              {
+                __pyx_t_8 = PyTuple_New(4+__pyx_t_10); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 267, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_8);
+                if (__pyx_t_6) {
+                  __Pyx_GIVEREF(__pyx_t_6); PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_6); __pyx_t_6 = NULL;
+                }
+                __Pyx_GIVEREF(__pyx_t_9);
+                PyTuple_SET_ITEM(__pyx_t_8, 0+__pyx_t_10, __pyx_t_9);
+                __Pyx_GIVEREF(__pyx_t_11);
+                PyTuple_SET_ITEM(__pyx_t_8, 1+__pyx_t_10, __pyx_t_11);
+                __Pyx_INCREF(__pyx_v_board_);
+                __Pyx_GIVEREF(__pyx_v_board_);
+                PyTuple_SET_ITEM(__pyx_t_8, 2+__pyx_t_10, __pyx_v_board_);
+                __Pyx_INCREF(__pyx_v_player);
+                __Pyx_GIVEREF(__pyx_v_player);
+                PyTuple_SET_ITEM(__pyx_t_8, 3+__pyx_t_10, __pyx_v_player);
+                __pyx_t_9 = 0;
+                __pyx_t_11 = 0;
+                __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_8, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 267, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_1);
+                __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+              }
+              __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+              __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 267, __pyx_L1_error)
+              __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+              if (__pyx_t_2) {
+
+                /* "ai_minimax_alpha_beta.py":269
+ *                                 if self.checkmuhle(move[0], move[1], board_, player):
+ *                                     # New mill generated
+ *                                     score_addition += 100             # <<<<<<<<<<<<<<
+ *                                     if self.checkmuhle(ring, stelle, board, player):
+ *                                         # Zwickmuehle
+ */
+                __pyx_t_1 = __Pyx_PyInt_AddObjC(__pyx_v_score_addition, __pyx_int_100, 0x64, 1, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 269, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_1);
+                __Pyx_DECREF_SET(__pyx_v_score_addition, __pyx_t_1);
+                __pyx_t_1 = 0;
+
+                /* "ai_minimax_alpha_beta.py":270
+ *                                     # New mill generated
+ *                                     score_addition += 100
+ *                                     if self.checkmuhle(ring, stelle, board, player):             # <<<<<<<<<<<<<<
+ *                                         # Zwickmuehle
+ *                                         score_addition += 500
+ */
+                __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_checkmuhle); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 270, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_7);
+                __pyx_t_8 = __Pyx_PyInt_From_long(__pyx_v_ring); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 270, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_8);
+                __pyx_t_11 = __Pyx_PyInt_From_long(__pyx_v_stelle); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 270, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_11);
+                __pyx_t_9 = NULL;
+                __pyx_t_10 = 0;
+                if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_7))) {
+                  __pyx_t_9 = PyMethod_GET_SELF(__pyx_t_7);
+                  if (likely(__pyx_t_9)) {
+                    PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
+                    __Pyx_INCREF(__pyx_t_9);
+                    __Pyx_INCREF(function);
+                    __Pyx_DECREF_SET(__pyx_t_7, function);
+                    __pyx_t_10 = 1;
+                  }
+                }
+                #if CYTHON_FAST_PYCALL
+                if (PyFunction_Check(__pyx_t_7)) {
+                  PyObject *__pyx_temp[5] = {__pyx_t_9, __pyx_t_8, __pyx_t_11, __pyx_v_board, __pyx_v_player};
+                  __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_10, 4+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 270, __pyx_L1_error)
+                  __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
+                  __Pyx_GOTREF(__pyx_t_1);
+                  __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+                  __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+                } else
+                #endif
+                #if CYTHON_FAST_PYCCALL
+                if (__Pyx_PyFastCFunction_Check(__pyx_t_7)) {
+                  PyObject *__pyx_temp[5] = {__pyx_t_9, __pyx_t_8, __pyx_t_11, __pyx_v_board, __pyx_v_player};
+                  __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_10, 4+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 270, __pyx_L1_error)
+                  __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
+                  __Pyx_GOTREF(__pyx_t_1);
+                  __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+                  __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+                } else
+                #endif
+                {
+                  __pyx_t_6 = PyTuple_New(4+__pyx_t_10); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 270, __pyx_L1_error)
+                  __Pyx_GOTREF(__pyx_t_6);
+                  if (__pyx_t_9) {
+                    __Pyx_GIVEREF(__pyx_t_9); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_9); __pyx_t_9 = NULL;
+                  }
+                  __Pyx_GIVEREF(__pyx_t_8);
+                  PyTuple_SET_ITEM(__pyx_t_6, 0+__pyx_t_10, __pyx_t_8);
+                  __Pyx_GIVEREF(__pyx_t_11);
+                  PyTuple_SET_ITEM(__pyx_t_6, 1+__pyx_t_10, __pyx_t_11);
+                  __Pyx_INCREF(__pyx_v_board);
+                  __Pyx_GIVEREF(__pyx_v_board);
+                  PyTuple_SET_ITEM(__pyx_t_6, 2+__pyx_t_10, __pyx_v_board);
+                  __Pyx_INCREF(__pyx_v_player);
+                  __Pyx_GIVEREF(__pyx_v_player);
+                  PyTuple_SET_ITEM(__pyx_t_6, 3+__pyx_t_10, __pyx_v_player);
+                  __pyx_t_8 = 0;
+                  __pyx_t_11 = 0;
+                  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_6, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 270, __pyx_L1_error)
+                  __Pyx_GOTREF(__pyx_t_1);
+                  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+                }
+                __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+                __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 270, __pyx_L1_error)
+                __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+                if (__pyx_t_2) {
+
+                  /* "ai_minimax_alpha_beta.py":272
+ *                                     if self.checkmuhle(ring, stelle, board, player):
+ *                                         # Zwickmuehle
+ *                                         score_addition += 500             # <<<<<<<<<<<<<<
+ * 
+ *                                     to_remove = self.toremove(board_, 1 if player == 2 else 2)
+ */
+                  __pyx_t_1 = __Pyx_PyInt_AddObjC(__pyx_v_score_addition, __pyx_int_500, 0x1F4, 1, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 272, __pyx_L1_error)
+                  __Pyx_GOTREF(__pyx_t_1);
+                  __Pyx_DECREF_SET(__pyx_v_score_addition, __pyx_t_1);
+                  __pyx_t_1 = 0;
+
+                  /* "ai_minimax_alpha_beta.py":270
+ *                                     # New mill generated
+ *                                     score_addition += 100
+ *                                     if self.checkmuhle(ring, stelle, board, player):             # <<<<<<<<<<<<<<
+ *                                         # Zwickmuehle
+ *                                         score_addition += 500
+ */
+                }
+
+                /* "ai_minimax_alpha_beta.py":274
+ *                                         score_addition += 500
+ * 
+ *                                     to_remove = self.toremove(board_, 1 if player == 2 else 2)             # <<<<<<<<<<<<<<
+ *                                     if board_[to_remove[0]][to_remove[1]] == (1 if player == 2 else 2) and not \
+ *                                     muhlen_[to_remove[0]][to_remove[1]] == 0:
+ */
+                __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_toremove); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 274, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_7);
+                __pyx_t_11 = __Pyx_PyInt_EqObjC(__pyx_v_player, __pyx_int_2, 2, 0); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 274, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_11);
+                __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_11); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 274, __pyx_L1_error)
+                __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+                if (__pyx_t_2) {
+                  __Pyx_INCREF(__pyx_int_1);
+                  __pyx_t_6 = __pyx_int_1;
+                } else {
+                  __Pyx_INCREF(__pyx_int_2);
+                  __pyx_t_6 = __pyx_int_2;
+                }
+                __pyx_t_11 = NULL;
+                __pyx_t_10 = 0;
+                if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_7))) {
+                  __pyx_t_11 = PyMethod_GET_SELF(__pyx_t_7);
+                  if (likely(__pyx_t_11)) {
+                    PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
+                    __Pyx_INCREF(__pyx_t_11);
+                    __Pyx_INCREF(function);
+                    __Pyx_DECREF_SET(__pyx_t_7, function);
+                    __pyx_t_10 = 1;
+                  }
+                }
+                #if CYTHON_FAST_PYCALL
+                if (PyFunction_Check(__pyx_t_7)) {
+                  PyObject *__pyx_temp[3] = {__pyx_t_11, __pyx_v_board_, __pyx_t_6};
+                  __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 274, __pyx_L1_error)
+                  __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
+                  __Pyx_GOTREF(__pyx_t_1);
+                  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+                } else
+                #endif
+                #if CYTHON_FAST_PYCCALL
+                if (__Pyx_PyFastCFunction_Check(__pyx_t_7)) {
+                  PyObject *__pyx_temp[3] = {__pyx_t_11, __pyx_v_board_, __pyx_t_6};
+                  __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 274, __pyx_L1_error)
+                  __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
+                  __Pyx_GOTREF(__pyx_t_1);
+                  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+                } else
+                #endif
+                {
+                  __pyx_t_8 = PyTuple_New(2+__pyx_t_10); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 274, __pyx_L1_error)
+                  __Pyx_GOTREF(__pyx_t_8);
+                  if (__pyx_t_11) {
+                    __Pyx_GIVEREF(__pyx_t_11); PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_11); __pyx_t_11 = NULL;
+                  }
+                  __Pyx_INCREF(__pyx_v_board_);
+                  __Pyx_GIVEREF(__pyx_v_board_);
+                  PyTuple_SET_ITEM(__pyx_t_8, 0+__pyx_t_10, __pyx_v_board_);
+                  __Pyx_GIVEREF(__pyx_t_6);
+                  PyTuple_SET_ITEM(__pyx_t_8, 1+__pyx_t_10, __pyx_t_6);
+                  __pyx_t_6 = 0;
+                  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_8, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 274, __pyx_L1_error)
+                  __Pyx_GOTREF(__pyx_t_1);
+                  __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+                }
+                __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+                __Pyx_XDECREF_SET(__pyx_v_to_remove, __pyx_t_1);
+                __pyx_t_1 = 0;
+
+                /* "ai_minimax_alpha_beta.py":275
+ * 
+ *                                     to_remove = self.toremove(board_, 1 if player == 2 else 2)
+ *                                     if board_[to_remove[0]][to_remove[1]] == (1 if player == 2 else 2) and not \             # <<<<<<<<<<<<<<
+ *                                     muhlen_[to_remove[0]][to_remove[1]] == 0:
+ *                                         board_[to_remove[0]][to_remove[1]] = 0
+ */
+                __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_to_remove, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 275, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_1);
+                __pyx_t_7 = __Pyx_PyObject_GetItem(__pyx_v_board_, __pyx_t_1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 275, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_7);
+                __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+                __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_to_remove, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 275, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_1);
+                __pyx_t_8 = __Pyx_PyObject_GetItem(__pyx_t_7, __pyx_t_1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 275, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_8);
+                __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+                __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+                __pyx_t_7 = __Pyx_PyInt_EqObjC(__pyx_v_player, __pyx_int_2, 2, 0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 275, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_7);
+                __pyx_t_13 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely(__pyx_t_13 < 0)) __PYX_ERR(0, 275, __pyx_L1_error)
+                __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+                if (__pyx_t_13) {
+                  __Pyx_INCREF(__pyx_int_1);
+                  __pyx_t_1 = __pyx_int_1;
+                } else {
+                  __Pyx_INCREF(__pyx_int_2);
+                  __pyx_t_1 = __pyx_int_2;
+                }
+                __pyx_t_7 = PyObject_RichCompare(__pyx_t_8, __pyx_t_1, Py_EQ); __Pyx_XGOTREF(__pyx_t_7); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 275, __pyx_L1_error)
+                __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+                __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+                __pyx_t_13 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely(__pyx_t_13 < 0)) __PYX_ERR(0, 275, __pyx_L1_error)
+                __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+                if (__pyx_t_13) {
+                } else {
+                  __pyx_t_2 = __pyx_t_13;
+                  goto __pyx_L108_bool_binop_done;
+                }
+
+                /* "ai_minimax_alpha_beta.py":276
+ *                                     to_remove = self.toremove(board_, 1 if player == 2 else 2)
+ *                                     if board_[to_remove[0]][to_remove[1]] == (1 if player == 2 else 2) and not \
+ *                                     muhlen_[to_remove[0]][to_remove[1]] == 0:             # <<<<<<<<<<<<<<
+ *                                         board_[to_remove[0]][to_remove[1]] = 0
+ *                                         muhlen_ = self.update_board_muhlen(board_, muhlen_)
+ */
+                __pyx_t_7 = __Pyx_GetItemInt(__pyx_v_to_remove, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 276, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_7);
+                __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_v_muhlen_, __pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 276, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_1);
+                __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+                __pyx_t_7 = __Pyx_GetItemInt(__pyx_v_to_remove, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 276, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_7);
+                __pyx_t_8 = __Pyx_PyObject_GetItem(__pyx_t_1, __pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 276, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_8);
+                __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+                __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+                __pyx_t_7 = __Pyx_PyInt_EqObjC(__pyx_t_8, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 276, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_7);
+                __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+                __pyx_t_13 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely(__pyx_t_13 < 0)) __PYX_ERR(0, 276, __pyx_L1_error)
+                __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+
+                /* "ai_minimax_alpha_beta.py":275
+ * 
+ *                                     to_remove = self.toremove(board_, 1 if player == 2 else 2)
+ *                                     if board_[to_remove[0]][to_remove[1]] == (1 if player == 2 else 2) and not \             # <<<<<<<<<<<<<<
+ *                                     muhlen_[to_remove[0]][to_remove[1]] == 0:
+ *                                         board_[to_remove[0]][to_remove[1]] = 0
+ */
+                __pyx_t_12 = ((!__pyx_t_13) != 0);
+                __pyx_t_2 = __pyx_t_12;
+                __pyx_L108_bool_binop_done:;
+                if (__pyx_t_2) {
+
+                  /* "ai_minimax_alpha_beta.py":277
+ *                                     if board_[to_remove[0]][to_remove[1]] == (1 if player == 2 else 2) and not \
+ *                                     muhlen_[to_remove[0]][to_remove[1]] == 0:
+ *                                         board_[to_remove[0]][to_remove[1]] = 0             # <<<<<<<<<<<<<<
+ *                                         muhlen_ = self.update_board_muhlen(board_, muhlen_)
+ * 
+ */
+                  __pyx_t_7 = __Pyx_GetItemInt(__pyx_v_to_remove, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 277, __pyx_L1_error)
+                  __Pyx_GOTREF(__pyx_t_7);
+                  __pyx_t_8 = __Pyx_PyObject_GetItem(__pyx_v_board_, __pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 277, __pyx_L1_error)
+                  __Pyx_GOTREF(__pyx_t_8);
+                  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+                  __pyx_t_7 = __Pyx_GetItemInt(__pyx_v_to_remove, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 277, __pyx_L1_error)
+                  __Pyx_GOTREF(__pyx_t_7);
+                  if (unlikely(PyObject_SetItem(__pyx_t_8, __pyx_t_7, __pyx_int_0) < 0)) __PYX_ERR(0, 277, __pyx_L1_error)
+                  __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+                  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+
+                  /* "ai_minimax_alpha_beta.py":278
+ *                                     muhlen_[to_remove[0]][to_remove[1]] == 0:
+ *                                         board_[to_remove[0]][to_remove[1]] = 0
+ *                                         muhlen_ = self.update_board_muhlen(board_, muhlen_)             # <<<<<<<<<<<<<<
+ * 
+ *                                 evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, alpha, best_score,
+ */
+                  __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_update_board_muhlen); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 278, __pyx_L1_error)
+                  __Pyx_GOTREF(__pyx_t_8);
+                  __pyx_t_1 = NULL;
+                  __pyx_t_10 = 0;
+                  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_8))) {
+                    __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_8);
+                    if (likely(__pyx_t_1)) {
+                      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_8);
+                      __Pyx_INCREF(__pyx_t_1);
+                      __Pyx_INCREF(function);
+                      __Pyx_DECREF_SET(__pyx_t_8, function);
+                      __pyx_t_10 = 1;
+                    }
+                  }
+                  #if CYTHON_FAST_PYCALL
+                  if (PyFunction_Check(__pyx_t_8)) {
+                    PyObject *__pyx_temp[3] = {__pyx_t_1, __pyx_v_board_, __pyx_v_muhlen_};
+                    __pyx_t_7 = __Pyx_PyFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 278, __pyx_L1_error)
+                    __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+                    __Pyx_GOTREF(__pyx_t_7);
+                  } else
+                  #endif
+                  #if CYTHON_FAST_PYCCALL
+                  if (__Pyx_PyFastCFunction_Check(__pyx_t_8)) {
+                    PyObject *__pyx_temp[3] = {__pyx_t_1, __pyx_v_board_, __pyx_v_muhlen_};
+                    __pyx_t_7 = __Pyx_PyCFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 278, __pyx_L1_error)
+                    __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+                    __Pyx_GOTREF(__pyx_t_7);
+                  } else
+                  #endif
+                  {
+                    __pyx_t_6 = PyTuple_New(2+__pyx_t_10); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 278, __pyx_L1_error)
+                    __Pyx_GOTREF(__pyx_t_6);
+                    if (__pyx_t_1) {
+                      __Pyx_GIVEREF(__pyx_t_1); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_1); __pyx_t_1 = NULL;
+                    }
+                    __Pyx_INCREF(__pyx_v_board_);
+                    __Pyx_GIVEREF(__pyx_v_board_);
+                    PyTuple_SET_ITEM(__pyx_t_6, 0+__pyx_t_10, __pyx_v_board_);
+                    __Pyx_INCREF(__pyx_v_muhlen_);
+                    __Pyx_GIVEREF(__pyx_v_muhlen_);
+                    PyTuple_SET_ITEM(__pyx_t_6, 1+__pyx_t_10, __pyx_v_muhlen_);
+                    __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_6, NULL); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 278, __pyx_L1_error)
+                    __Pyx_GOTREF(__pyx_t_7);
+                    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+                  }
+                  __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+                  __Pyx_DECREF_SET(__pyx_v_muhlen_, __pyx_t_7);
+                  __pyx_t_7 = 0;
+
+                  /* "ai_minimax_alpha_beta.py":275
+ * 
+ *                                     to_remove = self.toremove(board_, 1 if player == 2 else 2)
+ *                                     if board_[to_remove[0]][to_remove[1]] == (1 if player == 2 else 2) and not \             # <<<<<<<<<<<<<<
+ *                                     muhlen_[to_remove[0]][to_remove[1]] == 0:
+ *                                         board_[to_remove[0]][to_remove[1]] = 0
+ */
+                }
+
+                /* "ai_minimax_alpha_beta.py":267
+ *                                 # TODO: kinda whack
+ *                                 score_addition = 0
+ *                                 if self.checkmuhle(move[0], move[1], board_, player):             # <<<<<<<<<<<<<<
+ *                                     # New mill generated
+ *                                     score_addition += 100
+ */
+              }
+
+              /* "ai_minimax_alpha_beta.py":280
+ *                                         muhlen_ = self.update_board_muhlen(board_, muhlen_)
+ * 
+ *                                 evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, alpha, best_score,             # <<<<<<<<<<<<<<
+ *                                                           remaining_set, depth - 1)
+ *                                 evaluation += score_addition
+ */
+              __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_minimax); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 280, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_8);
+              __pyx_t_1 = __Pyx_PyInt_EqObjC(__pyx_v_player, __pyx_int_2, 2, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 280, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_1);
+              __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 280, __pyx_L1_error)
+              __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+              if (__pyx_t_2) {
+                __Pyx_INCREF(__pyx_int_1);
+                __pyx_t_6 = __pyx_int_1;
+              } else {
+                __Pyx_INCREF(__pyx_int_2);
+                __pyx_t_6 = __pyx_int_2;
+              }
+
+              /* "ai_minimax_alpha_beta.py":281
+ * 
+ *                                 evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, alpha, best_score,
+ *                                                           remaining_set, depth - 1)             # <<<<<<<<<<<<<<
+ *                                 evaluation += score_addition
+ *                                 if evaluation < best_score:
+ */
+              __pyx_t_1 = __Pyx_PyInt_SubtractObjC(__pyx_v_depth, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 281, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_1);
+              __pyx_t_11 = NULL;
+              __pyx_t_10 = 0;
+              if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_8))) {
+                __pyx_t_11 = PyMethod_GET_SELF(__pyx_t_8);
+                if (likely(__pyx_t_11)) {
+                  PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_8);
+                  __Pyx_INCREF(__pyx_t_11);
+                  __Pyx_INCREF(function);
+                  __Pyx_DECREF_SET(__pyx_t_8, function);
+                  __pyx_t_10 = 1;
+                }
+              }
+              #if CYTHON_FAST_PYCALL
+              if (PyFunction_Check(__pyx_t_8)) {
+                PyObject *__pyx_temp[8] = {__pyx_t_11, __pyx_v_board_, __pyx_v_muhlen_, __pyx_t_6, __pyx_v_alpha, __pyx_v_best_score, __pyx_v_remaining_set, __pyx_t_1};
+                __pyx_t_7 = __Pyx_PyFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_10, 7+__pyx_t_10); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 280, __pyx_L1_error)
+                __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
+                __Pyx_GOTREF(__pyx_t_7);
+                __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+                __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+              } else
+              #endif
+              #if CYTHON_FAST_PYCCALL
+              if (__Pyx_PyFastCFunction_Check(__pyx_t_8)) {
+                PyObject *__pyx_temp[8] = {__pyx_t_11, __pyx_v_board_, __pyx_v_muhlen_, __pyx_t_6, __pyx_v_alpha, __pyx_v_best_score, __pyx_v_remaining_set, __pyx_t_1};
+                __pyx_t_7 = __Pyx_PyCFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_10, 7+__pyx_t_10); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 280, __pyx_L1_error)
+                __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
+                __Pyx_GOTREF(__pyx_t_7);
+                __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+                __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+              } else
+              #endif
+              {
+                __pyx_t_9 = PyTuple_New(7+__pyx_t_10); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 280, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_9);
+                if (__pyx_t_11) {
+                  __Pyx_GIVEREF(__pyx_t_11); PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_11); __pyx_t_11 = NULL;
+                }
+                __Pyx_INCREF(__pyx_v_board_);
+                __Pyx_GIVEREF(__pyx_v_board_);
+                PyTuple_SET_ITEM(__pyx_t_9, 0+__pyx_t_10, __pyx_v_board_);
+                __Pyx_INCREF(__pyx_v_muhlen_);
+                __Pyx_GIVEREF(__pyx_v_muhlen_);
+                PyTuple_SET_ITEM(__pyx_t_9, 1+__pyx_t_10, __pyx_v_muhlen_);
+                __Pyx_GIVEREF(__pyx_t_6);
+                PyTuple_SET_ITEM(__pyx_t_9, 2+__pyx_t_10, __pyx_t_6);
+                __Pyx_INCREF(__pyx_v_alpha);
+                __Pyx_GIVEREF(__pyx_v_alpha);
+                PyTuple_SET_ITEM(__pyx_t_9, 3+__pyx_t_10, __pyx_v_alpha);
+                __Pyx_INCREF(__pyx_v_best_score);
+                __Pyx_GIVEREF(__pyx_v_best_score);
+                PyTuple_SET_ITEM(__pyx_t_9, 4+__pyx_t_10, __pyx_v_best_score);
+                __Pyx_INCREF(__pyx_v_remaining_set);
+                __Pyx_GIVEREF(__pyx_v_remaining_set);
+                PyTuple_SET_ITEM(__pyx_t_9, 5+__pyx_t_10, __pyx_v_remaining_set);
+                __Pyx_GIVEREF(__pyx_t_1);
+                PyTuple_SET_ITEM(__pyx_t_9, 6+__pyx_t_10, __pyx_t_1);
+                __pyx_t_6 = 0;
+                __pyx_t_1 = 0;
+                __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_9, NULL); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 280, __pyx_L1_error)
+                __Pyx_GOTREF(__pyx_t_7);
+                __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+              }
+              __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+              __Pyx_XDECREF_SET(__pyx_v_evaluation, __pyx_t_7);
+              __pyx_t_7 = 0;
+
+              /* "ai_minimax_alpha_beta.py":282
  *                                 evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, alpha, best_score,
  *                                                           remaining_set, depth - 1)
  *                                 evaluation += score_addition             # <<<<<<<<<<<<<<
  *                                 if evaluation < best_score:
  *                                     best_score = evaluation
  */
-              __pyx_t_9 = PyNumber_InPlaceAdd(__pyx_v_evaluation, __pyx_v_score_addition); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 297, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_9);
-              __Pyx_DECREF_SET(__pyx_v_evaluation, __pyx_t_9);
-              __pyx_t_9 = 0;
+              __pyx_t_7 = PyNumber_InPlaceAdd(__pyx_v_evaluation, __pyx_v_score_addition); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 282, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_7);
+              __Pyx_DECREF_SET(__pyx_v_evaluation, __pyx_t_7);
+              __pyx_t_7 = 0;
 
-              /* "ai_minimax_alpha_beta.py":298
+              /* "ai_minimax_alpha_beta.py":283
  *                                                           remaining_set, depth - 1)
  *                                 evaluation += score_addition
  *                                 if evaluation < best_score:             # <<<<<<<<<<<<<<
  *                                     best_score = evaluation
  *                                     if best_score <= alpha:
  */
-              __pyx_t_9 = PyObject_RichCompare(__pyx_v_evaluation, __pyx_v_best_score, Py_LT); __Pyx_XGOTREF(__pyx_t_9); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 298, __pyx_L1_error)
-              __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_9); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 298, __pyx_L1_error)
-              __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+              __pyx_t_7 = PyObject_RichCompare(__pyx_v_evaluation, __pyx_v_best_score, Py_LT); __Pyx_XGOTREF(__pyx_t_7); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 283, __pyx_L1_error)
+              __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 283, __pyx_L1_error)
+              __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
               if (__pyx_t_2) {
 
-                /* "ai_minimax_alpha_beta.py":299
+                /* "ai_minimax_alpha_beta.py":284
  *                                 evaluation += score_addition
  *                                 if evaluation < best_score:
  *                                     best_score = evaluation             # <<<<<<<<<<<<<<
@@ -7688,28 +8222,28 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
                 __Pyx_INCREF(__pyx_v_evaluation);
                 __Pyx_DECREF_SET(__pyx_v_best_score, __pyx_v_evaluation);
 
-                /* "ai_minimax_alpha_beta.py":300
+                /* "ai_minimax_alpha_beta.py":285
  *                                 if evaluation < best_score:
  *                                     best_score = evaluation
  *                                     if best_score <= alpha:             # <<<<<<<<<<<<<<
  *                                         break
  *                         else:
  */
-                __pyx_t_9 = PyObject_RichCompare(__pyx_v_best_score, __pyx_v_alpha, Py_LE); __Pyx_XGOTREF(__pyx_t_9); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 300, __pyx_L1_error)
-                __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_9); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 300, __pyx_L1_error)
-                __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+                __pyx_t_7 = PyObject_RichCompare(__pyx_v_best_score, __pyx_v_alpha, Py_LE); __Pyx_XGOTREF(__pyx_t_7); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 285, __pyx_L1_error)
+                __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 285, __pyx_L1_error)
+                __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
                 if (__pyx_t_2) {
 
-                  /* "ai_minimax_alpha_beta.py":301
+                  /* "ai_minimax_alpha_beta.py":286
  *                                     best_score = evaluation
  *                                     if best_score <= alpha:
  *                                         break             # <<<<<<<<<<<<<<
  *                         else:
  *                             continue
  */
-                  goto __pyx_L106_break;
+                  goto __pyx_L94_break;
 
-                  /* "ai_minimax_alpha_beta.py":300
+                  /* "ai_minimax_alpha_beta.py":285
  *                                 if evaluation < best_score:
  *                                     best_score = evaluation
  *                                     if best_score <= alpha:             # <<<<<<<<<<<<<<
@@ -7718,7 +8252,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
  */
                 }
 
-                /* "ai_minimax_alpha_beta.py":298
+                /* "ai_minimax_alpha_beta.py":283
  *                                                           remaining_set, depth - 1)
  *                                 evaluation += score_addition
  *                                 if evaluation < best_score:             # <<<<<<<<<<<<<<
@@ -7727,7 +8261,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
  */
               }
 
-              /* "ai_minimax_alpha_beta.py":267
+              /* "ai_minimax_alpha_beta.py":256
  *                             if not possiblemoves:
  *                                 continue
  *                             for move in possiblemoves:             # <<<<<<<<<<<<<<
@@ -7735,20 +8269,20 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
  *                                 muhlen_ = copy.deepcopy(board_muhlen)
  */
             }
-            __pyx_L106_break:;
-            __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+            __pyx_L94_break:;
+            __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-            /* "ai_minimax_alpha_beta.py":263
+            /* "ai_minimax_alpha_beta.py":252
  *                 for ring in range(3):
  *                     for stelle in range(8):
  *                         if board[ring][stelle] == player:             # <<<<<<<<<<<<<<
  *                             possiblemoves = self.possiblemoves(ring, stelle, board)
  *                             if not possiblemoves:
  */
-            goto __pyx_L103;
+            goto __pyx_L91;
           }
 
-          /* "ai_minimax_alpha_beta.py":303
+          /* "ai_minimax_alpha_beta.py":288
  *                                         break
  *                         else:
  *                             continue             # <<<<<<<<<<<<<<
@@ -7756,29 +8290,29 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
  *                 return best_score
  */
           /*else*/ {
-            goto __pyx_L101_continue;
+            goto __pyx_L89_continue;
           }
-          __pyx_L103:;
+          __pyx_L91:;
 
-          /* "ai_minimax_alpha_beta.py":304
+          /* "ai_minimax_alpha_beta.py":289
  *                         else:
  *                             continue
  *                         break             # <<<<<<<<<<<<<<
  *                 return best_score
  * 
  */
-          goto __pyx_L102_break;
-          __pyx_L101_continue:;
+          goto __pyx_L90_break;
+          __pyx_L89_continue:;
         }
-        __pyx_L102_break:;
+        __pyx_L90_break:;
       }
 
-      /* "ai_minimax_alpha_beta.py":305
+      /* "ai_minimax_alpha_beta.py":290
  *                             continue
  *                         break
  *                 return best_score             # <<<<<<<<<<<<<<
  * 
- *     # Not working, new version found above ^
+ * 
  */
       __Pyx_XDECREF(__pyx_r);
       __Pyx_INCREF(__pyx_v_best_score);
@@ -7787,7 +8321,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
     }
   }
 
-  /* "ai_minimax_alpha_beta.py":75
+  /* "ai_minimax_alpha_beta.py":83
  *     # Minimax function is simpler and only remembers and returns scores of the decision tree without the moves
  *     ###
  *     def minimax(self, board, board_muhlen, player, alpha, beta, remaining_set, depth):             # <<<<<<<<<<<<<<
@@ -7813,6 +8347,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
   __Pyx_XDECREF(__pyx_v_best_score);
   __Pyx_XDECREF(__pyx_v_board_);
   __Pyx_XDECREF(__pyx_v_muhlen_);
+  __Pyx_XDECREF(__pyx_v_to_remove);
   __Pyx_XDECREF(__pyx_v_evaluation);
   __Pyx_XDECREF(__pyx_v_mymen);
   __Pyx_XDECREF(__pyx_v_theirmen);
@@ -7824,1221 +8359,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_4minimax(CYTHON_UNUSED
   return __pyx_r;
 }
 
-/* "ai_minimax_alpha_beta.py":308
- * 
- *     # Not working, new version found above ^
- *     def minimax_(self, board, board_muhlen, player, alpha, beta, depth):             # <<<<<<<<<<<<<<
- *         # Static evaluation
- *         if depth < 1:
- */
-
-/* Python wrapper */
-static PyObject *__pyx_pw_21ai_minimax_alpha_beta_6Morris_7minimax_(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_21ai_minimax_alpha_beta_6Morris_7minimax_ = {"minimax_", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_21ai_minimax_alpha_beta_6Morris_7minimax_, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_21ai_minimax_alpha_beta_6Morris_7minimax_(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
-  PyObject *__pyx_v_self = 0;
-  PyObject *__pyx_v_board = 0;
-  PyObject *__pyx_v_board_muhlen = 0;
-  PyObject *__pyx_v_player = 0;
-  PyObject *__pyx_v_alpha = 0;
-  PyObject *__pyx_v_beta = 0;
-  PyObject *__pyx_v_depth = 0;
-  PyObject *__pyx_r = 0;
-  __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("minimax_ (wrapper)", 0);
-  {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_self,&__pyx_n_s_board,&__pyx_n_s_board_muhlen,&__pyx_n_s_player,&__pyx_n_s_alpha,&__pyx_n_s_beta,&__pyx_n_s_depth,0};
-    PyObject* values[7] = {0,0,0,0,0,0,0};
-    if (unlikely(__pyx_kwds)) {
-      Py_ssize_t kw_args;
-      const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
-      switch (pos_args) {
-        case  7: values[6] = PyTuple_GET_ITEM(__pyx_args, 6);
-        CYTHON_FALLTHROUGH;
-        case  6: values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
-        CYTHON_FALLTHROUGH;
-        case  5: values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
-        CYTHON_FALLTHROUGH;
-        case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
-        CYTHON_FALLTHROUGH;
-        case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
-        CYTHON_FALLTHROUGH;
-        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
-        CYTHON_FALLTHROUGH;
-        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
-        CYTHON_FALLTHROUGH;
-        case  0: break;
-        default: goto __pyx_L5_argtuple_error;
-      }
-      kw_args = PyDict_Size(__pyx_kwds);
-      switch (pos_args) {
-        case  0:
-        if (likely((values[0] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_self)) != 0)) kw_args--;
-        else goto __pyx_L5_argtuple_error;
-        CYTHON_FALLTHROUGH;
-        case  1:
-        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_board)) != 0)) kw_args--;
-        else {
-          __Pyx_RaiseArgtupleInvalid("minimax_", 1, 7, 7, 1); __PYX_ERR(0, 308, __pyx_L3_error)
-        }
-        CYTHON_FALLTHROUGH;
-        case  2:
-        if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_board_muhlen)) != 0)) kw_args--;
-        else {
-          __Pyx_RaiseArgtupleInvalid("minimax_", 1, 7, 7, 2); __PYX_ERR(0, 308, __pyx_L3_error)
-        }
-        CYTHON_FALLTHROUGH;
-        case  3:
-        if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_player)) != 0)) kw_args--;
-        else {
-          __Pyx_RaiseArgtupleInvalid("minimax_", 1, 7, 7, 3); __PYX_ERR(0, 308, __pyx_L3_error)
-        }
-        CYTHON_FALLTHROUGH;
-        case  4:
-        if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_alpha)) != 0)) kw_args--;
-        else {
-          __Pyx_RaiseArgtupleInvalid("minimax_", 1, 7, 7, 4); __PYX_ERR(0, 308, __pyx_L3_error)
-        }
-        CYTHON_FALLTHROUGH;
-        case  5:
-        if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_beta)) != 0)) kw_args--;
-        else {
-          __Pyx_RaiseArgtupleInvalid("minimax_", 1, 7, 7, 5); __PYX_ERR(0, 308, __pyx_L3_error)
-        }
-        CYTHON_FALLTHROUGH;
-        case  6:
-        if (likely((values[6] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_depth)) != 0)) kw_args--;
-        else {
-          __Pyx_RaiseArgtupleInvalid("minimax_", 1, 7, 7, 6); __PYX_ERR(0, 308, __pyx_L3_error)
-        }
-      }
-      if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "minimax_") < 0)) __PYX_ERR(0, 308, __pyx_L3_error)
-      }
-    } else if (PyTuple_GET_SIZE(__pyx_args) != 7) {
-      goto __pyx_L5_argtuple_error;
-    } else {
-      values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
-      values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
-      values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
-      values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
-      values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
-      values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
-      values[6] = PyTuple_GET_ITEM(__pyx_args, 6);
-    }
-    __pyx_v_self = values[0];
-    __pyx_v_board = values[1];
-    __pyx_v_board_muhlen = values[2];
-    __pyx_v_player = values[3];
-    __pyx_v_alpha = values[4];
-    __pyx_v_beta = values[5];
-    __pyx_v_depth = values[6];
-  }
-  goto __pyx_L4_argument_unpacking_done;
-  __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("minimax_", 1, 7, 7, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 308, __pyx_L3_error)
-  __pyx_L3_error:;
-  __Pyx_AddTraceback("ai_minimax_alpha_beta.Morris.minimax_", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __Pyx_RefNannyFinishContext();
-  return NULL;
-  __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_21ai_minimax_alpha_beta_6Morris_6minimax_(__pyx_self, __pyx_v_self, __pyx_v_board, __pyx_v_board_muhlen, __pyx_v_player, __pyx_v_alpha, __pyx_v_beta, __pyx_v_depth);
-
-  /* function exit code */
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_6minimax_(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_board, PyObject *__pyx_v_board_muhlen, PyObject *__pyx_v_player, PyObject *__pyx_v_alpha, PyObject *__pyx_v_beta, PyObject *__pyx_v_depth) {
-  PyObject *__pyx_v_score_player = NULL;
-  PyObject *__pyx_v_score_opponent = NULL;
-  long __pyx_v_i;
-  long __pyx_v_j;
-  PyObject *__pyx_v_score = NULL;
-  PyObject *__pyx_v_static_evaluation = NULL;
-  PyObject *__pyx_v_maxEval = NULL;
-  PyObject *__pyx_v_minEval = NULL;
-  long __pyx_v_ring;
-  long __pyx_v_stelle;
-  PyObject *__pyx_v_board_new = NULL;
-  PyObject *__pyx_v_board_new_muhlen = NULL;
-  PyObject *__pyx_v_evaluation = NULL;
-  PyObject *__pyx_r = NULL;
-  __Pyx_RefNannyDeclarations
-  PyObject *__pyx_t_1 = NULL;
-  int __pyx_t_2;
-  long __pyx_t_3;
-  long __pyx_t_4;
-  PyObject *__pyx_t_5 = NULL;
-  PyObject *__pyx_t_6 = NULL;
-  PyObject *__pyx_t_7 = NULL;
-  PyObject *__pyx_t_8 = NULL;
-  PyObject *__pyx_t_9 = NULL;
-  int __pyx_t_10;
-  PyObject *__pyx_t_11 = NULL;
-  int __pyx_t_12;
-  __Pyx_RefNannySetupContext("minimax_", 0);
-
-  /* "ai_minimax_alpha_beta.py":310
- *     def minimax_(self, board, board_muhlen, player, alpha, beta, depth):
- *         # Static evaluation
- *         if depth < 1:             # <<<<<<<<<<<<<<
- *             score_player = 0
- *             score_opponent = 0
- */
-  __pyx_t_1 = PyObject_RichCompare(__pyx_v_depth, __pyx_int_1, Py_LT); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 310, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 310, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (__pyx_t_2) {
-
-    /* "ai_minimax_alpha_beta.py":311
- *         # Static evaluation
- *         if depth < 1:
- *             score_player = 0             # <<<<<<<<<<<<<<
- *             score_opponent = 0
- *             for i in range(3):
- */
-    __Pyx_INCREF(__pyx_int_0);
-    __pyx_v_score_player = __pyx_int_0;
-
-    /* "ai_minimax_alpha_beta.py":312
- *         if depth < 1:
- *             score_player = 0
- *             score_opponent = 0             # <<<<<<<<<<<<<<
- *             for i in range(3):
- *                 for j in range(8):
- */
-    __Pyx_INCREF(__pyx_int_0);
-    __pyx_v_score_opponent = __pyx_int_0;
-
-    /* "ai_minimax_alpha_beta.py":313
- *             score_player = 0
- *             score_opponent = 0
- *             for i in range(3):             # <<<<<<<<<<<<<<
- *                 for j in range(8):
- *                     if board[i][j] == self.player:
- */
-    for (__pyx_t_3 = 0; __pyx_t_3 < 3; __pyx_t_3+=1) {
-      __pyx_v_i = __pyx_t_3;
-
-      /* "ai_minimax_alpha_beta.py":314
- *             score_opponent = 0
- *             for i in range(3):
- *                 for j in range(8):             # <<<<<<<<<<<<<<
- *                     if board[i][j] == self.player:
- *                         # score_player += 1
- */
-      for (__pyx_t_4 = 0; __pyx_t_4 < 8; __pyx_t_4+=1) {
-        __pyx_v_j = __pyx_t_4;
-
-        /* "ai_minimax_alpha_beta.py":315
- *             for i in range(3):
- *                 for j in range(8):
- *                     if board[i][j] == self.player:             # <<<<<<<<<<<<<<
- *                         # score_player += 1
- *                         pass
- */
-        __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_board, __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 315, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_1);
-        __pyx_t_5 = __Pyx_GetItemInt(__pyx_t_1, __pyx_v_j, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 315, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_5);
-        __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-        __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_player); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 315, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_1);
-        __pyx_t_6 = PyObject_RichCompare(__pyx_t_5, __pyx_t_1, Py_EQ); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 315, __pyx_L1_error)
-        __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-        __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-        __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 315, __pyx_L1_error)
-        __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-        if (__pyx_t_2) {
-          goto __pyx_L8;
-        }
-
-        /* "ai_minimax_alpha_beta.py":318
- *                         # score_player += 1
- *                         pass
- *                     elif board[i][j] == self.opponent:             # <<<<<<<<<<<<<<
- *                         # score_opponent += 1
- *                         pass
- */
-        __pyx_t_6 = __Pyx_GetItemInt(__pyx_v_board, __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 318, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_6);
-        __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_6, __pyx_v_j, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 318, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_1);
-        __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-        __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opponent); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 318, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_6);
-        __pyx_t_5 = PyObject_RichCompare(__pyx_t_1, __pyx_t_6, Py_EQ); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 318, __pyx_L1_error)
-        __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-        __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-        __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 318, __pyx_L1_error)
-        __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-        if (__pyx_t_2) {
-        }
-        __pyx_L8:;
-
-        /* "ai_minimax_alpha_beta.py":321
- *                         # score_opponent += 1
- *                         pass
- *                     if gameutil.checkmuhle(i, j, board, board_muhlen, self.player) and \             # <<<<<<<<<<<<<<
- *                             board[i][j] == self.player:
- *                         score_player += 100
- */
-        __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_gameutil); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 321, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_6);
-        __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_checkmuhle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 321, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_1);
-        __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-        __pyx_t_6 = __Pyx_PyInt_From_long(__pyx_v_i); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 321, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_6);
-        __pyx_t_7 = __Pyx_PyInt_From_long(__pyx_v_j); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 321, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_7);
-        __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_player); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 321, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_8);
-        __pyx_t_9 = NULL;
-        __pyx_t_10 = 0;
-        if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_1))) {
-          __pyx_t_9 = PyMethod_GET_SELF(__pyx_t_1);
-          if (likely(__pyx_t_9)) {
-            PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
-            __Pyx_INCREF(__pyx_t_9);
-            __Pyx_INCREF(function);
-            __Pyx_DECREF_SET(__pyx_t_1, function);
-            __pyx_t_10 = 1;
-          }
-        }
-        #if CYTHON_FAST_PYCALL
-        if (PyFunction_Check(__pyx_t_1)) {
-          PyObject *__pyx_temp[6] = {__pyx_t_9, __pyx_t_6, __pyx_t_7, __pyx_v_board, __pyx_v_board_muhlen, __pyx_t_8};
-          __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_10, 5+__pyx_t_10); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 321, __pyx_L1_error)
-          __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
-          __Pyx_GOTREF(__pyx_t_5);
-          __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-          __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-          __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-        } else
-        #endif
-        #if CYTHON_FAST_PYCCALL
-        if (__Pyx_PyFastCFunction_Check(__pyx_t_1)) {
-          PyObject *__pyx_temp[6] = {__pyx_t_9, __pyx_t_6, __pyx_t_7, __pyx_v_board, __pyx_v_board_muhlen, __pyx_t_8};
-          __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_10, 5+__pyx_t_10); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 321, __pyx_L1_error)
-          __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
-          __Pyx_GOTREF(__pyx_t_5);
-          __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-          __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-          __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-        } else
-        #endif
-        {
-          __pyx_t_11 = PyTuple_New(5+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 321, __pyx_L1_error)
-          __Pyx_GOTREF(__pyx_t_11);
-          if (__pyx_t_9) {
-            __Pyx_GIVEREF(__pyx_t_9); PyTuple_SET_ITEM(__pyx_t_11, 0, __pyx_t_9); __pyx_t_9 = NULL;
-          }
-          __Pyx_GIVEREF(__pyx_t_6);
-          PyTuple_SET_ITEM(__pyx_t_11, 0+__pyx_t_10, __pyx_t_6);
-          __Pyx_GIVEREF(__pyx_t_7);
-          PyTuple_SET_ITEM(__pyx_t_11, 1+__pyx_t_10, __pyx_t_7);
-          __Pyx_INCREF(__pyx_v_board);
-          __Pyx_GIVEREF(__pyx_v_board);
-          PyTuple_SET_ITEM(__pyx_t_11, 2+__pyx_t_10, __pyx_v_board);
-          __Pyx_INCREF(__pyx_v_board_muhlen);
-          __Pyx_GIVEREF(__pyx_v_board_muhlen);
-          PyTuple_SET_ITEM(__pyx_t_11, 3+__pyx_t_10, __pyx_v_board_muhlen);
-          __Pyx_GIVEREF(__pyx_t_8);
-          PyTuple_SET_ITEM(__pyx_t_11, 4+__pyx_t_10, __pyx_t_8);
-          __pyx_t_6 = 0;
-          __pyx_t_7 = 0;
-          __pyx_t_8 = 0;
-          __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_11, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 321, __pyx_L1_error)
-          __Pyx_GOTREF(__pyx_t_5);
-          __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-        }
-        __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-        __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 321, __pyx_L1_error)
-        __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-        if (__pyx_t_12) {
-        } else {
-          __pyx_t_2 = __pyx_t_12;
-          goto __pyx_L10_bool_binop_done;
-        }
-
-        /* "ai_minimax_alpha_beta.py":322
- *                         pass
- *                     if gameutil.checkmuhle(i, j, board, board_muhlen, self.player) and \
- *                             board[i][j] == self.player:             # <<<<<<<<<<<<<<
- *                         score_player += 100
- * 
- */
-        __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_board, __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 322, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_5);
-        __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_5, __pyx_v_j, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 322, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_1);
-        __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-        __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_player); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 322, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_5);
-        __pyx_t_11 = PyObject_RichCompare(__pyx_t_1, __pyx_t_5, Py_EQ); __Pyx_XGOTREF(__pyx_t_11); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 322, __pyx_L1_error)
-        __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-        __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-        __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_11); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 322, __pyx_L1_error)
-        __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-        __pyx_t_2 = __pyx_t_12;
-        __pyx_L10_bool_binop_done:;
-
-        /* "ai_minimax_alpha_beta.py":321
- *                         # score_opponent += 1
- *                         pass
- *                     if gameutil.checkmuhle(i, j, board, board_muhlen, self.player) and \             # <<<<<<<<<<<<<<
- *                             board[i][j] == self.player:
- *                         score_player += 100
- */
-        if (__pyx_t_2) {
-
-          /* "ai_minimax_alpha_beta.py":323
- *                     if gameutil.checkmuhle(i, j, board, board_muhlen, self.player) and \
- *                             board[i][j] == self.player:
- *                         score_player += 100             # <<<<<<<<<<<<<<
- * 
- *                     elif gameutil.checkmuhle(i, j, board, board_muhlen, self.opponent) and \
- */
-          __pyx_t_11 = __Pyx_PyInt_AddObjC(__pyx_v_score_player, __pyx_int_100, 0x64, 1, 0); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 323, __pyx_L1_error)
-          __Pyx_GOTREF(__pyx_t_11);
-          __Pyx_DECREF_SET(__pyx_v_score_player, __pyx_t_11);
-          __pyx_t_11 = 0;
-
-          /* "ai_minimax_alpha_beta.py":321
- *                         # score_opponent += 1
- *                         pass
- *                     if gameutil.checkmuhle(i, j, board, board_muhlen, self.player) and \             # <<<<<<<<<<<<<<
- *                             board[i][j] == self.player:
- *                         score_player += 100
- */
-          goto __pyx_L9;
-        }
-
-        /* "ai_minimax_alpha_beta.py":325
- *                         score_player += 100
- * 
- *                     elif gameutil.checkmuhle(i, j, board, board_muhlen, self.opponent) and \             # <<<<<<<<<<<<<<
- *                             board[i][j] == self.opponent:
- *                         score_opponent += 110
- */
-        __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_gameutil); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 325, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_5);
-        __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_checkmuhle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 325, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_1);
-        __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-        __pyx_t_5 = __Pyx_PyInt_From_long(__pyx_v_i); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 325, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_5);
-        __pyx_t_8 = __Pyx_PyInt_From_long(__pyx_v_j); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 325, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_8);
-        __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opponent); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 325, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_7);
-        __pyx_t_6 = NULL;
-        __pyx_t_10 = 0;
-        if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_1))) {
-          __pyx_t_6 = PyMethod_GET_SELF(__pyx_t_1);
-          if (likely(__pyx_t_6)) {
-            PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
-            __Pyx_INCREF(__pyx_t_6);
-            __Pyx_INCREF(function);
-            __Pyx_DECREF_SET(__pyx_t_1, function);
-            __pyx_t_10 = 1;
-          }
-        }
-        #if CYTHON_FAST_PYCALL
-        if (PyFunction_Check(__pyx_t_1)) {
-          PyObject *__pyx_temp[6] = {__pyx_t_6, __pyx_t_5, __pyx_t_8, __pyx_v_board, __pyx_v_board_muhlen, __pyx_t_7};
-          __pyx_t_11 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_10, 5+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 325, __pyx_L1_error)
-          __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-          __Pyx_GOTREF(__pyx_t_11);
-          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-          __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-          __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-        } else
-        #endif
-        #if CYTHON_FAST_PYCCALL
-        if (__Pyx_PyFastCFunction_Check(__pyx_t_1)) {
-          PyObject *__pyx_temp[6] = {__pyx_t_6, __pyx_t_5, __pyx_t_8, __pyx_v_board, __pyx_v_board_muhlen, __pyx_t_7};
-          __pyx_t_11 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_10, 5+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 325, __pyx_L1_error)
-          __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-          __Pyx_GOTREF(__pyx_t_11);
-          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-          __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-          __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-        } else
-        #endif
-        {
-          __pyx_t_9 = PyTuple_New(5+__pyx_t_10); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 325, __pyx_L1_error)
-          __Pyx_GOTREF(__pyx_t_9);
-          if (__pyx_t_6) {
-            __Pyx_GIVEREF(__pyx_t_6); PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_6); __pyx_t_6 = NULL;
-          }
-          __Pyx_GIVEREF(__pyx_t_5);
-          PyTuple_SET_ITEM(__pyx_t_9, 0+__pyx_t_10, __pyx_t_5);
-          __Pyx_GIVEREF(__pyx_t_8);
-          PyTuple_SET_ITEM(__pyx_t_9, 1+__pyx_t_10, __pyx_t_8);
-          __Pyx_INCREF(__pyx_v_board);
-          __Pyx_GIVEREF(__pyx_v_board);
-          PyTuple_SET_ITEM(__pyx_t_9, 2+__pyx_t_10, __pyx_v_board);
-          __Pyx_INCREF(__pyx_v_board_muhlen);
-          __Pyx_GIVEREF(__pyx_v_board_muhlen);
-          PyTuple_SET_ITEM(__pyx_t_9, 3+__pyx_t_10, __pyx_v_board_muhlen);
-          __Pyx_GIVEREF(__pyx_t_7);
-          PyTuple_SET_ITEM(__pyx_t_9, 4+__pyx_t_10, __pyx_t_7);
-          __pyx_t_5 = 0;
-          __pyx_t_8 = 0;
-          __pyx_t_7 = 0;
-          __pyx_t_11 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_9, NULL); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 325, __pyx_L1_error)
-          __Pyx_GOTREF(__pyx_t_11);
-          __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-        }
-        __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-        __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_11); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 325, __pyx_L1_error)
-        __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-        if (__pyx_t_12) {
-        } else {
-          __pyx_t_2 = __pyx_t_12;
-          goto __pyx_L12_bool_binop_done;
-        }
-
-        /* "ai_minimax_alpha_beta.py":326
- * 
- *                     elif gameutil.checkmuhle(i, j, board, board_muhlen, self.opponent) and \
- *                             board[i][j] == self.opponent:             # <<<<<<<<<<<<<<
- *                         score_opponent += 110
- *                     # score_player += self.number_possible_moves(board, self.player)
- */
-        __pyx_t_11 = __Pyx_GetItemInt(__pyx_v_board, __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 326, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_11);
-        __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_11, __pyx_v_j, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 326, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_1);
-        __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-        __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opponent); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 326, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_11);
-        __pyx_t_9 = PyObject_RichCompare(__pyx_t_1, __pyx_t_11, Py_EQ); __Pyx_XGOTREF(__pyx_t_9); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 326, __pyx_L1_error)
-        __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-        __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-        __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_9); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 326, __pyx_L1_error)
-        __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-        __pyx_t_2 = __pyx_t_12;
-        __pyx_L12_bool_binop_done:;
-
-        /* "ai_minimax_alpha_beta.py":325
- *                         score_player += 100
- * 
- *                     elif gameutil.checkmuhle(i, j, board, board_muhlen, self.opponent) and \             # <<<<<<<<<<<<<<
- *                             board[i][j] == self.opponent:
- *                         score_opponent += 110
- */
-        if (__pyx_t_2) {
-
-          /* "ai_minimax_alpha_beta.py":327
- *                     elif gameutil.checkmuhle(i, j, board, board_muhlen, self.opponent) and \
- *                             board[i][j] == self.opponent:
- *                         score_opponent += 110             # <<<<<<<<<<<<<<
- *                     # score_player += self.number_possible_moves(board, self.player)
- *                     # score_opponent += self.number_possible_moves(board, self.opponent)
- */
-          __pyx_t_9 = __Pyx_PyInt_AddObjC(__pyx_v_score_opponent, __pyx_int_110, 0x6E, 1, 0); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 327, __pyx_L1_error)
-          __Pyx_GOTREF(__pyx_t_9);
-          __Pyx_DECREF_SET(__pyx_v_score_opponent, __pyx_t_9);
-          __pyx_t_9 = 0;
-
-          /* "ai_minimax_alpha_beta.py":325
- *                         score_player += 100
- * 
- *                     elif gameutil.checkmuhle(i, j, board, board_muhlen, self.opponent) and \             # <<<<<<<<<<<<<<
- *                             board[i][j] == self.opponent:
- *                         score_opponent += 110
- */
-        }
-        __pyx_L9:;
-      }
-    }
-
-    /* "ai_minimax_alpha_beta.py":330
- *                     # score_player += self.number_possible_moves(board, self.player)
- *                     # score_opponent += self.number_possible_moves(board, self.opponent)
- *             score = score_player - score_opponent             # <<<<<<<<<<<<<<
- *             static_evaluation = score
- *             # print(score)
- */
-    __pyx_t_9 = PyNumber_Subtract(__pyx_v_score_player, __pyx_v_score_opponent); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 330, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
-    __pyx_v_score = __pyx_t_9;
-    __pyx_t_9 = 0;
-
-    /* "ai_minimax_alpha_beta.py":331
- *                     # score_opponent += self.number_possible_moves(board, self.opponent)
- *             score = score_player - score_opponent
- *             static_evaluation = score             # <<<<<<<<<<<<<<
- *             # print(score)
- *             # End generate static evaluation
- */
-    __Pyx_INCREF(__pyx_v_score);
-    __pyx_v_static_evaluation = __pyx_v_score;
-
-    /* "ai_minimax_alpha_beta.py":334
- *             # print(score)
- *             # End generate static evaluation
- *             return static_evaluation             # <<<<<<<<<<<<<<
- * 
- *         # Make all possible moves
- */
-    __Pyx_XDECREF(__pyx_r);
-    __Pyx_INCREF(__pyx_v_static_evaluation);
-    __pyx_r = __pyx_v_static_evaluation;
-    goto __pyx_L0;
-
-    /* "ai_minimax_alpha_beta.py":310
- *     def minimax_(self, board, board_muhlen, player, alpha, beta, depth):
- *         # Static evaluation
- *         if depth < 1:             # <<<<<<<<<<<<<<
- *             score_player = 0
- *             score_opponent = 0
- */
-  }
-
-  /* "ai_minimax_alpha_beta.py":337
- * 
- *         # Make all possible moves
- *         maxEval = alpha             # <<<<<<<<<<<<<<
- *         minEval = beta
- * 
- */
-  __Pyx_INCREF(__pyx_v_alpha);
-  __pyx_v_maxEval = __pyx_v_alpha;
-
-  /* "ai_minimax_alpha_beta.py":338
- *         # Make all possible moves
- *         maxEval = alpha
- *         minEval = beta             # <<<<<<<<<<<<<<
- * 
- *         for ring in range(3):
- */
-  __Pyx_INCREF(__pyx_v_beta);
-  __pyx_v_minEval = __pyx_v_beta;
-
-  /* "ai_minimax_alpha_beta.py":340
- *         minEval = beta
- * 
- *         for ring in range(3):             # <<<<<<<<<<<<<<
- *             for stelle in range(8):
- *                 if board[ring][stelle] == 0:
- */
-  for (__pyx_t_3 = 0; __pyx_t_3 < 3; __pyx_t_3+=1) {
-    __pyx_v_ring = __pyx_t_3;
-
-    /* "ai_minimax_alpha_beta.py":341
- * 
- *         for ring in range(3):
- *             for stelle in range(8):             # <<<<<<<<<<<<<<
- *                 if board[ring][stelle] == 0:
- *                     board_new = copy.deepcopy(board)
- */
-    for (__pyx_t_4 = 0; __pyx_t_4 < 8; __pyx_t_4+=1) {
-      __pyx_v_stelle = __pyx_t_4;
-
-      /* "ai_minimax_alpha_beta.py":342
- *         for ring in range(3):
- *             for stelle in range(8):
- *                 if board[ring][stelle] == 0:             # <<<<<<<<<<<<<<
- *                     board_new = copy.deepcopy(board)
- *                     board_new[ring][stelle] = player
- */
-      __pyx_t_9 = __Pyx_GetItemInt(__pyx_v_board, __pyx_v_ring, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 342, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_9);
-      __pyx_t_11 = __Pyx_GetItemInt(__pyx_t_9, __pyx_v_stelle, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 342, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_11);
-      __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-      __pyx_t_9 = __Pyx_PyInt_EqObjC(__pyx_t_11, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 342, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_9);
-      __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-      __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_9); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 342, __pyx_L1_error)
-      __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-      if (__pyx_t_2) {
-
-        /* "ai_minimax_alpha_beta.py":343
- *             for stelle in range(8):
- *                 if board[ring][stelle] == 0:
- *                     board_new = copy.deepcopy(board)             # <<<<<<<<<<<<<<
- *                     board_new[ring][stelle] = player
- *                     board_new_muhlen = copy.deepcopy(board_muhlen)
- */
-        __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_n_s_copy); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 343, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_11);
-        __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_11, __pyx_n_s_deepcopy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 343, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_1);
-        __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-        __pyx_t_11 = NULL;
-        if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_1))) {
-          __pyx_t_11 = PyMethod_GET_SELF(__pyx_t_1);
-          if (likely(__pyx_t_11)) {
-            PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
-            __Pyx_INCREF(__pyx_t_11);
-            __Pyx_INCREF(function);
-            __Pyx_DECREF_SET(__pyx_t_1, function);
-          }
-        }
-        __pyx_t_9 = (__pyx_t_11) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_11, __pyx_v_board) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_v_board);
-        __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
-        if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 343, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_9);
-        __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-        __Pyx_XDECREF_SET(__pyx_v_board_new, __pyx_t_9);
-        __pyx_t_9 = 0;
-
-        /* "ai_minimax_alpha_beta.py":344
- *                 if board[ring][stelle] == 0:
- *                     board_new = copy.deepcopy(board)
- *                     board_new[ring][stelle] = player             # <<<<<<<<<<<<<<
- *                     board_new_muhlen = copy.deepcopy(board_muhlen)
- *                     if self.player == player:
- */
-        __pyx_t_9 = __Pyx_GetItemInt(__pyx_v_board_new, __pyx_v_ring, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 344, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_9);
-        if (unlikely(__Pyx_SetItemInt(__pyx_t_9, __pyx_v_stelle, __pyx_v_player, long, 1, __Pyx_PyInt_From_long, 0, 1, 1) < 0)) __PYX_ERR(0, 344, __pyx_L1_error)
-        __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-
-        /* "ai_minimax_alpha_beta.py":345
- *                     board_new = copy.deepcopy(board)
- *                     board_new[ring][stelle] = player
- *                     board_new_muhlen = copy.deepcopy(board_muhlen)             # <<<<<<<<<<<<<<
- *                     if self.player == player:
- *                         # Max player
- */
-        __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_copy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 345, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_1);
-        __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_deepcopy); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 345, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_11);
-        __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-        __pyx_t_1 = NULL;
-        if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_11))) {
-          __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_11);
-          if (likely(__pyx_t_1)) {
-            PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_11);
-            __Pyx_INCREF(__pyx_t_1);
-            __Pyx_INCREF(function);
-            __Pyx_DECREF_SET(__pyx_t_11, function);
-          }
-        }
-        __pyx_t_9 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_11, __pyx_t_1, __pyx_v_board_muhlen) : __Pyx_PyObject_CallOneArg(__pyx_t_11, __pyx_v_board_muhlen);
-        __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-        if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 345, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_9);
-        __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-        __Pyx_XDECREF_SET(__pyx_v_board_new_muhlen, __pyx_t_9);
-        __pyx_t_9 = 0;
-
-        /* "ai_minimax_alpha_beta.py":346
- *                     board_new[ring][stelle] = player
- *                     board_new_muhlen = copy.deepcopy(board_muhlen)
- *                     if self.player == player:             # <<<<<<<<<<<<<<
- *                         # Max player
- *                         evaluation = self.minimax(board_new, board_new_muhlen, 1 if player == 2 else 2, maxEval, beta, depth-1)
- */
-        __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_player); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 346, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_9);
-        __pyx_t_11 = PyObject_RichCompare(__pyx_t_9, __pyx_v_player, Py_EQ); __Pyx_XGOTREF(__pyx_t_11); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 346, __pyx_L1_error)
-        __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-        __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_11); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 346, __pyx_L1_error)
-        __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-        if (__pyx_t_2) {
-
-          /* "ai_minimax_alpha_beta.py":348
- *                     if self.player == player:
- *                         # Max player
- *                         evaluation = self.minimax(board_new, board_new_muhlen, 1 if player == 2 else 2, maxEval, beta, depth-1)             # <<<<<<<<<<<<<<
- *                         if evaluation > maxEval:
- *                             maxEval = evaluation
- */
-          __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_minimax); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 348, __pyx_L1_error)
-          __Pyx_GOTREF(__pyx_t_9);
-          __pyx_t_7 = __Pyx_PyInt_EqObjC(__pyx_v_player, __pyx_int_2, 2, 0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 348, __pyx_L1_error)
-          __Pyx_GOTREF(__pyx_t_7);
-          __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 348, __pyx_L1_error)
-          __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-          if (__pyx_t_2) {
-            __Pyx_INCREF(__pyx_int_1);
-            __pyx_t_1 = __pyx_int_1;
-          } else {
-            __Pyx_INCREF(__pyx_int_2);
-            __pyx_t_1 = __pyx_int_2;
-          }
-          __pyx_t_7 = __Pyx_PyInt_SubtractObjC(__pyx_v_depth, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 348, __pyx_L1_error)
-          __Pyx_GOTREF(__pyx_t_7);
-          __pyx_t_8 = NULL;
-          __pyx_t_10 = 0;
-          if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_9))) {
-            __pyx_t_8 = PyMethod_GET_SELF(__pyx_t_9);
-            if (likely(__pyx_t_8)) {
-              PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_9);
-              __Pyx_INCREF(__pyx_t_8);
-              __Pyx_INCREF(function);
-              __Pyx_DECREF_SET(__pyx_t_9, function);
-              __pyx_t_10 = 1;
-            }
-          }
-          #if CYTHON_FAST_PYCALL
-          if (PyFunction_Check(__pyx_t_9)) {
-            PyObject *__pyx_temp[7] = {__pyx_t_8, __pyx_v_board_new, __pyx_v_board_new_muhlen, __pyx_t_1, __pyx_v_maxEval, __pyx_v_beta, __pyx_t_7};
-            __pyx_t_11 = __Pyx_PyFunction_FastCall(__pyx_t_9, __pyx_temp+1-__pyx_t_10, 6+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 348, __pyx_L1_error)
-            __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-            __Pyx_GOTREF(__pyx_t_11);
-            __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-            __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-          } else
-          #endif
-          #if CYTHON_FAST_PYCCALL
-          if (__Pyx_PyFastCFunction_Check(__pyx_t_9)) {
-            PyObject *__pyx_temp[7] = {__pyx_t_8, __pyx_v_board_new, __pyx_v_board_new_muhlen, __pyx_t_1, __pyx_v_maxEval, __pyx_v_beta, __pyx_t_7};
-            __pyx_t_11 = __Pyx_PyCFunction_FastCall(__pyx_t_9, __pyx_temp+1-__pyx_t_10, 6+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 348, __pyx_L1_error)
-            __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-            __Pyx_GOTREF(__pyx_t_11);
-            __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-            __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-          } else
-          #endif
-          {
-            __pyx_t_5 = PyTuple_New(6+__pyx_t_10); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 348, __pyx_L1_error)
-            __Pyx_GOTREF(__pyx_t_5);
-            if (__pyx_t_8) {
-              __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_8); __pyx_t_8 = NULL;
-            }
-            __Pyx_INCREF(__pyx_v_board_new);
-            __Pyx_GIVEREF(__pyx_v_board_new);
-            PyTuple_SET_ITEM(__pyx_t_5, 0+__pyx_t_10, __pyx_v_board_new);
-            __Pyx_INCREF(__pyx_v_board_new_muhlen);
-            __Pyx_GIVEREF(__pyx_v_board_new_muhlen);
-            PyTuple_SET_ITEM(__pyx_t_5, 1+__pyx_t_10, __pyx_v_board_new_muhlen);
-            __Pyx_GIVEREF(__pyx_t_1);
-            PyTuple_SET_ITEM(__pyx_t_5, 2+__pyx_t_10, __pyx_t_1);
-            __Pyx_INCREF(__pyx_v_maxEval);
-            __Pyx_GIVEREF(__pyx_v_maxEval);
-            PyTuple_SET_ITEM(__pyx_t_5, 3+__pyx_t_10, __pyx_v_maxEval);
-            __Pyx_INCREF(__pyx_v_beta);
-            __Pyx_GIVEREF(__pyx_v_beta);
-            PyTuple_SET_ITEM(__pyx_t_5, 4+__pyx_t_10, __pyx_v_beta);
-            __Pyx_GIVEREF(__pyx_t_7);
-            PyTuple_SET_ITEM(__pyx_t_5, 5+__pyx_t_10, __pyx_t_7);
-            __pyx_t_1 = 0;
-            __pyx_t_7 = 0;
-            __pyx_t_11 = __Pyx_PyObject_Call(__pyx_t_9, __pyx_t_5, NULL); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 348, __pyx_L1_error)
-            __Pyx_GOTREF(__pyx_t_11);
-            __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-          }
-          __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-          __Pyx_XDECREF_SET(__pyx_v_evaluation, __pyx_t_11);
-          __pyx_t_11 = 0;
-
-          /* "ai_minimax_alpha_beta.py":349
- *                         # Max player
- *                         evaluation = self.minimax(board_new, board_new_muhlen, 1 if player == 2 else 2, maxEval, beta, depth-1)
- *                         if evaluation > maxEval:             # <<<<<<<<<<<<<<
- *                             maxEval = evaluation
- *                             if maxEval >= beta:
- */
-          __pyx_t_11 = PyObject_RichCompare(__pyx_v_evaluation, __pyx_v_maxEval, Py_GT); __Pyx_XGOTREF(__pyx_t_11); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 349, __pyx_L1_error)
-          __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_11); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 349, __pyx_L1_error)
-          __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-          if (__pyx_t_2) {
-
-            /* "ai_minimax_alpha_beta.py":350
- *                         evaluation = self.minimax(board_new, board_new_muhlen, 1 if player == 2 else 2, maxEval, beta, depth-1)
- *                         if evaluation > maxEval:
- *                             maxEval = evaluation             # <<<<<<<<<<<<<<
- *                             if maxEval >= beta:
- *                                 print("MAX", maxEval, depth)
- */
-            __Pyx_INCREF(__pyx_v_evaluation);
-            __Pyx_DECREF_SET(__pyx_v_maxEval, __pyx_v_evaluation);
-
-            /* "ai_minimax_alpha_beta.py":351
- *                         if evaluation > maxEval:
- *                             maxEval = evaluation
- *                             if maxEval >= beta:             # <<<<<<<<<<<<<<
- *                                 print("MAX", maxEval, depth)
- *                                 return maxEval
- */
-            __pyx_t_11 = PyObject_RichCompare(__pyx_v_maxEval, __pyx_v_beta, Py_GE); __Pyx_XGOTREF(__pyx_t_11); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 351, __pyx_L1_error)
-            __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_11); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 351, __pyx_L1_error)
-            __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-            if (__pyx_t_2) {
-
-              /* "ai_minimax_alpha_beta.py":352
- *                             maxEval = evaluation
- *                             if maxEval >= beta:
- *                                 print("MAX", maxEval, depth)             # <<<<<<<<<<<<<<
- *                                 return maxEval
- *                     else:
- */
-              __pyx_t_11 = PyTuple_New(3); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 352, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_11);
-              __Pyx_INCREF(__pyx_n_s_MAX);
-              __Pyx_GIVEREF(__pyx_n_s_MAX);
-              PyTuple_SET_ITEM(__pyx_t_11, 0, __pyx_n_s_MAX);
-              __Pyx_INCREF(__pyx_v_maxEval);
-              __Pyx_GIVEREF(__pyx_v_maxEval);
-              PyTuple_SET_ITEM(__pyx_t_11, 1, __pyx_v_maxEval);
-              __Pyx_INCREF(__pyx_v_depth);
-              __Pyx_GIVEREF(__pyx_v_depth);
-              PyTuple_SET_ITEM(__pyx_t_11, 2, __pyx_v_depth);
-              if (__Pyx_PrintOne(0, __pyx_t_11) < 0) __PYX_ERR(0, 352, __pyx_L1_error)
-              __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-
-              /* "ai_minimax_alpha_beta.py":353
- *                             if maxEval >= beta:
- *                                 print("MAX", maxEval, depth)
- *                                 return maxEval             # <<<<<<<<<<<<<<
- *                     else:
- *                         # Min player
- */
-              __Pyx_XDECREF(__pyx_r);
-              __Pyx_INCREF(__pyx_v_maxEval);
-              __pyx_r = __pyx_v_maxEval;
-              goto __pyx_L0;
-
-              /* "ai_minimax_alpha_beta.py":351
- *                         if evaluation > maxEval:
- *                             maxEval = evaluation
- *                             if maxEval >= beta:             # <<<<<<<<<<<<<<
- *                                 print("MAX", maxEval, depth)
- *                                 return maxEval
- */
-            }
-
-            /* "ai_minimax_alpha_beta.py":349
- *                         # Max player
- *                         evaluation = self.minimax(board_new, board_new_muhlen, 1 if player == 2 else 2, maxEval, beta, depth-1)
- *                         if evaluation > maxEval:             # <<<<<<<<<<<<<<
- *                             maxEval = evaluation
- *                             if maxEval >= beta:
- */
-          }
-
-          /* "ai_minimax_alpha_beta.py":346
- *                     board_new[ring][stelle] = player
- *                     board_new_muhlen = copy.deepcopy(board_muhlen)
- *                     if self.player == player:             # <<<<<<<<<<<<<<
- *                         # Max player
- *                         evaluation = self.minimax(board_new, board_new_muhlen, 1 if player == 2 else 2, maxEval, beta, depth-1)
- */
-          goto __pyx_L19;
-        }
-
-        /* "ai_minimax_alpha_beta.py":356
- *                     else:
- *                         # Min player
- *                         evaluation = self.minimax(board_new, board_new_muhlen, 1 if player == 2 else 2, alpha, minEval, depth-1)             # <<<<<<<<<<<<<<
- *                         if evaluation < minEval:
- *                             minEval = evaluation
- */
-        /*else*/ {
-          __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_minimax); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 356, __pyx_L1_error)
-          __Pyx_GOTREF(__pyx_t_9);
-          __pyx_t_7 = __Pyx_PyInt_EqObjC(__pyx_v_player, __pyx_int_2, 2, 0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 356, __pyx_L1_error)
-          __Pyx_GOTREF(__pyx_t_7);
-          __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 356, __pyx_L1_error)
-          __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-          if (__pyx_t_2) {
-            __Pyx_INCREF(__pyx_int_1);
-            __pyx_t_5 = __pyx_int_1;
-          } else {
-            __Pyx_INCREF(__pyx_int_2);
-            __pyx_t_5 = __pyx_int_2;
-          }
-          __pyx_t_7 = __Pyx_PyInt_SubtractObjC(__pyx_v_depth, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 356, __pyx_L1_error)
-          __Pyx_GOTREF(__pyx_t_7);
-          __pyx_t_1 = NULL;
-          __pyx_t_10 = 0;
-          if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_9))) {
-            __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_9);
-            if (likely(__pyx_t_1)) {
-              PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_9);
-              __Pyx_INCREF(__pyx_t_1);
-              __Pyx_INCREF(function);
-              __Pyx_DECREF_SET(__pyx_t_9, function);
-              __pyx_t_10 = 1;
-            }
-          }
-          #if CYTHON_FAST_PYCALL
-          if (PyFunction_Check(__pyx_t_9)) {
-            PyObject *__pyx_temp[7] = {__pyx_t_1, __pyx_v_board_new, __pyx_v_board_new_muhlen, __pyx_t_5, __pyx_v_alpha, __pyx_v_minEval, __pyx_t_7};
-            __pyx_t_11 = __Pyx_PyFunction_FastCall(__pyx_t_9, __pyx_temp+1-__pyx_t_10, 6+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 356, __pyx_L1_error)
-            __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-            __Pyx_GOTREF(__pyx_t_11);
-            __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-            __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-          } else
-          #endif
-          #if CYTHON_FAST_PYCCALL
-          if (__Pyx_PyFastCFunction_Check(__pyx_t_9)) {
-            PyObject *__pyx_temp[7] = {__pyx_t_1, __pyx_v_board_new, __pyx_v_board_new_muhlen, __pyx_t_5, __pyx_v_alpha, __pyx_v_minEval, __pyx_t_7};
-            __pyx_t_11 = __Pyx_PyCFunction_FastCall(__pyx_t_9, __pyx_temp+1-__pyx_t_10, 6+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 356, __pyx_L1_error)
-            __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-            __Pyx_GOTREF(__pyx_t_11);
-            __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-            __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-          } else
-          #endif
-          {
-            __pyx_t_8 = PyTuple_New(6+__pyx_t_10); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 356, __pyx_L1_error)
-            __Pyx_GOTREF(__pyx_t_8);
-            if (__pyx_t_1) {
-              __Pyx_GIVEREF(__pyx_t_1); PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_1); __pyx_t_1 = NULL;
-            }
-            __Pyx_INCREF(__pyx_v_board_new);
-            __Pyx_GIVEREF(__pyx_v_board_new);
-            PyTuple_SET_ITEM(__pyx_t_8, 0+__pyx_t_10, __pyx_v_board_new);
-            __Pyx_INCREF(__pyx_v_board_new_muhlen);
-            __Pyx_GIVEREF(__pyx_v_board_new_muhlen);
-            PyTuple_SET_ITEM(__pyx_t_8, 1+__pyx_t_10, __pyx_v_board_new_muhlen);
-            __Pyx_GIVEREF(__pyx_t_5);
-            PyTuple_SET_ITEM(__pyx_t_8, 2+__pyx_t_10, __pyx_t_5);
-            __Pyx_INCREF(__pyx_v_alpha);
-            __Pyx_GIVEREF(__pyx_v_alpha);
-            PyTuple_SET_ITEM(__pyx_t_8, 3+__pyx_t_10, __pyx_v_alpha);
-            __Pyx_INCREF(__pyx_v_minEval);
-            __Pyx_GIVEREF(__pyx_v_minEval);
-            PyTuple_SET_ITEM(__pyx_t_8, 4+__pyx_t_10, __pyx_v_minEval);
-            __Pyx_GIVEREF(__pyx_t_7);
-            PyTuple_SET_ITEM(__pyx_t_8, 5+__pyx_t_10, __pyx_t_7);
-            __pyx_t_5 = 0;
-            __pyx_t_7 = 0;
-            __pyx_t_11 = __Pyx_PyObject_Call(__pyx_t_9, __pyx_t_8, NULL); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 356, __pyx_L1_error)
-            __Pyx_GOTREF(__pyx_t_11);
-            __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-          }
-          __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-          __Pyx_XDECREF_SET(__pyx_v_evaluation, __pyx_t_11);
-          __pyx_t_11 = 0;
-
-          /* "ai_minimax_alpha_beta.py":357
- *                         # Min player
- *                         evaluation = self.minimax(board_new, board_new_muhlen, 1 if player == 2 else 2, alpha, minEval, depth-1)
- *                         if evaluation < minEval:             # <<<<<<<<<<<<<<
- *                             minEval = evaluation
- *                             if minEval <= alpha:
- */
-          __pyx_t_11 = PyObject_RichCompare(__pyx_v_evaluation, __pyx_v_minEval, Py_LT); __Pyx_XGOTREF(__pyx_t_11); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 357, __pyx_L1_error)
-          __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_11); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 357, __pyx_L1_error)
-          __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-          if (__pyx_t_2) {
-
-            /* "ai_minimax_alpha_beta.py":358
- *                         evaluation = self.minimax(board_new, board_new_muhlen, 1 if player == 2 else 2, alpha, minEval, depth-1)
- *                         if evaluation < minEval:
- *                             minEval = evaluation             # <<<<<<<<<<<<<<
- *                             if minEval <= alpha:
- *                                 print("MIN", minEval, depth)
- */
-            __Pyx_INCREF(__pyx_v_evaluation);
-            __Pyx_DECREF_SET(__pyx_v_minEval, __pyx_v_evaluation);
-
-            /* "ai_minimax_alpha_beta.py":359
- *                         if evaluation < minEval:
- *                             minEval = evaluation
- *                             if minEval <= alpha:             # <<<<<<<<<<<<<<
- *                                 print("MIN", minEval, depth)
- *                                 return minEval
- */
-            __pyx_t_11 = PyObject_RichCompare(__pyx_v_minEval, __pyx_v_alpha, Py_LE); __Pyx_XGOTREF(__pyx_t_11); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 359, __pyx_L1_error)
-            __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_11); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 359, __pyx_L1_error)
-            __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-            if (__pyx_t_2) {
-
-              /* "ai_minimax_alpha_beta.py":360
- *                             minEval = evaluation
- *                             if minEval <= alpha:
- *                                 print("MIN", minEval, depth)             # <<<<<<<<<<<<<<
- *                                 return minEval
- *         if self.player == player:
- */
-              __pyx_t_11 = PyTuple_New(3); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 360, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_11);
-              __Pyx_INCREF(__pyx_n_s_MIN);
-              __Pyx_GIVEREF(__pyx_n_s_MIN);
-              PyTuple_SET_ITEM(__pyx_t_11, 0, __pyx_n_s_MIN);
-              __Pyx_INCREF(__pyx_v_minEval);
-              __Pyx_GIVEREF(__pyx_v_minEval);
-              PyTuple_SET_ITEM(__pyx_t_11, 1, __pyx_v_minEval);
-              __Pyx_INCREF(__pyx_v_depth);
-              __Pyx_GIVEREF(__pyx_v_depth);
-              PyTuple_SET_ITEM(__pyx_t_11, 2, __pyx_v_depth);
-              if (__Pyx_PrintOne(0, __pyx_t_11) < 0) __PYX_ERR(0, 360, __pyx_L1_error)
-              __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-
-              /* "ai_minimax_alpha_beta.py":361
- *                             if minEval <= alpha:
- *                                 print("MIN", minEval, depth)
- *                                 return minEval             # <<<<<<<<<<<<<<
- *         if self.player == player:
- *             print("MAX", maxEval, depth)
- */
-              __Pyx_XDECREF(__pyx_r);
-              __Pyx_INCREF(__pyx_v_minEval);
-              __pyx_r = __pyx_v_minEval;
-              goto __pyx_L0;
-
-              /* "ai_minimax_alpha_beta.py":359
- *                         if evaluation < minEval:
- *                             minEval = evaluation
- *                             if minEval <= alpha:             # <<<<<<<<<<<<<<
- *                                 print("MIN", minEval, depth)
- *                                 return minEval
- */
-            }
-
-            /* "ai_minimax_alpha_beta.py":357
- *                         # Min player
- *                         evaluation = self.minimax(board_new, board_new_muhlen, 1 if player == 2 else 2, alpha, minEval, depth-1)
- *                         if evaluation < minEval:             # <<<<<<<<<<<<<<
- *                             minEval = evaluation
- *                             if minEval <= alpha:
- */
-          }
-        }
-        __pyx_L19:;
-
-        /* "ai_minimax_alpha_beta.py":342
- *         for ring in range(3):
- *             for stelle in range(8):
- *                 if board[ring][stelle] == 0:             # <<<<<<<<<<<<<<
- *                     board_new = copy.deepcopy(board)
- *                     board_new[ring][stelle] = player
- */
-      }
-    }
-  }
-
-  /* "ai_minimax_alpha_beta.py":362
- *                                 print("MIN", minEval, depth)
- *                                 return minEval
- *         if self.player == player:             # <<<<<<<<<<<<<<
- *             print("MAX", maxEval, depth)
- *             return maxEval
- */
-  __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_player); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 362, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_11);
-  __pyx_t_9 = PyObject_RichCompare(__pyx_t_11, __pyx_v_player, Py_EQ); __Pyx_XGOTREF(__pyx_t_9); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 362, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_9); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 362, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-  if (__pyx_t_2) {
-
-    /* "ai_minimax_alpha_beta.py":363
- *                                 return minEval
- *         if self.player == player:
- *             print("MAX", maxEval, depth)             # <<<<<<<<<<<<<<
- *             return maxEval
- *         else:
- */
-    __pyx_t_9 = PyTuple_New(3); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 363, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
-    __Pyx_INCREF(__pyx_n_s_MAX);
-    __Pyx_GIVEREF(__pyx_n_s_MAX);
-    PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_n_s_MAX);
-    __Pyx_INCREF(__pyx_v_maxEval);
-    __Pyx_GIVEREF(__pyx_v_maxEval);
-    PyTuple_SET_ITEM(__pyx_t_9, 1, __pyx_v_maxEval);
-    __Pyx_INCREF(__pyx_v_depth);
-    __Pyx_GIVEREF(__pyx_v_depth);
-    PyTuple_SET_ITEM(__pyx_t_9, 2, __pyx_v_depth);
-    if (__Pyx_PrintOne(0, __pyx_t_9) < 0) __PYX_ERR(0, 363, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-
-    /* "ai_minimax_alpha_beta.py":364
- *         if self.player == player:
- *             print("MAX", maxEval, depth)
- *             return maxEval             # <<<<<<<<<<<<<<
- *         else:
- *             print("MIN", minEval, depth)
- */
-    __Pyx_XDECREF(__pyx_r);
-    __Pyx_INCREF(__pyx_v_maxEval);
-    __pyx_r = __pyx_v_maxEval;
-    goto __pyx_L0;
-
-    /* "ai_minimax_alpha_beta.py":362
- *                                 print("MIN", minEval, depth)
- *                                 return minEval
- *         if self.player == player:             # <<<<<<<<<<<<<<
- *             print("MAX", maxEval, depth)
- *             return maxEval
- */
-  }
-
-  /* "ai_minimax_alpha_beta.py":366
- *             return maxEval
- *         else:
- *             print("MIN", minEval, depth)             # <<<<<<<<<<<<<<
- *             return minEval
- *     ###
- */
-  /*else*/ {
-    __pyx_t_9 = PyTuple_New(3); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 366, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
-    __Pyx_INCREF(__pyx_n_s_MIN);
-    __Pyx_GIVEREF(__pyx_n_s_MIN);
-    PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_n_s_MIN);
-    __Pyx_INCREF(__pyx_v_minEval);
-    __Pyx_GIVEREF(__pyx_v_minEval);
-    PyTuple_SET_ITEM(__pyx_t_9, 1, __pyx_v_minEval);
-    __Pyx_INCREF(__pyx_v_depth);
-    __Pyx_GIVEREF(__pyx_v_depth);
-    PyTuple_SET_ITEM(__pyx_t_9, 2, __pyx_v_depth);
-    if (__Pyx_PrintOne(0, __pyx_t_9) < 0) __PYX_ERR(0, 366, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-
-    /* "ai_minimax_alpha_beta.py":367
- *         else:
- *             print("MIN", minEval, depth)
- *             return minEval             # <<<<<<<<<<<<<<
- *     ###
- *     # Additional Functions for the AI
- */
-    __Pyx_XDECREF(__pyx_r);
-    __Pyx_INCREF(__pyx_v_minEval);
-    __pyx_r = __pyx_v_minEval;
-    goto __pyx_L0;
-  }
-
-  /* "ai_minimax_alpha_beta.py":308
- * 
- *     # Not working, new version found above ^
- *     def minimax_(self, board, board_muhlen, player, alpha, beta, depth):             # <<<<<<<<<<<<<<
- *         # Static evaluation
- *         if depth < 1:
- */
-
-  /* function exit code */
-  __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_XDECREF(__pyx_t_5);
-  __Pyx_XDECREF(__pyx_t_6);
-  __Pyx_XDECREF(__pyx_t_7);
-  __Pyx_XDECREF(__pyx_t_8);
-  __Pyx_XDECREF(__pyx_t_9);
-  __Pyx_XDECREF(__pyx_t_11);
-  __Pyx_AddTraceback("ai_minimax_alpha_beta.Morris.minimax_", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __pyx_r = NULL;
-  __pyx_L0:;
-  __Pyx_XDECREF(__pyx_v_score_player);
-  __Pyx_XDECREF(__pyx_v_score_opponent);
-  __Pyx_XDECREF(__pyx_v_score);
-  __Pyx_XDECREF(__pyx_v_static_evaluation);
-  __Pyx_XDECREF(__pyx_v_maxEval);
-  __Pyx_XDECREF(__pyx_v_minEval);
-  __Pyx_XDECREF(__pyx_v_board_new);
-  __Pyx_XDECREF(__pyx_v_board_new_muhlen);
-  __Pyx_XDECREF(__pyx_v_evaluation);
-  __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-/* "ai_minimax_alpha_beta.py":372
+/* "ai_minimax_alpha_beta.py":297
  *     ###
  * 
  *     def number_possible_moves(self, board, player):             # <<<<<<<<<<<<<<
@@ -9047,9 +8368,9 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_6minimax_(CYTHON_UNUSE
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_21ai_minimax_alpha_beta_6Morris_9number_possible_moves(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_21ai_minimax_alpha_beta_6Morris_9number_possible_moves = {"number_possible_moves", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_21ai_minimax_alpha_beta_6Morris_9number_possible_moves, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_21ai_minimax_alpha_beta_6Morris_9number_possible_moves(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_21ai_minimax_alpha_beta_6Morris_7number_possible_moves(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_21ai_minimax_alpha_beta_6Morris_7number_possible_moves = {"number_possible_moves", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_21ai_minimax_alpha_beta_6Morris_7number_possible_moves, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_21ai_minimax_alpha_beta_6Morris_7number_possible_moves(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_self = 0;
   PyObject *__pyx_v_board = 0;
   PyObject *__pyx_v_player = 0;
@@ -9081,17 +8402,17 @@ static PyObject *__pyx_pw_21ai_minimax_alpha_beta_6Morris_9number_possible_moves
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_board)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("number_possible_moves", 1, 3, 3, 1); __PYX_ERR(0, 372, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("number_possible_moves", 1, 3, 3, 1); __PYX_ERR(0, 297, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_player)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("number_possible_moves", 1, 3, 3, 2); __PYX_ERR(0, 372, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("number_possible_moves", 1, 3, 3, 2); __PYX_ERR(0, 297, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "number_possible_moves") < 0)) __PYX_ERR(0, 372, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "number_possible_moves") < 0)) __PYX_ERR(0, 297, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 3) {
       goto __pyx_L5_argtuple_error;
@@ -9106,20 +8427,20 @@ static PyObject *__pyx_pw_21ai_minimax_alpha_beta_6Morris_9number_possible_moves
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("number_possible_moves", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 372, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("number_possible_moves", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 297, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("ai_minimax_alpha_beta.Morris.number_possible_moves", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_21ai_minimax_alpha_beta_6Morris_8number_possible_moves(__pyx_self, __pyx_v_self, __pyx_v_board, __pyx_v_player);
+  __pyx_r = __pyx_pf_21ai_minimax_alpha_beta_6Morris_6number_possible_moves(__pyx_self, __pyx_v_self, __pyx_v_board, __pyx_v_player);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_8number_possible_moves(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_board, PyObject *__pyx_v_player) {
+static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_6number_possible_moves(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_board, PyObject *__pyx_v_player) {
   PyObject *__pyx_v_n = NULL;
   PyObject *__pyx_v_i = NULL;
   PyObject *__pyx_v_j = NULL;
@@ -9134,7 +8455,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_8number_possible_moves
   int __pyx_t_7;
   __Pyx_RefNannySetupContext("number_possible_moves", 0);
 
-  /* "ai_minimax_alpha_beta.py":373
+  /* "ai_minimax_alpha_beta.py":298
  * 
  *     def number_possible_moves(self, board, player):
  *         n = 0             # <<<<<<<<<<<<<<
@@ -9144,7 +8465,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_8number_possible_moves
   __Pyx_INCREF(__pyx_int_0);
   __pyx_v_n = __pyx_int_0;
 
-  /* "ai_minimax_alpha_beta.py":374
+  /* "ai_minimax_alpha_beta.py":299
  *     def number_possible_moves(self, board, player):
  *         n = 0
  *         for i in range(3):             # <<<<<<<<<<<<<<
@@ -9152,12 +8473,12 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_8number_possible_moves
  *                 if board[i][j] == player:
  */
   for (__pyx_t_1 = 0; __pyx_t_1 < 3; __pyx_t_1+=1) {
-    __pyx_t_2 = __Pyx_PyInt_From_long(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 374, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyInt_From_long(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 299, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_XDECREF_SET(__pyx_v_i, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "ai_minimax_alpha_beta.py":375
+    /* "ai_minimax_alpha_beta.py":300
  *         n = 0
  *         for i in range(3):
  *             for j in range(8):             # <<<<<<<<<<<<<<
@@ -9165,67 +8486,67 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_8number_possible_moves
  *                     # Left/Right you can go anytime, anywhere
  */
     for (__pyx_t_3 = 0; __pyx_t_3 < 8; __pyx_t_3+=1) {
-      __pyx_t_2 = __Pyx_PyInt_From_long(__pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 375, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyInt_From_long(__pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 300, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_XDECREF_SET(__pyx_v_j, __pyx_t_2);
       __pyx_t_2 = 0;
 
-      /* "ai_minimax_alpha_beta.py":376
+      /* "ai_minimax_alpha_beta.py":301
  *         for i in range(3):
  *             for j in range(8):
  *                 if board[i][j] == player:             # <<<<<<<<<<<<<<
  *                     # Left/Right you can go anytime, anywhere
  *                     if board[i][(j + 1) % 8] == 0:
  */
-      __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_v_board, __pyx_v_i); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 376, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_v_board, __pyx_v_i); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 301, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_t_2, __pyx_v_j); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 376, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_t_2, __pyx_v_j); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 301, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __pyx_t_2 = PyObject_RichCompare(__pyx_t_4, __pyx_v_player, Py_EQ); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 376, __pyx_L1_error)
+      __pyx_t_2 = PyObject_RichCompare(__pyx_t_4, __pyx_v_player, Py_EQ); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 301, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 376, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 301, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       if (__pyx_t_5) {
 
-        /* "ai_minimax_alpha_beta.py":378
+        /* "ai_minimax_alpha_beta.py":303
  *                 if board[i][j] == player:
  *                     # Left/Right you can go anytime, anywhere
  *                     if board[i][(j + 1) % 8] == 0:             # <<<<<<<<<<<<<<
  *                         n += 1
  *                     if board[i][(j - 1) % 8] == 0:
  */
-        __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_v_board, __pyx_v_i); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 378, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_v_board, __pyx_v_i); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 303, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
-        __pyx_t_4 = __Pyx_PyInt_AddObjC(__pyx_v_j, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 378, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyInt_AddObjC(__pyx_v_j, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 303, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
-        __pyx_t_6 = __Pyx_PyInt_RemainderObjC(__pyx_t_4, __pyx_int_8, 8, 0, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 378, __pyx_L1_error)
+        __pyx_t_6 = __Pyx_PyInt_RemainderObjC(__pyx_t_4, __pyx_int_8, 8, 0, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 303, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-        __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_t_2, __pyx_t_6); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 378, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_t_2, __pyx_t_6); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 303, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-        __pyx_t_6 = __Pyx_PyInt_EqObjC(__pyx_t_4, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 378, __pyx_L1_error)
+        __pyx_t_6 = __Pyx_PyInt_EqObjC(__pyx_t_4, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 303, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-        __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 378, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 303, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
         if (__pyx_t_5) {
 
-          /* "ai_minimax_alpha_beta.py":379
+          /* "ai_minimax_alpha_beta.py":304
  *                     # Left/Right you can go anytime, anywhere
  *                     if board[i][(j + 1) % 8] == 0:
  *                         n += 1             # <<<<<<<<<<<<<<
  *                     if board[i][(j - 1) % 8] == 0:
  *                         n += 1
  */
-          __pyx_t_6 = __Pyx_PyInt_AddObjC(__pyx_v_n, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 379, __pyx_L1_error)
+          __pyx_t_6 = __Pyx_PyInt_AddObjC(__pyx_v_n, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 304, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_6);
           __Pyx_DECREF_SET(__pyx_v_n, __pyx_t_6);
           __pyx_t_6 = 0;
 
-          /* "ai_minimax_alpha_beta.py":378
+          /* "ai_minimax_alpha_beta.py":303
  *                 if board[i][j] == player:
  *                     # Left/Right you can go anytime, anywhere
  *                     if board[i][(j + 1) % 8] == 0:             # <<<<<<<<<<<<<<
@@ -9234,44 +8555,44 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_8number_possible_moves
  */
         }
 
-        /* "ai_minimax_alpha_beta.py":380
+        /* "ai_minimax_alpha_beta.py":305
  *                     if board[i][(j + 1) % 8] == 0:
  *                         n += 1
  *                     if board[i][(j - 1) % 8] == 0:             # <<<<<<<<<<<<<<
  *                         n += 1
  *                     # Up/Down you can only go in center positions
  */
-        __pyx_t_6 = __Pyx_PyObject_GetItem(__pyx_v_board, __pyx_v_i); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 380, __pyx_L1_error)
+        __pyx_t_6 = __Pyx_PyObject_GetItem(__pyx_v_board, __pyx_v_i); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 305, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
-        __pyx_t_4 = __Pyx_PyInt_SubtractObjC(__pyx_v_j, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 380, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyInt_SubtractObjC(__pyx_v_j, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 305, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
-        __pyx_t_2 = __Pyx_PyInt_RemainderObjC(__pyx_t_4, __pyx_int_8, 8, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 380, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyInt_RemainderObjC(__pyx_t_4, __pyx_int_8, 8, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 305, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-        __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_t_6, __pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 380, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_t_6, __pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 305, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-        __pyx_t_2 = __Pyx_PyInt_EqObjC(__pyx_t_4, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 380, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyInt_EqObjC(__pyx_t_4, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 305, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-        __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 380, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 305, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         if (__pyx_t_5) {
 
-          /* "ai_minimax_alpha_beta.py":381
+          /* "ai_minimax_alpha_beta.py":306
  *                         n += 1
  *                     if board[i][(j - 1) % 8] == 0:
  *                         n += 1             # <<<<<<<<<<<<<<
  *                     # Up/Down you can only go in center positions
  *                     if j % 2 != 0:
  */
-          __pyx_t_2 = __Pyx_PyInt_AddObjC(__pyx_v_n, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 381, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyInt_AddObjC(__pyx_v_n, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 306, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF_SET(__pyx_v_n, __pyx_t_2);
           __pyx_t_2 = 0;
 
-          /* "ai_minimax_alpha_beta.py":380
+          /* "ai_minimax_alpha_beta.py":305
  *                     if board[i][(j + 1) % 8] == 0:
  *                         n += 1
  *                     if board[i][(j - 1) % 8] == 0:             # <<<<<<<<<<<<<<
@@ -9280,68 +8601,68 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_8number_possible_moves
  */
         }
 
-        /* "ai_minimax_alpha_beta.py":383
+        /* "ai_minimax_alpha_beta.py":308
  *                         n += 1
  *                     # Up/Down you can only go in center positions
  *                     if j % 2 != 0:             # <<<<<<<<<<<<<<
  *                         if i == 0 and board[i + 1][j] == 0:
  *                             n += 1
  */
-        __pyx_t_2 = __Pyx_PyInt_RemainderObjC(__pyx_v_j, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 383, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyInt_RemainderObjC(__pyx_v_j, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 308, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
-        __pyx_t_4 = __Pyx_PyInt_NeObjC(__pyx_t_2, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 383, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyInt_NeObjC(__pyx_t_2, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 308, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-        __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 383, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 308, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
         if (__pyx_t_5) {
 
-          /* "ai_minimax_alpha_beta.py":384
+          /* "ai_minimax_alpha_beta.py":309
  *                     # Up/Down you can only go in center positions
  *                     if j % 2 != 0:
  *                         if i == 0 and board[i + 1][j] == 0:             # <<<<<<<<<<<<<<
  *                             n += 1
  *                         if i == 1 and board[i + 1][j] == 0:
  */
-          __pyx_t_4 = __Pyx_PyInt_EqObjC(__pyx_v_i, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 384, __pyx_L1_error)
+          __pyx_t_4 = __Pyx_PyInt_EqObjC(__pyx_v_i, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 309, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_4);
-          __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 384, __pyx_L1_error)
+          __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 309, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
           if (__pyx_t_7) {
           } else {
             __pyx_t_5 = __pyx_t_7;
             goto __pyx_L12_bool_binop_done;
           }
-          __pyx_t_4 = __Pyx_PyInt_AddObjC(__pyx_v_i, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 384, __pyx_L1_error)
+          __pyx_t_4 = __Pyx_PyInt_AddObjC(__pyx_v_i, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 309, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_4);
-          __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_v_board, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 384, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_v_board, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 309, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_t_2, __pyx_v_j); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 384, __pyx_L1_error)
+          __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_t_2, __pyx_v_j); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 309, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_4);
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-          __pyx_t_2 = __Pyx_PyInt_EqObjC(__pyx_t_4, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 384, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyInt_EqObjC(__pyx_t_4, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 309, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 384, __pyx_L1_error)
+          __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 309, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
           __pyx_t_5 = __pyx_t_7;
           __pyx_L12_bool_binop_done:;
           if (__pyx_t_5) {
 
-            /* "ai_minimax_alpha_beta.py":385
+            /* "ai_minimax_alpha_beta.py":310
  *                     if j % 2 != 0:
  *                         if i == 0 and board[i + 1][j] == 0:
  *                             n += 1             # <<<<<<<<<<<<<<
  *                         if i == 1 and board[i + 1][j] == 0:
  *                             n += 1
  */
-            __pyx_t_2 = __Pyx_PyInt_AddObjC(__pyx_v_n, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 385, __pyx_L1_error)
+            __pyx_t_2 = __Pyx_PyInt_AddObjC(__pyx_v_n, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 310, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_2);
             __Pyx_DECREF_SET(__pyx_v_n, __pyx_t_2);
             __pyx_t_2 = 0;
 
-            /* "ai_minimax_alpha_beta.py":384
+            /* "ai_minimax_alpha_beta.py":309
  *                     # Up/Down you can only go in center positions
  *                     if j % 2 != 0:
  *                         if i == 0 and board[i + 1][j] == 0:             # <<<<<<<<<<<<<<
@@ -9350,52 +8671,52 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_8number_possible_moves
  */
           }
 
-          /* "ai_minimax_alpha_beta.py":386
+          /* "ai_minimax_alpha_beta.py":311
  *                         if i == 0 and board[i + 1][j] == 0:
  *                             n += 1
  *                         if i == 1 and board[i + 1][j] == 0:             # <<<<<<<<<<<<<<
  *                             n += 1
  *                         if i == 1 and board[i - 1][j] == 0:
  */
-          __pyx_t_2 = __Pyx_PyInt_EqObjC(__pyx_v_i, __pyx_int_1, 1, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 386, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyInt_EqObjC(__pyx_v_i, __pyx_int_1, 1, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 311, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
-          __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 386, __pyx_L1_error)
+          __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 311, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
           if (__pyx_t_7) {
           } else {
             __pyx_t_5 = __pyx_t_7;
             goto __pyx_L15_bool_binop_done;
           }
-          __pyx_t_2 = __Pyx_PyInt_AddObjC(__pyx_v_i, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 386, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyInt_AddObjC(__pyx_v_i, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 311, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
-          __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_v_board, __pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 386, __pyx_L1_error)
+          __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_v_board, __pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 311, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_4);
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-          __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_t_4, __pyx_v_j); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 386, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_t_4, __pyx_v_j); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 311, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          __pyx_t_4 = __Pyx_PyInt_EqObjC(__pyx_t_2, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 386, __pyx_L1_error)
+          __pyx_t_4 = __Pyx_PyInt_EqObjC(__pyx_t_2, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 311, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_4);
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-          __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 386, __pyx_L1_error)
+          __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 311, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
           __pyx_t_5 = __pyx_t_7;
           __pyx_L15_bool_binop_done:;
           if (__pyx_t_5) {
 
-            /* "ai_minimax_alpha_beta.py":387
+            /* "ai_minimax_alpha_beta.py":312
  *                             n += 1
  *                         if i == 1 and board[i + 1][j] == 0:
  *                             n += 1             # <<<<<<<<<<<<<<
  *                         if i == 1 and board[i - 1][j] == 0:
  *                             n += 1
  */
-            __pyx_t_4 = __Pyx_PyInt_AddObjC(__pyx_v_n, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 387, __pyx_L1_error)
+            __pyx_t_4 = __Pyx_PyInt_AddObjC(__pyx_v_n, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 312, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_4);
             __Pyx_DECREF_SET(__pyx_v_n, __pyx_t_4);
             __pyx_t_4 = 0;
 
-            /* "ai_minimax_alpha_beta.py":386
+            /* "ai_minimax_alpha_beta.py":311
  *                         if i == 0 and board[i + 1][j] == 0:
  *                             n += 1
  *                         if i == 1 and board[i + 1][j] == 0:             # <<<<<<<<<<<<<<
@@ -9404,52 +8725,52 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_8number_possible_moves
  */
           }
 
-          /* "ai_minimax_alpha_beta.py":388
+          /* "ai_minimax_alpha_beta.py":313
  *                         if i == 1 and board[i + 1][j] == 0:
  *                             n += 1
  *                         if i == 1 and board[i - 1][j] == 0:             # <<<<<<<<<<<<<<
  *                             n += 1
  *                         if i == 2 and board[i - 1][j] == 0:
  */
-          __pyx_t_4 = __Pyx_PyInt_EqObjC(__pyx_v_i, __pyx_int_1, 1, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 388, __pyx_L1_error)
+          __pyx_t_4 = __Pyx_PyInt_EqObjC(__pyx_v_i, __pyx_int_1, 1, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 313, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_4);
-          __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 388, __pyx_L1_error)
+          __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 313, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
           if (__pyx_t_7) {
           } else {
             __pyx_t_5 = __pyx_t_7;
             goto __pyx_L18_bool_binop_done;
           }
-          __pyx_t_4 = __Pyx_PyInt_SubtractObjC(__pyx_v_i, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 388, __pyx_L1_error)
+          __pyx_t_4 = __Pyx_PyInt_SubtractObjC(__pyx_v_i, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 313, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_4);
-          __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_v_board, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 388, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_v_board, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 313, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_t_2, __pyx_v_j); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 388, __pyx_L1_error)
+          __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_t_2, __pyx_v_j); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 313, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_4);
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-          __pyx_t_2 = __Pyx_PyInt_EqObjC(__pyx_t_4, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 388, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyInt_EqObjC(__pyx_t_4, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 313, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 388, __pyx_L1_error)
+          __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 313, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
           __pyx_t_5 = __pyx_t_7;
           __pyx_L18_bool_binop_done:;
           if (__pyx_t_5) {
 
-            /* "ai_minimax_alpha_beta.py":389
+            /* "ai_minimax_alpha_beta.py":314
  *                             n += 1
  *                         if i == 1 and board[i - 1][j] == 0:
  *                             n += 1             # <<<<<<<<<<<<<<
  *                         if i == 2 and board[i - 1][j] == 0:
  *                             n += 1
  */
-            __pyx_t_2 = __Pyx_PyInt_AddObjC(__pyx_v_n, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 389, __pyx_L1_error)
+            __pyx_t_2 = __Pyx_PyInt_AddObjC(__pyx_v_n, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 314, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_2);
             __Pyx_DECREF_SET(__pyx_v_n, __pyx_t_2);
             __pyx_t_2 = 0;
 
-            /* "ai_minimax_alpha_beta.py":388
+            /* "ai_minimax_alpha_beta.py":313
  *                         if i == 1 and board[i + 1][j] == 0:
  *                             n += 1
  *                         if i == 1 and board[i - 1][j] == 0:             # <<<<<<<<<<<<<<
@@ -9458,52 +8779,52 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_8number_possible_moves
  */
           }
 
-          /* "ai_minimax_alpha_beta.py":390
+          /* "ai_minimax_alpha_beta.py":315
  *                         if i == 1 and board[i - 1][j] == 0:
  *                             n += 1
  *                         if i == 2 and board[i - 1][j] == 0:             # <<<<<<<<<<<<<<
  *                             n += 1
  *         return n
  */
-          __pyx_t_2 = __Pyx_PyInt_EqObjC(__pyx_v_i, __pyx_int_2, 2, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 390, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyInt_EqObjC(__pyx_v_i, __pyx_int_2, 2, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 315, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
-          __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 390, __pyx_L1_error)
+          __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 315, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
           if (__pyx_t_7) {
           } else {
             __pyx_t_5 = __pyx_t_7;
             goto __pyx_L21_bool_binop_done;
           }
-          __pyx_t_2 = __Pyx_PyInt_SubtractObjC(__pyx_v_i, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 390, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyInt_SubtractObjC(__pyx_v_i, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 315, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
-          __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_v_board, __pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 390, __pyx_L1_error)
+          __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_v_board, __pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 315, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_4);
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-          __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_t_4, __pyx_v_j); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 390, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_t_4, __pyx_v_j); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 315, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          __pyx_t_4 = __Pyx_PyInt_EqObjC(__pyx_t_2, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 390, __pyx_L1_error)
+          __pyx_t_4 = __Pyx_PyInt_EqObjC(__pyx_t_2, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 315, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_4);
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-          __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 390, __pyx_L1_error)
+          __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 315, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
           __pyx_t_5 = __pyx_t_7;
           __pyx_L21_bool_binop_done:;
           if (__pyx_t_5) {
 
-            /* "ai_minimax_alpha_beta.py":391
+            /* "ai_minimax_alpha_beta.py":316
  *                             n += 1
  *                         if i == 2 and board[i - 1][j] == 0:
  *                             n += 1             # <<<<<<<<<<<<<<
  *         return n
  * 
  */
-            __pyx_t_4 = __Pyx_PyInt_AddObjC(__pyx_v_n, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 391, __pyx_L1_error)
+            __pyx_t_4 = __Pyx_PyInt_AddObjC(__pyx_v_n, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 316, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_4);
             __Pyx_DECREF_SET(__pyx_v_n, __pyx_t_4);
             __pyx_t_4 = 0;
 
-            /* "ai_minimax_alpha_beta.py":390
+            /* "ai_minimax_alpha_beta.py":315
  *                         if i == 1 and board[i - 1][j] == 0:
  *                             n += 1
  *                         if i == 2 and board[i - 1][j] == 0:             # <<<<<<<<<<<<<<
@@ -9512,7 +8833,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_8number_possible_moves
  */
           }
 
-          /* "ai_minimax_alpha_beta.py":383
+          /* "ai_minimax_alpha_beta.py":308
  *                         n += 1
  *                     # Up/Down you can only go in center positions
  *                     if j % 2 != 0:             # <<<<<<<<<<<<<<
@@ -9521,7 +8842,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_8number_possible_moves
  */
         }
 
-        /* "ai_minimax_alpha_beta.py":376
+        /* "ai_minimax_alpha_beta.py":301
  *         for i in range(3):
  *             for j in range(8):
  *                 if board[i][j] == player:             # <<<<<<<<<<<<<<
@@ -9532,7 +8853,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_8number_possible_moves
     }
   }
 
-  /* "ai_minimax_alpha_beta.py":392
+  /* "ai_minimax_alpha_beta.py":317
  *                         if i == 2 and board[i - 1][j] == 0:
  *                             n += 1
  *         return n             # <<<<<<<<<<<<<<
@@ -9544,7 +8865,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_8number_possible_moves
   __pyx_r = __pyx_v_n;
   goto __pyx_L0;
 
-  /* "ai_minimax_alpha_beta.py":372
+  /* "ai_minimax_alpha_beta.py":297
  *     ###
  * 
  *     def number_possible_moves(self, board, player):             # <<<<<<<<<<<<<<
@@ -9568,7 +8889,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_8number_possible_moves
   return __pyx_r;
 }
 
-/* "ai_minimax_alpha_beta.py":394
+/* "ai_minimax_alpha_beta.py":319
  *         return n
  * 
  *     def possiblemoves(self, ringpos, stellepos, spielfeld):             # <<<<<<<<<<<<<<
@@ -9577,9 +8898,9 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_8number_possible_moves
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_21ai_minimax_alpha_beta_6Morris_11possiblemoves(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_21ai_minimax_alpha_beta_6Morris_11possiblemoves = {"possiblemoves", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_21ai_minimax_alpha_beta_6Morris_11possiblemoves, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_21ai_minimax_alpha_beta_6Morris_11possiblemoves(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_21ai_minimax_alpha_beta_6Morris_9possiblemoves(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_21ai_minimax_alpha_beta_6Morris_9possiblemoves = {"possiblemoves", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_21ai_minimax_alpha_beta_6Morris_9possiblemoves, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_21ai_minimax_alpha_beta_6Morris_9possiblemoves(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_self = 0;
   PyObject *__pyx_v_ringpos = 0;
   PyObject *__pyx_v_stellepos = 0;
@@ -9614,23 +8935,23 @@ static PyObject *__pyx_pw_21ai_minimax_alpha_beta_6Morris_11possiblemoves(PyObje
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ringpos)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("possiblemoves", 1, 4, 4, 1); __PYX_ERR(0, 394, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("possiblemoves", 1, 4, 4, 1); __PYX_ERR(0, 319, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_stellepos)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("possiblemoves", 1, 4, 4, 2); __PYX_ERR(0, 394, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("possiblemoves", 1, 4, 4, 2); __PYX_ERR(0, 319, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_spielfeld)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("possiblemoves", 1, 4, 4, 3); __PYX_ERR(0, 394, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("possiblemoves", 1, 4, 4, 3); __PYX_ERR(0, 319, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "possiblemoves") < 0)) __PYX_ERR(0, 394, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "possiblemoves") < 0)) __PYX_ERR(0, 319, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
       goto __pyx_L5_argtuple_error;
@@ -9647,20 +8968,20 @@ static PyObject *__pyx_pw_21ai_minimax_alpha_beta_6Morris_11possiblemoves(PyObje
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("possiblemoves", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 394, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("possiblemoves", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 319, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("ai_minimax_alpha_beta.Morris.possiblemoves", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_21ai_minimax_alpha_beta_6Morris_10possiblemoves(__pyx_self, __pyx_v_self, __pyx_v_ringpos, __pyx_v_stellepos, __pyx_v_spielfeld);
+  __pyx_r = __pyx_pf_21ai_minimax_alpha_beta_6Morris_8possiblemoves(__pyx_self, __pyx_v_self, __pyx_v_ringpos, __pyx_v_stellepos, __pyx_v_spielfeld);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_10possiblemoves(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_ringpos, PyObject *__pyx_v_stellepos, PyObject *__pyx_v_spielfeld) {
+static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_8possiblemoves(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_ringpos, PyObject *__pyx_v_stellepos, PyObject *__pyx_v_spielfeld) {
   PyObject *__pyx_v_possiblemoves = NULL;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -9672,72 +8993,72 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_10possiblemoves(CYTHON
   Py_ssize_t __pyx_t_6;
   __Pyx_RefNannySetupContext("possiblemoves", 0);
 
-  /* "ai_minimax_alpha_beta.py":395
+  /* "ai_minimax_alpha_beta.py":320
  * 
  *     def possiblemoves(self, ringpos, stellepos, spielfeld):
  *         possiblemoves = []             # <<<<<<<<<<<<<<
  *         if stellepos % 2 == 0:  # Men on the edges
  *             if spielfeld[ringpos][(stellepos+1) % 8] == 0:  # Sideways
  */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 395, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 320, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_possiblemoves = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "ai_minimax_alpha_beta.py":396
+  /* "ai_minimax_alpha_beta.py":321
  *     def possiblemoves(self, ringpos, stellepos, spielfeld):
  *         possiblemoves = []
  *         if stellepos % 2 == 0:  # Men on the edges             # <<<<<<<<<<<<<<
  *             if spielfeld[ringpos][(stellepos+1) % 8] == 0:  # Sideways
  *                 possiblemoves.append((ringpos, (stellepos+1) % 8))
  */
-  __pyx_t_1 = __Pyx_PyInt_RemainderObjC(__pyx_v_stellepos, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 396, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_RemainderObjC(__pyx_v_stellepos, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 321, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyInt_EqObjC(__pyx_t_1, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 396, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_EqObjC(__pyx_t_1, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 321, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 396, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 321, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   if (__pyx_t_3) {
 
-    /* "ai_minimax_alpha_beta.py":397
+    /* "ai_minimax_alpha_beta.py":322
  *         possiblemoves = []
  *         if stellepos % 2 == 0:  # Men on the edges
  *             if spielfeld[ringpos][(stellepos+1) % 8] == 0:  # Sideways             # <<<<<<<<<<<<<<
  *                 possiblemoves.append((ringpos, (stellepos+1) % 8))
  *             if spielfeld[ringpos][(stellepos-1) % 8] == 0:
  */
-    __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_v_spielfeld, __pyx_v_ringpos); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 397, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_v_spielfeld, __pyx_v_ringpos); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 322, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_1 = __Pyx_PyInt_AddObjC(__pyx_v_stellepos, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 397, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyInt_AddObjC(__pyx_v_stellepos, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 322, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_4 = __Pyx_PyInt_RemainderObjC(__pyx_t_1, __pyx_int_8, 8, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 397, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyInt_RemainderObjC(__pyx_t_1, __pyx_int_8, 8, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 322, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 397, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 322, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = __Pyx_PyInt_EqObjC(__pyx_t_1, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 397, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyInt_EqObjC(__pyx_t_1, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 322, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 397, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 322, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     if (__pyx_t_3) {
 
-      /* "ai_minimax_alpha_beta.py":398
+      /* "ai_minimax_alpha_beta.py":323
  *         if stellepos % 2 == 0:  # Men on the edges
  *             if spielfeld[ringpos][(stellepos+1) % 8] == 0:  # Sideways
  *                 possiblemoves.append((ringpos, (stellepos+1) % 8))             # <<<<<<<<<<<<<<
  *             if spielfeld[ringpos][(stellepos-1) % 8] == 0:
  *                 possiblemoves.append((ringpos, (stellepos-1) % 8))
  */
-      __pyx_t_4 = __Pyx_PyInt_AddObjC(__pyx_v_stellepos, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 398, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyInt_AddObjC(__pyx_v_stellepos, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 323, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_1 = __Pyx_PyInt_RemainderObjC(__pyx_t_4, __pyx_int_8, 8, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 398, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyInt_RemainderObjC(__pyx_t_4, __pyx_int_8, 8, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 323, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 398, __pyx_L1_error)
+      __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 323, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_INCREF(__pyx_v_ringpos);
       __Pyx_GIVEREF(__pyx_v_ringpos);
@@ -9745,10 +9066,10 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_10possiblemoves(CYTHON
       __Pyx_GIVEREF(__pyx_t_1);
       PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_t_1);
       __pyx_t_1 = 0;
-      __pyx_t_5 = __Pyx_PyList_Append(__pyx_v_possiblemoves, __pyx_t_4); if (unlikely(__pyx_t_5 == ((int)-1))) __PYX_ERR(0, 398, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyList_Append(__pyx_v_possiblemoves, __pyx_t_4); if (unlikely(__pyx_t_5 == ((int)-1))) __PYX_ERR(0, 323, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-      /* "ai_minimax_alpha_beta.py":397
+      /* "ai_minimax_alpha_beta.py":322
  *         possiblemoves = []
  *         if stellepos % 2 == 0:  # Men on the edges
  *             if spielfeld[ringpos][(stellepos+1) % 8] == 0:  # Sideways             # <<<<<<<<<<<<<<
@@ -9757,44 +9078,44 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_10possiblemoves(CYTHON
  */
     }
 
-    /* "ai_minimax_alpha_beta.py":399
+    /* "ai_minimax_alpha_beta.py":324
  *             if spielfeld[ringpos][(stellepos+1) % 8] == 0:  # Sideways
  *                 possiblemoves.append((ringpos, (stellepos+1) % 8))
  *             if spielfeld[ringpos][(stellepos-1) % 8] == 0:             # <<<<<<<<<<<<<<
  *                 possiblemoves.append((ringpos, (stellepos-1) % 8))
  *         else:  # Men on the center fields
  */
-    __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_v_spielfeld, __pyx_v_ringpos); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 399, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_v_spielfeld, __pyx_v_ringpos); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 324, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_1 = __Pyx_PyInt_SubtractObjC(__pyx_v_stellepos, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 399, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyInt_SubtractObjC(__pyx_v_stellepos, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 324, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = __Pyx_PyInt_RemainderObjC(__pyx_t_1, __pyx_int_8, 8, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 399, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyInt_RemainderObjC(__pyx_t_1, __pyx_int_8, 8, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 324, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_t_4, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 399, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_t_4, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 324, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyInt_EqObjC(__pyx_t_1, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 399, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyInt_EqObjC(__pyx_t_1, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 324, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 399, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 324, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     if (__pyx_t_3) {
 
-      /* "ai_minimax_alpha_beta.py":400
+      /* "ai_minimax_alpha_beta.py":325
  *                 possiblemoves.append((ringpos, (stellepos+1) % 8))
  *             if spielfeld[ringpos][(stellepos-1) % 8] == 0:
  *                 possiblemoves.append((ringpos, (stellepos-1) % 8))             # <<<<<<<<<<<<<<
  *         else:  # Men on the center fields
  *             if spielfeld[ringpos][(stellepos+1) % 8] == 0:
  */
-      __pyx_t_2 = __Pyx_PyInt_SubtractObjC(__pyx_v_stellepos, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 400, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyInt_SubtractObjC(__pyx_v_stellepos, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 325, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_1 = __Pyx_PyInt_RemainderObjC(__pyx_t_2, __pyx_int_8, 8, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 400, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyInt_RemainderObjC(__pyx_t_2, __pyx_int_8, 8, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 325, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 400, __pyx_L1_error)
+      __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 325, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_INCREF(__pyx_v_ringpos);
       __Pyx_GIVEREF(__pyx_v_ringpos);
@@ -9802,10 +9123,10 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_10possiblemoves(CYTHON
       __Pyx_GIVEREF(__pyx_t_1);
       PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_t_1);
       __pyx_t_1 = 0;
-      __pyx_t_5 = __Pyx_PyList_Append(__pyx_v_possiblemoves, __pyx_t_2); if (unlikely(__pyx_t_5 == ((int)-1))) __PYX_ERR(0, 400, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyList_Append(__pyx_v_possiblemoves, __pyx_t_2); if (unlikely(__pyx_t_5 == ((int)-1))) __PYX_ERR(0, 325, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-      /* "ai_minimax_alpha_beta.py":399
+      /* "ai_minimax_alpha_beta.py":324
  *             if spielfeld[ringpos][(stellepos+1) % 8] == 0:  # Sideways
  *                 possiblemoves.append((ringpos, (stellepos+1) % 8))
  *             if spielfeld[ringpos][(stellepos-1) % 8] == 0:             # <<<<<<<<<<<<<<
@@ -9814,7 +9135,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_10possiblemoves(CYTHON
  */
     }
 
-    /* "ai_minimax_alpha_beta.py":396
+    /* "ai_minimax_alpha_beta.py":321
  *     def possiblemoves(self, ringpos, stellepos, spielfeld):
  *         possiblemoves = []
  *         if stellepos % 2 == 0:  # Men on the edges             # <<<<<<<<<<<<<<
@@ -9824,7 +9145,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_10possiblemoves(CYTHON
     goto __pyx_L3;
   }
 
-  /* "ai_minimax_alpha_beta.py":402
+  /* "ai_minimax_alpha_beta.py":327
  *                 possiblemoves.append((ringpos, (stellepos-1) % 8))
  *         else:  # Men on the center fields
  *             if spielfeld[ringpos][(stellepos+1) % 8] == 0:             # <<<<<<<<<<<<<<
@@ -9832,34 +9153,34 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_10possiblemoves(CYTHON
  *             if spielfeld[ringpos][(stellepos-1) % 8] == 0:  # Sideways
  */
   /*else*/ {
-    __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_v_spielfeld, __pyx_v_ringpos); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 402, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_v_spielfeld, __pyx_v_ringpos); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 327, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_1 = __Pyx_PyInt_AddObjC(__pyx_v_stellepos, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 402, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyInt_AddObjC(__pyx_v_stellepos, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 327, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_4 = __Pyx_PyInt_RemainderObjC(__pyx_t_1, __pyx_int_8, 8, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 402, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyInt_RemainderObjC(__pyx_t_1, __pyx_int_8, 8, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 327, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 402, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 327, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = __Pyx_PyInt_EqObjC(__pyx_t_1, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 402, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyInt_EqObjC(__pyx_t_1, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 327, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 402, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 327, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     if (__pyx_t_3) {
 
-      /* "ai_minimax_alpha_beta.py":403
+      /* "ai_minimax_alpha_beta.py":328
  *         else:  # Men on the center fields
  *             if spielfeld[ringpos][(stellepos+1) % 8] == 0:
  *                 possiblemoves.append((ringpos, stellepos+1 % 8))             # <<<<<<<<<<<<<<
  *             if spielfeld[ringpos][(stellepos-1) % 8] == 0:  # Sideways
  *                 possiblemoves.append((ringpos, stellepos-1 % 8))
  */
-      __pyx_t_4 = __Pyx_PyInt_AddObjC(__pyx_v_stellepos, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 403, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyInt_AddObjC(__pyx_v_stellepos, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 328, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 403, __pyx_L1_error)
+      __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 328, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_INCREF(__pyx_v_ringpos);
       __Pyx_GIVEREF(__pyx_v_ringpos);
@@ -9867,10 +9188,10 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_10possiblemoves(CYTHON
       __Pyx_GIVEREF(__pyx_t_4);
       PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_4);
       __pyx_t_4 = 0;
-      __pyx_t_5 = __Pyx_PyList_Append(__pyx_v_possiblemoves, __pyx_t_1); if (unlikely(__pyx_t_5 == ((int)-1))) __PYX_ERR(0, 403, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyList_Append(__pyx_v_possiblemoves, __pyx_t_1); if (unlikely(__pyx_t_5 == ((int)-1))) __PYX_ERR(0, 328, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-      /* "ai_minimax_alpha_beta.py":402
+      /* "ai_minimax_alpha_beta.py":327
  *                 possiblemoves.append((ringpos, (stellepos-1) % 8))
  *         else:  # Men on the center fields
  *             if spielfeld[ringpos][(stellepos+1) % 8] == 0:             # <<<<<<<<<<<<<<
@@ -9879,41 +9200,41 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_10possiblemoves(CYTHON
  */
     }
 
-    /* "ai_minimax_alpha_beta.py":404
+    /* "ai_minimax_alpha_beta.py":329
  *             if spielfeld[ringpos][(stellepos+1) % 8] == 0:
  *                 possiblemoves.append((ringpos, stellepos+1 % 8))
  *             if spielfeld[ringpos][(stellepos-1) % 8] == 0:  # Sideways             # <<<<<<<<<<<<<<
  *                 possiblemoves.append((ringpos, stellepos-1 % 8))
  *             if ringpos == 0:  # Outer ring
  */
-    __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_v_spielfeld, __pyx_v_ringpos); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 404, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_v_spielfeld, __pyx_v_ringpos); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 329, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_4 = __Pyx_PyInt_SubtractObjC(__pyx_v_stellepos, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 404, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyInt_SubtractObjC(__pyx_v_stellepos, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 329, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_2 = __Pyx_PyInt_RemainderObjC(__pyx_t_4, __pyx_int_8, 8, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 404, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyInt_RemainderObjC(__pyx_t_4, __pyx_int_8, 8, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 329, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 404, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 329, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyInt_EqObjC(__pyx_t_4, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 404, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyInt_EqObjC(__pyx_t_4, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 329, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 404, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 329, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     if (__pyx_t_3) {
 
-      /* "ai_minimax_alpha_beta.py":405
+      /* "ai_minimax_alpha_beta.py":330
  *                 possiblemoves.append((ringpos, stellepos+1 % 8))
  *             if spielfeld[ringpos][(stellepos-1) % 8] == 0:  # Sideways
  *                 possiblemoves.append((ringpos, stellepos-1 % 8))             # <<<<<<<<<<<<<<
  *             if ringpos == 0:  # Outer ring
  *                 if spielfeld[1][stellepos] == 0:
  */
-      __pyx_t_2 = __Pyx_PyInt_SubtractObjC(__pyx_v_stellepos, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 405, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyInt_SubtractObjC(__pyx_v_stellepos, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 330, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 405, __pyx_L1_error)
+      __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 330, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_INCREF(__pyx_v_ringpos);
       __Pyx_GIVEREF(__pyx_v_ringpos);
@@ -9921,10 +9242,10 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_10possiblemoves(CYTHON
       __Pyx_GIVEREF(__pyx_t_2);
       PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_t_2);
       __pyx_t_2 = 0;
-      __pyx_t_5 = __Pyx_PyList_Append(__pyx_v_possiblemoves, __pyx_t_4); if (unlikely(__pyx_t_5 == ((int)-1))) __PYX_ERR(0, 405, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyList_Append(__pyx_v_possiblemoves, __pyx_t_4); if (unlikely(__pyx_t_5 == ((int)-1))) __PYX_ERR(0, 330, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-      /* "ai_minimax_alpha_beta.py":404
+      /* "ai_minimax_alpha_beta.py":329
  *             if spielfeld[ringpos][(stellepos+1) % 8] == 0:
  *                 possiblemoves.append((ringpos, stellepos+1 % 8))
  *             if spielfeld[ringpos][(stellepos-1) % 8] == 0:  # Sideways             # <<<<<<<<<<<<<<
@@ -9933,46 +9254,46 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_10possiblemoves(CYTHON
  */
     }
 
-    /* "ai_minimax_alpha_beta.py":406
+    /* "ai_minimax_alpha_beta.py":331
  *             if spielfeld[ringpos][(stellepos-1) % 8] == 0:  # Sideways
  *                 possiblemoves.append((ringpos, stellepos-1 % 8))
  *             if ringpos == 0:  # Outer ring             # <<<<<<<<<<<<<<
  *                 if spielfeld[1][stellepos] == 0:
  *                     possiblemoves.append((1, stellepos))
  */
-    __pyx_t_4 = __Pyx_PyInt_EqObjC(__pyx_v_ringpos, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 406, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyInt_EqObjC(__pyx_v_ringpos, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 331, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 406, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 331, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     if (__pyx_t_3) {
 
-      /* "ai_minimax_alpha_beta.py":407
+      /* "ai_minimax_alpha_beta.py":332
  *                 possiblemoves.append((ringpos, stellepos-1 % 8))
  *             if ringpos == 0:  # Outer ring
  *                 if spielfeld[1][stellepos] == 0:             # <<<<<<<<<<<<<<
  *                     possiblemoves.append((1, stellepos))
  *             if ringpos == 1:  # Center ring
  */
-      __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_spielfeld, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 407, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_spielfeld, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 332, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_t_4, __pyx_v_stellepos); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 407, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_t_4, __pyx_v_stellepos); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 332, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __pyx_t_4 = __Pyx_PyInt_EqObjC(__pyx_t_2, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 407, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyInt_EqObjC(__pyx_t_2, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 332, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 407, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 332, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       if (__pyx_t_3) {
 
-        /* "ai_minimax_alpha_beta.py":408
+        /* "ai_minimax_alpha_beta.py":333
  *             if ringpos == 0:  # Outer ring
  *                 if spielfeld[1][stellepos] == 0:
  *                     possiblemoves.append((1, stellepos))             # <<<<<<<<<<<<<<
  *             if ringpos == 1:  # Center ring
  *                 if spielfeld[0][stellepos] == 0:
  */
-        __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 408, __pyx_L1_error)
+        __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 333, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_INCREF(__pyx_int_1);
         __Pyx_GIVEREF(__pyx_int_1);
@@ -9980,10 +9301,10 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_10possiblemoves(CYTHON
         __Pyx_INCREF(__pyx_v_stellepos);
         __Pyx_GIVEREF(__pyx_v_stellepos);
         PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_v_stellepos);
-        __pyx_t_5 = __Pyx_PyList_Append(__pyx_v_possiblemoves, __pyx_t_4); if (unlikely(__pyx_t_5 == ((int)-1))) __PYX_ERR(0, 408, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyList_Append(__pyx_v_possiblemoves, __pyx_t_4); if (unlikely(__pyx_t_5 == ((int)-1))) __PYX_ERR(0, 333, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-        /* "ai_minimax_alpha_beta.py":407
+        /* "ai_minimax_alpha_beta.py":332
  *                 possiblemoves.append((ringpos, stellepos-1 % 8))
  *             if ringpos == 0:  # Outer ring
  *                 if spielfeld[1][stellepos] == 0:             # <<<<<<<<<<<<<<
@@ -9992,7 +9313,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_10possiblemoves(CYTHON
  */
       }
 
-      /* "ai_minimax_alpha_beta.py":406
+      /* "ai_minimax_alpha_beta.py":331
  *             if spielfeld[ringpos][(stellepos-1) % 8] == 0:  # Sideways
  *                 possiblemoves.append((ringpos, stellepos-1 % 8))
  *             if ringpos == 0:  # Outer ring             # <<<<<<<<<<<<<<
@@ -10001,46 +9322,46 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_10possiblemoves(CYTHON
  */
     }
 
-    /* "ai_minimax_alpha_beta.py":409
+    /* "ai_minimax_alpha_beta.py":334
  *                 if spielfeld[1][stellepos] == 0:
  *                     possiblemoves.append((1, stellepos))
  *             if ringpos == 1:  # Center ring             # <<<<<<<<<<<<<<
  *                 if spielfeld[0][stellepos] == 0:
  *                     possiblemoves.append((0, stellepos))
  */
-    __pyx_t_4 = __Pyx_PyInt_EqObjC(__pyx_v_ringpos, __pyx_int_1, 1, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 409, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyInt_EqObjC(__pyx_v_ringpos, __pyx_int_1, 1, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 334, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 409, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 334, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     if (__pyx_t_3) {
 
-      /* "ai_minimax_alpha_beta.py":410
+      /* "ai_minimax_alpha_beta.py":335
  *                     possiblemoves.append((1, stellepos))
  *             if ringpos == 1:  # Center ring
  *                 if spielfeld[0][stellepos] == 0:             # <<<<<<<<<<<<<<
  *                     possiblemoves.append((0, stellepos))
  *                 if spielfeld[2][stellepos] == 0:
  */
-      __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_spielfeld, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 410, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_spielfeld, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 335, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_t_4, __pyx_v_stellepos); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 410, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_t_4, __pyx_v_stellepos); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 335, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __pyx_t_4 = __Pyx_PyInt_EqObjC(__pyx_t_2, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 410, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyInt_EqObjC(__pyx_t_2, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 335, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 410, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 335, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       if (__pyx_t_3) {
 
-        /* "ai_minimax_alpha_beta.py":411
+        /* "ai_minimax_alpha_beta.py":336
  *             if ringpos == 1:  # Center ring
  *                 if spielfeld[0][stellepos] == 0:
  *                     possiblemoves.append((0, stellepos))             # <<<<<<<<<<<<<<
  *                 if spielfeld[2][stellepos] == 0:
  *                     possiblemoves.append((2, stellepos))
  */
-        __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 411, __pyx_L1_error)
+        __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 336, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_INCREF(__pyx_int_0);
         __Pyx_GIVEREF(__pyx_int_0);
@@ -10048,10 +9369,10 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_10possiblemoves(CYTHON
         __Pyx_INCREF(__pyx_v_stellepos);
         __Pyx_GIVEREF(__pyx_v_stellepos);
         PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_v_stellepos);
-        __pyx_t_5 = __Pyx_PyList_Append(__pyx_v_possiblemoves, __pyx_t_4); if (unlikely(__pyx_t_5 == ((int)-1))) __PYX_ERR(0, 411, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyList_Append(__pyx_v_possiblemoves, __pyx_t_4); if (unlikely(__pyx_t_5 == ((int)-1))) __PYX_ERR(0, 336, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-        /* "ai_minimax_alpha_beta.py":410
+        /* "ai_minimax_alpha_beta.py":335
  *                     possiblemoves.append((1, stellepos))
  *             if ringpos == 1:  # Center ring
  *                 if spielfeld[0][stellepos] == 0:             # <<<<<<<<<<<<<<
@@ -10060,33 +9381,33 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_10possiblemoves(CYTHON
  */
       }
 
-      /* "ai_minimax_alpha_beta.py":412
+      /* "ai_minimax_alpha_beta.py":337
  *                 if spielfeld[0][stellepos] == 0:
  *                     possiblemoves.append((0, stellepos))
  *                 if spielfeld[2][stellepos] == 0:             # <<<<<<<<<<<<<<
  *                     possiblemoves.append((2, stellepos))
  *             if ringpos == 2:  # Inner ring
  */
-      __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_spielfeld, 2, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 412, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_spielfeld, 2, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 337, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_t_4, __pyx_v_stellepos); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 412, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_t_4, __pyx_v_stellepos); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 337, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __pyx_t_4 = __Pyx_PyInt_EqObjC(__pyx_t_2, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 412, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyInt_EqObjC(__pyx_t_2, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 337, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 412, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 337, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       if (__pyx_t_3) {
 
-        /* "ai_minimax_alpha_beta.py":413
+        /* "ai_minimax_alpha_beta.py":338
  *                     possiblemoves.append((0, stellepos))
  *                 if spielfeld[2][stellepos] == 0:
  *                     possiblemoves.append((2, stellepos))             # <<<<<<<<<<<<<<
  *             if ringpos == 2:  # Inner ring
  *                 if spielfeld[1][stellepos] == 0:
  */
-        __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 413, __pyx_L1_error)
+        __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 338, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_INCREF(__pyx_int_2);
         __Pyx_GIVEREF(__pyx_int_2);
@@ -10094,10 +9415,10 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_10possiblemoves(CYTHON
         __Pyx_INCREF(__pyx_v_stellepos);
         __Pyx_GIVEREF(__pyx_v_stellepos);
         PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_v_stellepos);
-        __pyx_t_5 = __Pyx_PyList_Append(__pyx_v_possiblemoves, __pyx_t_4); if (unlikely(__pyx_t_5 == ((int)-1))) __PYX_ERR(0, 413, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyList_Append(__pyx_v_possiblemoves, __pyx_t_4); if (unlikely(__pyx_t_5 == ((int)-1))) __PYX_ERR(0, 338, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-        /* "ai_minimax_alpha_beta.py":412
+        /* "ai_minimax_alpha_beta.py":337
  *                 if spielfeld[0][stellepos] == 0:
  *                     possiblemoves.append((0, stellepos))
  *                 if spielfeld[2][stellepos] == 0:             # <<<<<<<<<<<<<<
@@ -10106,7 +9427,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_10possiblemoves(CYTHON
  */
       }
 
-      /* "ai_minimax_alpha_beta.py":409
+      /* "ai_minimax_alpha_beta.py":334
  *                 if spielfeld[1][stellepos] == 0:
  *                     possiblemoves.append((1, stellepos))
  *             if ringpos == 1:  # Center ring             # <<<<<<<<<<<<<<
@@ -10115,46 +9436,46 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_10possiblemoves(CYTHON
  */
     }
 
-    /* "ai_minimax_alpha_beta.py":414
+    /* "ai_minimax_alpha_beta.py":339
  *                 if spielfeld[2][stellepos] == 0:
  *                     possiblemoves.append((2, stellepos))
  *             if ringpos == 2:  # Inner ring             # <<<<<<<<<<<<<<
  *                 if spielfeld[1][stellepos] == 0:
  *                     possiblemoves.append((1, stellepos))
  */
-    __pyx_t_4 = __Pyx_PyInt_EqObjC(__pyx_v_ringpos, __pyx_int_2, 2, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 414, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyInt_EqObjC(__pyx_v_ringpos, __pyx_int_2, 2, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 339, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 414, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 339, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     if (__pyx_t_3) {
 
-      /* "ai_minimax_alpha_beta.py":415
+      /* "ai_minimax_alpha_beta.py":340
  *                     possiblemoves.append((2, stellepos))
  *             if ringpos == 2:  # Inner ring
  *                 if spielfeld[1][stellepos] == 0:             # <<<<<<<<<<<<<<
  *                     possiblemoves.append((1, stellepos))
  *         if len(possiblemoves) == 0:
  */
-      __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_spielfeld, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 415, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_spielfeld, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 340, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_t_4, __pyx_v_stellepos); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 415, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_t_4, __pyx_v_stellepos); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 340, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __pyx_t_4 = __Pyx_PyInt_EqObjC(__pyx_t_2, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 415, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyInt_EqObjC(__pyx_t_2, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 340, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 415, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 340, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       if (__pyx_t_3) {
 
-        /* "ai_minimax_alpha_beta.py":416
+        /* "ai_minimax_alpha_beta.py":341
  *             if ringpos == 2:  # Inner ring
  *                 if spielfeld[1][stellepos] == 0:
  *                     possiblemoves.append((1, stellepos))             # <<<<<<<<<<<<<<
  *         if len(possiblemoves) == 0:
  *             return False
  */
-        __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 416, __pyx_L1_error)
+        __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 341, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_INCREF(__pyx_int_1);
         __Pyx_GIVEREF(__pyx_int_1);
@@ -10162,10 +9483,10 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_10possiblemoves(CYTHON
         __Pyx_INCREF(__pyx_v_stellepos);
         __Pyx_GIVEREF(__pyx_v_stellepos);
         PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_v_stellepos);
-        __pyx_t_5 = __Pyx_PyList_Append(__pyx_v_possiblemoves, __pyx_t_4); if (unlikely(__pyx_t_5 == ((int)-1))) __PYX_ERR(0, 416, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyList_Append(__pyx_v_possiblemoves, __pyx_t_4); if (unlikely(__pyx_t_5 == ((int)-1))) __PYX_ERR(0, 341, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-        /* "ai_minimax_alpha_beta.py":415
+        /* "ai_minimax_alpha_beta.py":340
  *                     possiblemoves.append((2, stellepos))
  *             if ringpos == 2:  # Inner ring
  *                 if spielfeld[1][stellepos] == 0:             # <<<<<<<<<<<<<<
@@ -10174,7 +9495,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_10possiblemoves(CYTHON
  */
       }
 
-      /* "ai_minimax_alpha_beta.py":414
+      /* "ai_minimax_alpha_beta.py":339
  *                 if spielfeld[2][stellepos] == 0:
  *                     possiblemoves.append((2, stellepos))
  *             if ringpos == 2:  # Inner ring             # <<<<<<<<<<<<<<
@@ -10185,18 +9506,18 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_10possiblemoves(CYTHON
   }
   __pyx_L3:;
 
-  /* "ai_minimax_alpha_beta.py":417
+  /* "ai_minimax_alpha_beta.py":342
  *                 if spielfeld[1][stellepos] == 0:
  *                     possiblemoves.append((1, stellepos))
  *         if len(possiblemoves) == 0:             # <<<<<<<<<<<<<<
  *             return False
  *         return possiblemoves
  */
-  __pyx_t_6 = PyList_GET_SIZE(__pyx_v_possiblemoves); if (unlikely(__pyx_t_6 == ((Py_ssize_t)-1))) __PYX_ERR(0, 417, __pyx_L1_error)
+  __pyx_t_6 = PyList_GET_SIZE(__pyx_v_possiblemoves); if (unlikely(__pyx_t_6 == ((Py_ssize_t)-1))) __PYX_ERR(0, 342, __pyx_L1_error)
   __pyx_t_3 = ((__pyx_t_6 == 0) != 0);
   if (__pyx_t_3) {
 
-    /* "ai_minimax_alpha_beta.py":418
+    /* "ai_minimax_alpha_beta.py":343
  *                     possiblemoves.append((1, stellepos))
  *         if len(possiblemoves) == 0:
  *             return False             # <<<<<<<<<<<<<<
@@ -10208,7 +9529,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_10possiblemoves(CYTHON
     __pyx_r = Py_False;
     goto __pyx_L0;
 
-    /* "ai_minimax_alpha_beta.py":417
+    /* "ai_minimax_alpha_beta.py":342
  *                 if spielfeld[1][stellepos] == 0:
  *                     possiblemoves.append((1, stellepos))
  *         if len(possiblemoves) == 0:             # <<<<<<<<<<<<<<
@@ -10217,7 +9538,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_10possiblemoves(CYTHON
  */
   }
 
-  /* "ai_minimax_alpha_beta.py":419
+  /* "ai_minimax_alpha_beta.py":344
  *         if len(possiblemoves) == 0:
  *             return False
  *         return possiblemoves             # <<<<<<<<<<<<<<
@@ -10229,7 +9550,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_10possiblemoves(CYTHON
   __pyx_r = __pyx_v_possiblemoves;
   goto __pyx_L0;
 
-  /* "ai_minimax_alpha_beta.py":394
+  /* "ai_minimax_alpha_beta.py":319
  *         return n
  * 
  *     def possiblemoves(self, ringpos, stellepos, spielfeld):             # <<<<<<<<<<<<<<
@@ -10251,7 +9572,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_10possiblemoves(CYTHON
   return __pyx_r;
 }
 
-/* "ai_minimax_alpha_beta.py":421
+/* "ai_minimax_alpha_beta.py":346
  *         return possiblemoves
  * 
  *     def checkmuhle(self, ringPos, stellePos, spielfeld, mancolor):             # <<<<<<<<<<<<<<
@@ -10260,9 +9581,9 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_10possiblemoves(CYTHON
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_21ai_minimax_alpha_beta_6Morris_13checkmuhle(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_21ai_minimax_alpha_beta_6Morris_13checkmuhle = {"checkmuhle", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_21ai_minimax_alpha_beta_6Morris_13checkmuhle, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_21ai_minimax_alpha_beta_6Morris_13checkmuhle(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_21ai_minimax_alpha_beta_6Morris_11checkmuhle(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_21ai_minimax_alpha_beta_6Morris_11checkmuhle = {"checkmuhle", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_21ai_minimax_alpha_beta_6Morris_11checkmuhle, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_21ai_minimax_alpha_beta_6Morris_11checkmuhle(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_self = 0;
   PyObject *__pyx_v_ringPos = 0;
   PyObject *__pyx_v_stellePos = 0;
@@ -10300,29 +9621,29 @@ static PyObject *__pyx_pw_21ai_minimax_alpha_beta_6Morris_13checkmuhle(PyObject 
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ringPos)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("checkmuhle", 1, 5, 5, 1); __PYX_ERR(0, 421, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("checkmuhle", 1, 5, 5, 1); __PYX_ERR(0, 346, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_stellePos)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("checkmuhle", 1, 5, 5, 2); __PYX_ERR(0, 421, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("checkmuhle", 1, 5, 5, 2); __PYX_ERR(0, 346, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_spielfeld)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("checkmuhle", 1, 5, 5, 3); __PYX_ERR(0, 421, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("checkmuhle", 1, 5, 5, 3); __PYX_ERR(0, 346, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
         if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_mancolor)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("checkmuhle", 1, 5, 5, 4); __PYX_ERR(0, 421, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("checkmuhle", 1, 5, 5, 4); __PYX_ERR(0, 346, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "checkmuhle") < 0)) __PYX_ERR(0, 421, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "checkmuhle") < 0)) __PYX_ERR(0, 346, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 5) {
       goto __pyx_L5_argtuple_error;
@@ -10341,20 +9662,20 @@ static PyObject *__pyx_pw_21ai_minimax_alpha_beta_6Morris_13checkmuhle(PyObject 
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("checkmuhle", 1, 5, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 421, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("checkmuhle", 1, 5, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 346, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("ai_minimax_alpha_beta.Morris.checkmuhle", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_21ai_minimax_alpha_beta_6Morris_12checkmuhle(__pyx_self, __pyx_v_self, __pyx_v_ringPos, __pyx_v_stellePos, __pyx_v_spielfeld, __pyx_v_mancolor);
+  __pyx_r = __pyx_pf_21ai_minimax_alpha_beta_6Morris_10checkmuhle(__pyx_self, __pyx_v_self, __pyx_v_ringPos, __pyx_v_stellePos, __pyx_v_spielfeld, __pyx_v_mancolor);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_12checkmuhle(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_ringPos, PyObject *__pyx_v_stellePos, PyObject *__pyx_v_spielfeld, PyObject *__pyx_v_mancolor) {
+static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_10checkmuhle(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_ringPos, PyObject *__pyx_v_stellePos, PyObject *__pyx_v_spielfeld, PyObject *__pyx_v_mancolor) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -10364,43 +9685,43 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_12checkmuhle(CYTHON_UN
   int __pyx_t_5;
   __Pyx_RefNannySetupContext("checkmuhle", 0);
 
-  /* "ai_minimax_alpha_beta.py":422
+  /* "ai_minimax_alpha_beta.py":347
  * 
  *     def checkmuhle(self, ringPos, stellePos, spielfeld, mancolor):
  *         if stellePos % 2 == 0:  # Men on the edge             # <<<<<<<<<<<<<<
  *             if spielfeld[ringPos][(stellePos + 1) % 8] == mancolor and spielfeld[ringPos][
  *                                     (stellePos + 2) % 8] == mancolor:
  */
-  __pyx_t_1 = __Pyx_PyInt_RemainderObjC(__pyx_v_stellePos, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 422, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_RemainderObjC(__pyx_v_stellePos, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 347, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyInt_EqObjC(__pyx_t_1, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 422, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_EqObjC(__pyx_t_1, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 347, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 422, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 347, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   if (__pyx_t_3) {
 
-    /* "ai_minimax_alpha_beta.py":423
+    /* "ai_minimax_alpha_beta.py":348
  *     def checkmuhle(self, ringPos, stellePos, spielfeld, mancolor):
  *         if stellePos % 2 == 0:  # Men on the edge
  *             if spielfeld[ringPos][(stellePos + 1) % 8] == mancolor and spielfeld[ringPos][             # <<<<<<<<<<<<<<
  *                                     (stellePos + 2) % 8] == mancolor:
  *                 return True
  */
-    __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_v_spielfeld, __pyx_v_ringPos); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 423, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_v_spielfeld, __pyx_v_ringPos); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 348, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_1 = __Pyx_PyInt_AddObjC(__pyx_v_stellePos, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 423, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyInt_AddObjC(__pyx_v_stellePos, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 348, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_4 = __Pyx_PyInt_RemainderObjC(__pyx_t_1, __pyx_int_8, 8, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 423, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyInt_RemainderObjC(__pyx_t_1, __pyx_int_8, 8, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 348, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 423, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 348, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = PyObject_RichCompare(__pyx_t_1, __pyx_v_mancolor, Py_EQ); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 423, __pyx_L1_error)
+    __pyx_t_4 = PyObject_RichCompare(__pyx_t_1, __pyx_v_mancolor, Py_EQ); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 348, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 423, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 348, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     if (__pyx_t_5) {
     } else {
@@ -10408,48 +9729,48 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_12checkmuhle(CYTHON_UN
       goto __pyx_L5_bool_binop_done;
     }
 
-    /* "ai_minimax_alpha_beta.py":424
+    /* "ai_minimax_alpha_beta.py":349
  *         if stellePos % 2 == 0:  # Men on the edge
  *             if spielfeld[ringPos][(stellePos + 1) % 8] == mancolor and spielfeld[ringPos][
  *                                     (stellePos + 2) % 8] == mancolor:             # <<<<<<<<<<<<<<
  *                 return True
  *             if spielfeld[ringPos][(stellePos - 1) % 8] == mancolor and spielfeld[ringPos][
  */
-    __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_v_spielfeld, __pyx_v_ringPos); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 423, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_v_spielfeld, __pyx_v_ringPos); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 348, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_1 = __Pyx_PyInt_AddObjC(__pyx_v_stellePos, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 424, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyInt_AddObjC(__pyx_v_stellePos, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 349, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = __Pyx_PyInt_RemainderObjC(__pyx_t_1, __pyx_int_8, 8, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 424, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyInt_RemainderObjC(__pyx_t_1, __pyx_int_8, 8, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 349, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "ai_minimax_alpha_beta.py":423
+    /* "ai_minimax_alpha_beta.py":348
  *     def checkmuhle(self, ringPos, stellePos, spielfeld, mancolor):
  *         if stellePos % 2 == 0:  # Men on the edge
  *             if spielfeld[ringPos][(stellePos + 1) % 8] == mancolor and spielfeld[ringPos][             # <<<<<<<<<<<<<<
  *                                     (stellePos + 2) % 8] == mancolor:
  *                 return True
  */
-    __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_t_4, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 423, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_t_4, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 348, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "ai_minimax_alpha_beta.py":424
+    /* "ai_minimax_alpha_beta.py":349
  *         if stellePos % 2 == 0:  # Men on the edge
  *             if spielfeld[ringPos][(stellePos + 1) % 8] == mancolor and spielfeld[ringPos][
  *                                     (stellePos + 2) % 8] == mancolor:             # <<<<<<<<<<<<<<
  *                 return True
  *             if spielfeld[ringPos][(stellePos - 1) % 8] == mancolor and spielfeld[ringPos][
  */
-    __pyx_t_2 = PyObject_RichCompare(__pyx_t_1, __pyx_v_mancolor, Py_EQ); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 424, __pyx_L1_error)
+    __pyx_t_2 = PyObject_RichCompare(__pyx_t_1, __pyx_v_mancolor, Py_EQ); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 349, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 424, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 349, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_t_3 = __pyx_t_5;
     __pyx_L5_bool_binop_done:;
 
-    /* "ai_minimax_alpha_beta.py":423
+    /* "ai_minimax_alpha_beta.py":348
  *     def checkmuhle(self, ringPos, stellePos, spielfeld, mancolor):
  *         if stellePos % 2 == 0:  # Men on the edge
  *             if spielfeld[ringPos][(stellePos + 1) % 8] == mancolor and spielfeld[ringPos][             # <<<<<<<<<<<<<<
@@ -10458,7 +9779,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_12checkmuhle(CYTHON_UN
  */
     if (__pyx_t_3) {
 
-      /* "ai_minimax_alpha_beta.py":425
+      /* "ai_minimax_alpha_beta.py":350
  *             if spielfeld[ringPos][(stellePos + 1) % 8] == mancolor and spielfeld[ringPos][
  *                                     (stellePos + 2) % 8] == mancolor:
  *                 return True             # <<<<<<<<<<<<<<
@@ -10470,7 +9791,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_12checkmuhle(CYTHON_UN
       __pyx_r = Py_True;
       goto __pyx_L0;
 
-      /* "ai_minimax_alpha_beta.py":423
+      /* "ai_minimax_alpha_beta.py":348
  *     def checkmuhle(self, ringPos, stellePos, spielfeld, mancolor):
  *         if stellePos % 2 == 0:  # Men on the edge
  *             if spielfeld[ringPos][(stellePos + 1) % 8] == mancolor and spielfeld[ringPos][             # <<<<<<<<<<<<<<
@@ -10479,27 +9800,27 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_12checkmuhle(CYTHON_UN
  */
     }
 
-    /* "ai_minimax_alpha_beta.py":426
+    /* "ai_minimax_alpha_beta.py":351
  *                                     (stellePos + 2) % 8] == mancolor:
  *                 return True
  *             if spielfeld[ringPos][(stellePos - 1) % 8] == mancolor and spielfeld[ringPos][             # <<<<<<<<<<<<<<
  *                 (stellePos - 2) % 8] == mancolor:
  *                 return True
  */
-    __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_v_spielfeld, __pyx_v_ringPos); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 426, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_v_spielfeld, __pyx_v_ringPos); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 351, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_1 = __Pyx_PyInt_SubtractObjC(__pyx_v_stellePos, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 426, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyInt_SubtractObjC(__pyx_v_stellePos, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 351, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_4 = __Pyx_PyInt_RemainderObjC(__pyx_t_1, __pyx_int_8, 8, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 426, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyInt_RemainderObjC(__pyx_t_1, __pyx_int_8, 8, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 351, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 426, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 351, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = PyObject_RichCompare(__pyx_t_1, __pyx_v_mancolor, Py_EQ); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 426, __pyx_L1_error)
+    __pyx_t_4 = PyObject_RichCompare(__pyx_t_1, __pyx_v_mancolor, Py_EQ); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 351, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 426, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 351, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     if (__pyx_t_5) {
     } else {
@@ -10507,48 +9828,48 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_12checkmuhle(CYTHON_UN
       goto __pyx_L8_bool_binop_done;
     }
 
-    /* "ai_minimax_alpha_beta.py":427
+    /* "ai_minimax_alpha_beta.py":352
  *                 return True
  *             if spielfeld[ringPos][(stellePos - 1) % 8] == mancolor and spielfeld[ringPos][
  *                 (stellePos - 2) % 8] == mancolor:             # <<<<<<<<<<<<<<
  *                 return True
  *         else:  # Men in the centre lines
  */
-    __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_v_spielfeld, __pyx_v_ringPos); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 426, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_v_spielfeld, __pyx_v_ringPos); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 351, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_1 = __Pyx_PyInt_SubtractObjC(__pyx_v_stellePos, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 427, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyInt_SubtractObjC(__pyx_v_stellePos, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 352, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = __Pyx_PyInt_RemainderObjC(__pyx_t_1, __pyx_int_8, 8, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 427, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyInt_RemainderObjC(__pyx_t_1, __pyx_int_8, 8, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 352, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "ai_minimax_alpha_beta.py":426
+    /* "ai_minimax_alpha_beta.py":351
  *                                     (stellePos + 2) % 8] == mancolor:
  *                 return True
  *             if spielfeld[ringPos][(stellePos - 1) % 8] == mancolor and spielfeld[ringPos][             # <<<<<<<<<<<<<<
  *                 (stellePos - 2) % 8] == mancolor:
  *                 return True
  */
-    __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_t_4, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 426, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_t_4, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 351, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "ai_minimax_alpha_beta.py":427
+    /* "ai_minimax_alpha_beta.py":352
  *                 return True
  *             if spielfeld[ringPos][(stellePos - 1) % 8] == mancolor and spielfeld[ringPos][
  *                 (stellePos - 2) % 8] == mancolor:             # <<<<<<<<<<<<<<
  *                 return True
  *         else:  # Men in the centre lines
  */
-    __pyx_t_2 = PyObject_RichCompare(__pyx_t_1, __pyx_v_mancolor, Py_EQ); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 427, __pyx_L1_error)
+    __pyx_t_2 = PyObject_RichCompare(__pyx_t_1, __pyx_v_mancolor, Py_EQ); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 352, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 427, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 352, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_t_3 = __pyx_t_5;
     __pyx_L8_bool_binop_done:;
 
-    /* "ai_minimax_alpha_beta.py":426
+    /* "ai_minimax_alpha_beta.py":351
  *                                     (stellePos + 2) % 8] == mancolor:
  *                 return True
  *             if spielfeld[ringPos][(stellePos - 1) % 8] == mancolor and spielfeld[ringPos][             # <<<<<<<<<<<<<<
@@ -10557,7 +9878,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_12checkmuhle(CYTHON_UN
  */
     if (__pyx_t_3) {
 
-      /* "ai_minimax_alpha_beta.py":428
+      /* "ai_minimax_alpha_beta.py":353
  *             if spielfeld[ringPos][(stellePos - 1) % 8] == mancolor and spielfeld[ringPos][
  *                 (stellePos - 2) % 8] == mancolor:
  *                 return True             # <<<<<<<<<<<<<<
@@ -10569,7 +9890,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_12checkmuhle(CYTHON_UN
       __pyx_r = Py_True;
       goto __pyx_L0;
 
-      /* "ai_minimax_alpha_beta.py":426
+      /* "ai_minimax_alpha_beta.py":351
  *                                     (stellePos + 2) % 8] == mancolor:
  *                 return True
  *             if spielfeld[ringPos][(stellePos - 1) % 8] == mancolor and spielfeld[ringPos][             # <<<<<<<<<<<<<<
@@ -10578,7 +9899,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_12checkmuhle(CYTHON_UN
  */
     }
 
-    /* "ai_minimax_alpha_beta.py":422
+    /* "ai_minimax_alpha_beta.py":347
  * 
  *     def checkmuhle(self, ringPos, stellePos, spielfeld, mancolor):
  *         if stellePos % 2 == 0:  # Men on the edge             # <<<<<<<<<<<<<<
@@ -10588,7 +9909,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_12checkmuhle(CYTHON_UN
     goto __pyx_L3;
   }
 
-  /* "ai_minimax_alpha_beta.py":430
+  /* "ai_minimax_alpha_beta.py":355
  *                 return True
  *         else:  # Men in the centre lines
  *             if spielfeld[(ringPos + 1) % 3][stellePos] == mancolor and spielfeld[(ringPos + 2) % 3][             # <<<<<<<<<<<<<<
@@ -10596,20 +9917,20 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_12checkmuhle(CYTHON_UN
  *                 return True
  */
   /*else*/ {
-    __pyx_t_2 = __Pyx_PyInt_AddObjC(__pyx_v_ringPos, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 430, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyInt_AddObjC(__pyx_v_ringPos, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 355, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_1 = __Pyx_PyInt_RemainderObjC(__pyx_t_2, __pyx_int_3, 3, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 430, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyInt_RemainderObjC(__pyx_t_2, __pyx_int_3, 3, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 355, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_v_spielfeld, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 430, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_v_spielfeld, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 355, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_t_2, __pyx_v_stellePos); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 430, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_t_2, __pyx_v_stellePos); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 355, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = PyObject_RichCompare(__pyx_t_1, __pyx_v_mancolor, Py_EQ); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 430, __pyx_L1_error)
+    __pyx_t_2 = PyObject_RichCompare(__pyx_t_1, __pyx_v_mancolor, Py_EQ); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 355, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 430, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 355, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     if (__pyx_t_5) {
     } else {
@@ -10617,48 +9938,48 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_12checkmuhle(CYTHON_UN
       goto __pyx_L11_bool_binop_done;
     }
 
-    /* "ai_minimax_alpha_beta.py":431
+    /* "ai_minimax_alpha_beta.py":356
  *         else:  # Men in the centre lines
  *             if spielfeld[(ringPos + 1) % 3][stellePos] == mancolor and spielfeld[(ringPos + 2) % 3][
  *                                     stellePos] == mancolor:             # <<<<<<<<<<<<<<
  *                 return True
  *             if spielfeld[ringPos][(stellePos + 1) % 8] == mancolor and spielfeld[ringPos][
  */
-    __pyx_t_2 = __Pyx_PyInt_AddObjC(__pyx_v_ringPos, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 430, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyInt_AddObjC(__pyx_v_ringPos, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 355, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
 
-    /* "ai_minimax_alpha_beta.py":430
+    /* "ai_minimax_alpha_beta.py":355
  *                 return True
  *         else:  # Men in the centre lines
  *             if spielfeld[(ringPos + 1) % 3][stellePos] == mancolor and spielfeld[(ringPos + 2) % 3][             # <<<<<<<<<<<<<<
  *                                     stellePos] == mancolor:
  *                 return True
  */
-    __pyx_t_1 = __Pyx_PyInt_RemainderObjC(__pyx_t_2, __pyx_int_3, 3, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 430, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyInt_RemainderObjC(__pyx_t_2, __pyx_int_3, 3, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 355, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_v_spielfeld, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 430, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_v_spielfeld, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 355, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "ai_minimax_alpha_beta.py":431
+    /* "ai_minimax_alpha_beta.py":356
  *         else:  # Men in the centre lines
  *             if spielfeld[(ringPos + 1) % 3][stellePos] == mancolor and spielfeld[(ringPos + 2) % 3][
  *                                     stellePos] == mancolor:             # <<<<<<<<<<<<<<
  *                 return True
  *             if spielfeld[ringPos][(stellePos + 1) % 8] == mancolor and spielfeld[ringPos][
  */
-    __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_t_2, __pyx_v_stellePos); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 430, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_t_2, __pyx_v_stellePos); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 355, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = PyObject_RichCompare(__pyx_t_1, __pyx_v_mancolor, Py_EQ); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 431, __pyx_L1_error)
+    __pyx_t_2 = PyObject_RichCompare(__pyx_t_1, __pyx_v_mancolor, Py_EQ); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 356, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 431, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 356, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_t_3 = __pyx_t_5;
     __pyx_L11_bool_binop_done:;
 
-    /* "ai_minimax_alpha_beta.py":430
+    /* "ai_minimax_alpha_beta.py":355
  *                 return True
  *         else:  # Men in the centre lines
  *             if spielfeld[(ringPos + 1) % 3][stellePos] == mancolor and spielfeld[(ringPos + 2) % 3][             # <<<<<<<<<<<<<<
@@ -10667,7 +9988,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_12checkmuhle(CYTHON_UN
  */
     if (__pyx_t_3) {
 
-      /* "ai_minimax_alpha_beta.py":432
+      /* "ai_minimax_alpha_beta.py":357
  *             if spielfeld[(ringPos + 1) % 3][stellePos] == mancolor and spielfeld[(ringPos + 2) % 3][
  *                                     stellePos] == mancolor:
  *                 return True             # <<<<<<<<<<<<<<
@@ -10679,7 +10000,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_12checkmuhle(CYTHON_UN
       __pyx_r = Py_True;
       goto __pyx_L0;
 
-      /* "ai_minimax_alpha_beta.py":430
+      /* "ai_minimax_alpha_beta.py":355
  *                 return True
  *         else:  # Men in the centre lines
  *             if spielfeld[(ringPos + 1) % 3][stellePos] == mancolor and spielfeld[(ringPos + 2) % 3][             # <<<<<<<<<<<<<<
@@ -10688,27 +10009,27 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_12checkmuhle(CYTHON_UN
  */
     }
 
-    /* "ai_minimax_alpha_beta.py":433
+    /* "ai_minimax_alpha_beta.py":358
  *                                     stellePos] == mancolor:
  *                 return True
  *             if spielfeld[ringPos][(stellePos + 1) % 8] == mancolor and spielfeld[ringPos][             # <<<<<<<<<<<<<<
  *                                     (stellePos - 1) % 8] == mancolor:
  *                 return True
  */
-    __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_v_spielfeld, __pyx_v_ringPos); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 433, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_v_spielfeld, __pyx_v_ringPos); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 358, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_1 = __Pyx_PyInt_AddObjC(__pyx_v_stellePos, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 433, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyInt_AddObjC(__pyx_v_stellePos, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 358, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_4 = __Pyx_PyInt_RemainderObjC(__pyx_t_1, __pyx_int_8, 8, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 433, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyInt_RemainderObjC(__pyx_t_1, __pyx_int_8, 8, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 358, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 433, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 358, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = PyObject_RichCompare(__pyx_t_1, __pyx_v_mancolor, Py_EQ); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 433, __pyx_L1_error)
+    __pyx_t_4 = PyObject_RichCompare(__pyx_t_1, __pyx_v_mancolor, Py_EQ); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 358, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 433, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 358, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     if (__pyx_t_5) {
     } else {
@@ -10716,48 +10037,48 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_12checkmuhle(CYTHON_UN
       goto __pyx_L14_bool_binop_done;
     }
 
-    /* "ai_minimax_alpha_beta.py":434
+    /* "ai_minimax_alpha_beta.py":359
  *                 return True
  *             if spielfeld[ringPos][(stellePos + 1) % 8] == mancolor and spielfeld[ringPos][
  *                                     (stellePos - 1) % 8] == mancolor:             # <<<<<<<<<<<<<<
  *                 return True
  *         return False
  */
-    __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_v_spielfeld, __pyx_v_ringPos); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 433, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_v_spielfeld, __pyx_v_ringPos); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 358, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_1 = __Pyx_PyInt_SubtractObjC(__pyx_v_stellePos, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 434, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyInt_SubtractObjC(__pyx_v_stellePos, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 359, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = __Pyx_PyInt_RemainderObjC(__pyx_t_1, __pyx_int_8, 8, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 434, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyInt_RemainderObjC(__pyx_t_1, __pyx_int_8, 8, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 359, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "ai_minimax_alpha_beta.py":433
+    /* "ai_minimax_alpha_beta.py":358
  *                                     stellePos] == mancolor:
  *                 return True
  *             if spielfeld[ringPos][(stellePos + 1) % 8] == mancolor and spielfeld[ringPos][             # <<<<<<<<<<<<<<
  *                                     (stellePos - 1) % 8] == mancolor:
  *                 return True
  */
-    __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_t_4, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 433, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_t_4, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 358, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "ai_minimax_alpha_beta.py":434
+    /* "ai_minimax_alpha_beta.py":359
  *                 return True
  *             if spielfeld[ringPos][(stellePos + 1) % 8] == mancolor and spielfeld[ringPos][
  *                                     (stellePos - 1) % 8] == mancolor:             # <<<<<<<<<<<<<<
  *                 return True
  *         return False
  */
-    __pyx_t_2 = PyObject_RichCompare(__pyx_t_1, __pyx_v_mancolor, Py_EQ); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 434, __pyx_L1_error)
+    __pyx_t_2 = PyObject_RichCompare(__pyx_t_1, __pyx_v_mancolor, Py_EQ); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 359, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 434, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 359, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_t_3 = __pyx_t_5;
     __pyx_L14_bool_binop_done:;
 
-    /* "ai_minimax_alpha_beta.py":433
+    /* "ai_minimax_alpha_beta.py":358
  *                                     stellePos] == mancolor:
  *                 return True
  *             if spielfeld[ringPos][(stellePos + 1) % 8] == mancolor and spielfeld[ringPos][             # <<<<<<<<<<<<<<
@@ -10766,7 +10087,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_12checkmuhle(CYTHON_UN
  */
     if (__pyx_t_3) {
 
-      /* "ai_minimax_alpha_beta.py":435
+      /* "ai_minimax_alpha_beta.py":360
  *             if spielfeld[ringPos][(stellePos + 1) % 8] == mancolor and spielfeld[ringPos][
  *                                     (stellePos - 1) % 8] == mancolor:
  *                 return True             # <<<<<<<<<<<<<<
@@ -10778,7 +10099,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_12checkmuhle(CYTHON_UN
       __pyx_r = Py_True;
       goto __pyx_L0;
 
-      /* "ai_minimax_alpha_beta.py":433
+      /* "ai_minimax_alpha_beta.py":358
  *                                     stellePos] == mancolor:
  *                 return True
  *             if spielfeld[ringPos][(stellePos + 1) % 8] == mancolor and spielfeld[ringPos][             # <<<<<<<<<<<<<<
@@ -10789,7 +10110,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_12checkmuhle(CYTHON_UN
   }
   __pyx_L3:;
 
-  /* "ai_minimax_alpha_beta.py":436
+  /* "ai_minimax_alpha_beta.py":361
  *                                     (stellePos - 1) % 8] == mancolor:
  *                 return True
  *         return False             # <<<<<<<<<<<<<<
@@ -10801,7 +10122,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_12checkmuhle(CYTHON_UN
   __pyx_r = Py_False;
   goto __pyx_L0;
 
-  /* "ai_minimax_alpha_beta.py":421
+  /* "ai_minimax_alpha_beta.py":346
  *         return possiblemoves
  * 
  *     def checkmuhle(self, ringPos, stellePos, spielfeld, mancolor):             # <<<<<<<<<<<<<<
@@ -10822,7 +10143,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_12checkmuhle(CYTHON_UN
   return __pyx_r;
 }
 
-/* "ai_minimax_alpha_beta.py":438
+/* "ai_minimax_alpha_beta.py":363
  *         return False
  * 
  *     def clearmuhlen(self, board, board_muhlen):             # <<<<<<<<<<<<<<
@@ -10831,9 +10152,9 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_12checkmuhle(CYTHON_UN
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_21ai_minimax_alpha_beta_6Morris_15clearmuhlen(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_21ai_minimax_alpha_beta_6Morris_15clearmuhlen = {"clearmuhlen", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_21ai_minimax_alpha_beta_6Morris_15clearmuhlen, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_21ai_minimax_alpha_beta_6Morris_15clearmuhlen(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_21ai_minimax_alpha_beta_6Morris_13clearmuhlen(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_21ai_minimax_alpha_beta_6Morris_13clearmuhlen = {"clearmuhlen", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_21ai_minimax_alpha_beta_6Morris_13clearmuhlen, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_21ai_minimax_alpha_beta_6Morris_13clearmuhlen(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_self = 0;
   PyObject *__pyx_v_board = 0;
   PyObject *__pyx_v_board_muhlen = 0;
@@ -10865,17 +10186,17 @@ static PyObject *__pyx_pw_21ai_minimax_alpha_beta_6Morris_15clearmuhlen(PyObject
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_board)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("clearmuhlen", 1, 3, 3, 1); __PYX_ERR(0, 438, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("clearmuhlen", 1, 3, 3, 1); __PYX_ERR(0, 363, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_board_muhlen)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("clearmuhlen", 1, 3, 3, 2); __PYX_ERR(0, 438, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("clearmuhlen", 1, 3, 3, 2); __PYX_ERR(0, 363, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "clearmuhlen") < 0)) __PYX_ERR(0, 438, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "clearmuhlen") < 0)) __PYX_ERR(0, 363, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 3) {
       goto __pyx_L5_argtuple_error;
@@ -10890,20 +10211,20 @@ static PyObject *__pyx_pw_21ai_minimax_alpha_beta_6Morris_15clearmuhlen(PyObject
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("clearmuhlen", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 438, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("clearmuhlen", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 363, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("ai_minimax_alpha_beta.Morris.clearmuhlen", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_21ai_minimax_alpha_beta_6Morris_14clearmuhlen(__pyx_self, __pyx_v_self, __pyx_v_board, __pyx_v_board_muhlen);
+  __pyx_r = __pyx_pf_21ai_minimax_alpha_beta_6Morris_12clearmuhlen(__pyx_self, __pyx_v_self, __pyx_v_board, __pyx_v_board_muhlen);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_14clearmuhlen(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_board, PyObject *__pyx_v_board_muhlen) {
+static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_12clearmuhlen(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_board, PyObject *__pyx_v_board_muhlen) {
   PyObject *__pyx_v_tobecleared = NULL;
   long __pyx_v_ring;
   long __pyx_v_stelle;
@@ -10926,19 +10247,19 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_14clearmuhlen(CYTHON_U
   Py_ssize_t __pyx_t_15;
   __Pyx_RefNannySetupContext("clearmuhlen", 0);
 
-  /* "ai_minimax_alpha_beta.py":439
+  /* "ai_minimax_alpha_beta.py":364
  * 
  *     def clearmuhlen(self, board, board_muhlen):
  *         tobecleared = []             # <<<<<<<<<<<<<<
  *         for ring in range(3):
  *             for stelle in range(8):
  */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 439, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 364, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_tobecleared = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "ai_minimax_alpha_beta.py":440
+  /* "ai_minimax_alpha_beta.py":365
  *     def clearmuhlen(self, board, board_muhlen):
  *         tobecleared = []
  *         for ring in range(3):             # <<<<<<<<<<<<<<
@@ -10948,7 +10269,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_14clearmuhlen(CYTHON_U
   for (__pyx_t_2 = 0; __pyx_t_2 < 3; __pyx_t_2+=1) {
     __pyx_v_ring = __pyx_t_2;
 
-    /* "ai_minimax_alpha_beta.py":441
+    /* "ai_minimax_alpha_beta.py":366
  *         tobecleared = []
  *         for ring in range(3):
  *             for stelle in range(8):             # <<<<<<<<<<<<<<
@@ -10958,22 +10279,22 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_14clearmuhlen(CYTHON_U
     for (__pyx_t_3 = 0; __pyx_t_3 < 8; __pyx_t_3+=1) {
       __pyx_v_stelle = __pyx_t_3;
 
-      /* "ai_minimax_alpha_beta.py":442
+      /* "ai_minimax_alpha_beta.py":367
  *         for ring in range(3):
  *             for stelle in range(8):
  *                 if (not self.checkmuhle(ring, stelle, board, board[ring][stelle])) and (board_muhlen[ring][stelle] != 0):             # <<<<<<<<<<<<<<
  *                     tobecleared.append((ring, stelle))
  *         if len(tobecleared) == 0:
  */
-      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_checkmuhle); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 442, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_checkmuhle); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 367, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_6 = __Pyx_PyInt_From_long(__pyx_v_ring); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 442, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyInt_From_long(__pyx_v_ring); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 367, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
-      __pyx_t_7 = __Pyx_PyInt_From_long(__pyx_v_stelle); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 442, __pyx_L1_error)
+      __pyx_t_7 = __Pyx_PyInt_From_long(__pyx_v_stelle); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 367, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
-      __pyx_t_8 = __Pyx_GetItemInt(__pyx_v_board, __pyx_v_ring, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 442, __pyx_L1_error)
+      __pyx_t_8 = __Pyx_GetItemInt(__pyx_v_board, __pyx_v_ring, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 367, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
-      __pyx_t_9 = __Pyx_GetItemInt(__pyx_t_8, __pyx_v_stelle, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 442, __pyx_L1_error)
+      __pyx_t_9 = __Pyx_GetItemInt(__pyx_t_8, __pyx_v_stelle, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 367, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       __pyx_t_8 = NULL;
@@ -10991,7 +10312,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_14clearmuhlen(CYTHON_U
       #if CYTHON_FAST_PYCALL
       if (PyFunction_Check(__pyx_t_5)) {
         PyObject *__pyx_temp[5] = {__pyx_t_8, __pyx_t_6, __pyx_t_7, __pyx_v_board, __pyx_t_9};
-        __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_10, 4+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 442, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_10, 4+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 367, __pyx_L1_error)
         __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
@@ -11002,7 +10323,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_14clearmuhlen(CYTHON_U
       #if CYTHON_FAST_PYCCALL
       if (__Pyx_PyFastCFunction_Check(__pyx_t_5)) {
         PyObject *__pyx_temp[5] = {__pyx_t_8, __pyx_t_6, __pyx_t_7, __pyx_v_board, __pyx_t_9};
-        __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_10, 4+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 442, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_10, 4+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 367, __pyx_L1_error)
         __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
@@ -11011,7 +10332,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_14clearmuhlen(CYTHON_U
       } else
       #endif
       {
-        __pyx_t_11 = PyTuple_New(4+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 442, __pyx_L1_error)
+        __pyx_t_11 = PyTuple_New(4+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 367, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_11);
         if (__pyx_t_8) {
           __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_11, 0, __pyx_t_8); __pyx_t_8 = NULL;
@@ -11028,12 +10349,12 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_14clearmuhlen(CYTHON_U
         __pyx_t_6 = 0;
         __pyx_t_7 = 0;
         __pyx_t_9 = 0;
-        __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_11, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 442, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_11, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 367, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
       }
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 442, __pyx_L1_error)
+      __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 367, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __pyx_t_13 = ((!__pyx_t_12) != 0);
       if (__pyx_t_13) {
@@ -11041,32 +10362,32 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_14clearmuhlen(CYTHON_U
         __pyx_t_4 = __pyx_t_13;
         goto __pyx_L8_bool_binop_done;
       }
-      __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_board_muhlen, __pyx_v_ring, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 442, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_board_muhlen, __pyx_v_ring, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 367, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_5 = __Pyx_GetItemInt(__pyx_t_1, __pyx_v_stelle, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 442, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_GetItemInt(__pyx_t_1, __pyx_v_stelle, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 367, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __pyx_t_1 = __Pyx_PyInt_NeObjC(__pyx_t_5, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 442, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyInt_NeObjC(__pyx_t_5, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 367, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __pyx_t_13 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_13 < 0)) __PYX_ERR(0, 442, __pyx_L1_error)
+      __pyx_t_13 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_13 < 0)) __PYX_ERR(0, 367, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __pyx_t_4 = __pyx_t_13;
       __pyx_L8_bool_binop_done:;
       if (__pyx_t_4) {
 
-        /* "ai_minimax_alpha_beta.py":443
+        /* "ai_minimax_alpha_beta.py":368
  *             for stelle in range(8):
  *                 if (not self.checkmuhle(ring, stelle, board, board[ring][stelle])) and (board_muhlen[ring][stelle] != 0):
  *                     tobecleared.append((ring, stelle))             # <<<<<<<<<<<<<<
  *         if len(tobecleared) == 0:
  *             return False
  */
-        __pyx_t_1 = __Pyx_PyInt_From_long(__pyx_v_ring); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 443, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_PyInt_From_long(__pyx_v_ring); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 368, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
-        __pyx_t_5 = __Pyx_PyInt_From_long(__pyx_v_stelle); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 443, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyInt_From_long(__pyx_v_stelle); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 368, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
-        __pyx_t_11 = PyTuple_New(2); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 443, __pyx_L1_error)
+        __pyx_t_11 = PyTuple_New(2); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 368, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_11);
         __Pyx_GIVEREF(__pyx_t_1);
         PyTuple_SET_ITEM(__pyx_t_11, 0, __pyx_t_1);
@@ -11074,10 +10395,10 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_14clearmuhlen(CYTHON_U
         PyTuple_SET_ITEM(__pyx_t_11, 1, __pyx_t_5);
         __pyx_t_1 = 0;
         __pyx_t_5 = 0;
-        __pyx_t_14 = __Pyx_PyList_Append(__pyx_v_tobecleared, __pyx_t_11); if (unlikely(__pyx_t_14 == ((int)-1))) __PYX_ERR(0, 443, __pyx_L1_error)
+        __pyx_t_14 = __Pyx_PyList_Append(__pyx_v_tobecleared, __pyx_t_11); if (unlikely(__pyx_t_14 == ((int)-1))) __PYX_ERR(0, 368, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
 
-        /* "ai_minimax_alpha_beta.py":442
+        /* "ai_minimax_alpha_beta.py":367
  *         for ring in range(3):
  *             for stelle in range(8):
  *                 if (not self.checkmuhle(ring, stelle, board, board[ring][stelle])) and (board_muhlen[ring][stelle] != 0):             # <<<<<<<<<<<<<<
@@ -11088,18 +10409,18 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_14clearmuhlen(CYTHON_U
     }
   }
 
-  /* "ai_minimax_alpha_beta.py":444
+  /* "ai_minimax_alpha_beta.py":369
  *                 if (not self.checkmuhle(ring, stelle, board, board[ring][stelle])) and (board_muhlen[ring][stelle] != 0):
  *                     tobecleared.append((ring, stelle))
  *         if len(tobecleared) == 0:             # <<<<<<<<<<<<<<
  *             return False
  *         else:
  */
-  __pyx_t_15 = PyList_GET_SIZE(__pyx_v_tobecleared); if (unlikely(__pyx_t_15 == ((Py_ssize_t)-1))) __PYX_ERR(0, 444, __pyx_L1_error)
+  __pyx_t_15 = PyList_GET_SIZE(__pyx_v_tobecleared); if (unlikely(__pyx_t_15 == ((Py_ssize_t)-1))) __PYX_ERR(0, 369, __pyx_L1_error)
   __pyx_t_4 = ((__pyx_t_15 == 0) != 0);
   if (__pyx_t_4) {
 
-    /* "ai_minimax_alpha_beta.py":445
+    /* "ai_minimax_alpha_beta.py":370
  *                     tobecleared.append((ring, stelle))
  *         if len(tobecleared) == 0:
  *             return False             # <<<<<<<<<<<<<<
@@ -11111,7 +10432,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_14clearmuhlen(CYTHON_U
     __pyx_r = Py_False;
     goto __pyx_L0;
 
-    /* "ai_minimax_alpha_beta.py":444
+    /* "ai_minimax_alpha_beta.py":369
  *                 if (not self.checkmuhle(ring, stelle, board, board[ring][stelle])) and (board_muhlen[ring][stelle] != 0):
  *                     tobecleared.append((ring, stelle))
  *         if len(tobecleared) == 0:             # <<<<<<<<<<<<<<
@@ -11120,10 +10441,12 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_14clearmuhlen(CYTHON_U
  */
   }
 
-  /* "ai_minimax_alpha_beta.py":447
+  /* "ai_minimax_alpha_beta.py":372
  *             return False
  *         else:
  *             return tobecleared             # <<<<<<<<<<<<<<
+ * 
+ * 
  */
   /*else*/ {
     __Pyx_XDECREF(__pyx_r);
@@ -11132,7 +10455,7 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_14clearmuhlen(CYTHON_U
     goto __pyx_L0;
   }
 
-  /* "ai_minimax_alpha_beta.py":438
+  /* "ai_minimax_alpha_beta.py":363
  *         return False
  * 
  *     def clearmuhlen(self, board, board_muhlen):             # <<<<<<<<<<<<<<
@@ -11153,6 +10476,1332 @@ static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_14clearmuhlen(CYTHON_U
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_tobecleared);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "ai_minimax_alpha_beta.py":375
+ * 
+ * 
+ *     def update_board_muhlen(self, board, board_muhlen_old):             # <<<<<<<<<<<<<<
+ *         board_muhlen_new = copy.deepcopy(board_muhlen_old)
+ *         for ring in range(3):
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_21ai_minimax_alpha_beta_6Morris_15update_board_muhlen(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_21ai_minimax_alpha_beta_6Morris_15update_board_muhlen = {"update_board_muhlen", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_21ai_minimax_alpha_beta_6Morris_15update_board_muhlen, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_21ai_minimax_alpha_beta_6Morris_15update_board_muhlen(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+  PyObject *__pyx_v_self = 0;
+  PyObject *__pyx_v_board = 0;
+  PyObject *__pyx_v_board_muhlen_old = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("update_board_muhlen (wrapper)", 0);
+  {
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_self,&__pyx_n_s_board,&__pyx_n_s_board_muhlen_old,0};
+    PyObject* values[3] = {0,0,0};
+    if (unlikely(__pyx_kwds)) {
+      Py_ssize_t kw_args;
+      const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
+      switch (pos_args) {
+        case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+        CYTHON_FALLTHROUGH;
+        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+        CYTHON_FALLTHROUGH;
+        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+        CYTHON_FALLTHROUGH;
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      kw_args = PyDict_Size(__pyx_kwds);
+      switch (pos_args) {
+        case  0:
+        if (likely((values[0] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_self)) != 0)) kw_args--;
+        else goto __pyx_L5_argtuple_error;
+        CYTHON_FALLTHROUGH;
+        case  1:
+        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_board)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("update_board_muhlen", 1, 3, 3, 1); __PYX_ERR(0, 375, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  2:
+        if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_board_muhlen_old)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("update_board_muhlen", 1, 3, 3, 2); __PYX_ERR(0, 375, __pyx_L3_error)
+        }
+      }
+      if (unlikely(kw_args > 0)) {
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "update_board_muhlen") < 0)) __PYX_ERR(0, 375, __pyx_L3_error)
+      }
+    } else if (PyTuple_GET_SIZE(__pyx_args) != 3) {
+      goto __pyx_L5_argtuple_error;
+    } else {
+      values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+      values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+      values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+    }
+    __pyx_v_self = values[0];
+    __pyx_v_board = values[1];
+    __pyx_v_board_muhlen_old = values[2];
+  }
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("update_board_muhlen", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 375, __pyx_L3_error)
+  __pyx_L3_error:;
+  __Pyx_AddTraceback("ai_minimax_alpha_beta.Morris.update_board_muhlen", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  __pyx_r = __pyx_pf_21ai_minimax_alpha_beta_6Morris_14update_board_muhlen(__pyx_self, __pyx_v_self, __pyx_v_board, __pyx_v_board_muhlen_old);
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_14update_board_muhlen(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_board, PyObject *__pyx_v_board_muhlen_old) {
+  PyObject *__pyx_v_board_muhlen_new = NULL;
+  long __pyx_v_ring;
+  long __pyx_v_stelle;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  long __pyx_t_4;
+  long __pyx_t_5;
+  PyObject *__pyx_t_6 = NULL;
+  PyObject *__pyx_t_7 = NULL;
+  PyObject *__pyx_t_8 = NULL;
+  int __pyx_t_9;
+  PyObject *__pyx_t_10 = NULL;
+  int __pyx_t_11;
+  __Pyx_RefNannySetupContext("update_board_muhlen", 0);
+
+  /* "ai_minimax_alpha_beta.py":376
+ * 
+ *     def update_board_muhlen(self, board, board_muhlen_old):
+ *         board_muhlen_new = copy.deepcopy(board_muhlen_old)             # <<<<<<<<<<<<<<
+ *         for ring in range(3):
+ *             for stelle in range(8):
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_copy); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 376, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_deepcopy); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 376, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = NULL;
+  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
+    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_3);
+    if (likely(__pyx_t_2)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
+      __Pyx_INCREF(__pyx_t_2);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_3, function);
+    }
+  }
+  __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_2, __pyx_v_board_muhlen_old) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_board_muhlen_old);
+  __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 376, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_v_board_muhlen_new = __pyx_t_1;
+  __pyx_t_1 = 0;
+
+  /* "ai_minimax_alpha_beta.py":377
+ *     def update_board_muhlen(self, board, board_muhlen_old):
+ *         board_muhlen_new = copy.deepcopy(board_muhlen_old)
+ *         for ring in range(3):             # <<<<<<<<<<<<<<
+ *             for stelle in range(8):
+ *                 if self.checkmuhle(ring, stelle, board, board[ring][stelle]):
+ */
+  for (__pyx_t_4 = 0; __pyx_t_4 < 3; __pyx_t_4+=1) {
+    __pyx_v_ring = __pyx_t_4;
+
+    /* "ai_minimax_alpha_beta.py":378
+ *         board_muhlen_new = copy.deepcopy(board_muhlen_old)
+ *         for ring in range(3):
+ *             for stelle in range(8):             # <<<<<<<<<<<<<<
+ *                 if self.checkmuhle(ring, stelle, board, board[ring][stelle]):
+ *                     board_muhlen_new[ring][stelle] = 1
+ */
+    for (__pyx_t_5 = 0; __pyx_t_5 < 8; __pyx_t_5+=1) {
+      __pyx_v_stelle = __pyx_t_5;
+
+      /* "ai_minimax_alpha_beta.py":379
+ *         for ring in range(3):
+ *             for stelle in range(8):
+ *                 if self.checkmuhle(ring, stelle, board, board[ring][stelle]):             # <<<<<<<<<<<<<<
+ *                     board_muhlen_new[ring][stelle] = 1
+ *                 else:
+ */
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_checkmuhle); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 379, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_3);
+      __pyx_t_2 = __Pyx_PyInt_From_long(__pyx_v_ring); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 379, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_2);
+      __pyx_t_6 = __Pyx_PyInt_From_long(__pyx_v_stelle); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 379, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_6);
+      __pyx_t_7 = __Pyx_GetItemInt(__pyx_v_board, __pyx_v_ring, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 379, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_7);
+      __pyx_t_8 = __Pyx_GetItemInt(__pyx_t_7, __pyx_v_stelle, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 379, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_8);
+      __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+      __pyx_t_7 = NULL;
+      __pyx_t_9 = 0;
+      if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
+        __pyx_t_7 = PyMethod_GET_SELF(__pyx_t_3);
+        if (likely(__pyx_t_7)) {
+          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
+          __Pyx_INCREF(__pyx_t_7);
+          __Pyx_INCREF(function);
+          __Pyx_DECREF_SET(__pyx_t_3, function);
+          __pyx_t_9 = 1;
+        }
+      }
+      #if CYTHON_FAST_PYCALL
+      if (PyFunction_Check(__pyx_t_3)) {
+        PyObject *__pyx_temp[5] = {__pyx_t_7, __pyx_t_2, __pyx_t_6, __pyx_v_board, __pyx_t_8};
+        __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_9, 4+__pyx_t_9); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 379, __pyx_L1_error)
+        __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
+        __Pyx_GOTREF(__pyx_t_1);
+        __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+        __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+        __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+      } else
+      #endif
+      #if CYTHON_FAST_PYCCALL
+      if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
+        PyObject *__pyx_temp[5] = {__pyx_t_7, __pyx_t_2, __pyx_t_6, __pyx_v_board, __pyx_t_8};
+        __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_9, 4+__pyx_t_9); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 379, __pyx_L1_error)
+        __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
+        __Pyx_GOTREF(__pyx_t_1);
+        __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+        __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+        __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+      } else
+      #endif
+      {
+        __pyx_t_10 = PyTuple_New(4+__pyx_t_9); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 379, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_10);
+        if (__pyx_t_7) {
+          __Pyx_GIVEREF(__pyx_t_7); PyTuple_SET_ITEM(__pyx_t_10, 0, __pyx_t_7); __pyx_t_7 = NULL;
+        }
+        __Pyx_GIVEREF(__pyx_t_2);
+        PyTuple_SET_ITEM(__pyx_t_10, 0+__pyx_t_9, __pyx_t_2);
+        __Pyx_GIVEREF(__pyx_t_6);
+        PyTuple_SET_ITEM(__pyx_t_10, 1+__pyx_t_9, __pyx_t_6);
+        __Pyx_INCREF(__pyx_v_board);
+        __Pyx_GIVEREF(__pyx_v_board);
+        PyTuple_SET_ITEM(__pyx_t_10, 2+__pyx_t_9, __pyx_v_board);
+        __Pyx_GIVEREF(__pyx_t_8);
+        PyTuple_SET_ITEM(__pyx_t_10, 3+__pyx_t_9, __pyx_t_8);
+        __pyx_t_2 = 0;
+        __pyx_t_6 = 0;
+        __pyx_t_8 = 0;
+        __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_10, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 379, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_1);
+        __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+      }
+      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+      __pyx_t_11 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_11 < 0)) __PYX_ERR(0, 379, __pyx_L1_error)
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+      if (__pyx_t_11) {
+
+        /* "ai_minimax_alpha_beta.py":380
+ *             for stelle in range(8):
+ *                 if self.checkmuhle(ring, stelle, board, board[ring][stelle]):
+ *                     board_muhlen_new[ring][stelle] = 1             # <<<<<<<<<<<<<<
+ *                 else:
+ *                     board_muhlen_new[ring][stelle] = 0
+ */
+        __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_board_muhlen_new, __pyx_v_ring, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 380, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_1);
+        if (unlikely(__Pyx_SetItemInt(__pyx_t_1, __pyx_v_stelle, __pyx_int_1, long, 1, __Pyx_PyInt_From_long, 0, 1, 1) < 0)) __PYX_ERR(0, 380, __pyx_L1_error)
+        __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+        /* "ai_minimax_alpha_beta.py":379
+ *         for ring in range(3):
+ *             for stelle in range(8):
+ *                 if self.checkmuhle(ring, stelle, board, board[ring][stelle]):             # <<<<<<<<<<<<<<
+ *                     board_muhlen_new[ring][stelle] = 1
+ *                 else:
+ */
+        goto __pyx_L7;
+      }
+
+      /* "ai_minimax_alpha_beta.py":382
+ *                     board_muhlen_new[ring][stelle] = 1
+ *                 else:
+ *                     board_muhlen_new[ring][stelle] = 0             # <<<<<<<<<<<<<<
+ *         return board_muhlen_new
+ * 
+ */
+      /*else*/ {
+        __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_board_muhlen_new, __pyx_v_ring, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 382, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_1);
+        if (unlikely(__Pyx_SetItemInt(__pyx_t_1, __pyx_v_stelle, __pyx_int_0, long, 1, __Pyx_PyInt_From_long, 0, 1, 1) < 0)) __PYX_ERR(0, 382, __pyx_L1_error)
+        __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+      }
+      __pyx_L7:;
+    }
+  }
+
+  /* "ai_minimax_alpha_beta.py":383
+ *                 else:
+ *                     board_muhlen_new[ring][stelle] = 0
+ *         return board_muhlen_new             # <<<<<<<<<<<<<<
+ * 
+ * 
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __Pyx_INCREF(__pyx_v_board_muhlen_new);
+  __pyx_r = __pyx_v_board_muhlen_new;
+  goto __pyx_L0;
+
+  /* "ai_minimax_alpha_beta.py":375
+ * 
+ * 
+ *     def update_board_muhlen(self, board, board_muhlen_old):             # <<<<<<<<<<<<<<
+ *         board_muhlen_new = copy.deepcopy(board_muhlen_old)
+ *         for ring in range(3):
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_6);
+  __Pyx_XDECREF(__pyx_t_7);
+  __Pyx_XDECREF(__pyx_t_8);
+  __Pyx_XDECREF(__pyx_t_10);
+  __Pyx_AddTraceback("ai_minimax_alpha_beta.Morris.update_board_muhlen", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XDECREF(__pyx_v_board_muhlen_new);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "ai_minimax_alpha_beta.py":387
+ * 
+ *     # Determines which man is most beneficial to be removed
+ *     def toremove(self, board, enemy):             # <<<<<<<<<<<<<<
+ *         enemies = []
+ *         scores = []
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_21ai_minimax_alpha_beta_6Morris_17toremove(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_21ai_minimax_alpha_beta_6Morris_17toremove = {"toremove", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_21ai_minimax_alpha_beta_6Morris_17toremove, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_21ai_minimax_alpha_beta_6Morris_17toremove(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+  PyObject *__pyx_v_self = 0;
+  PyObject *__pyx_v_board = 0;
+  PyObject *__pyx_v_enemy = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("toremove (wrapper)", 0);
+  {
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_self,&__pyx_n_s_board,&__pyx_n_s_enemy,0};
+    PyObject* values[3] = {0,0,0};
+    if (unlikely(__pyx_kwds)) {
+      Py_ssize_t kw_args;
+      const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
+      switch (pos_args) {
+        case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+        CYTHON_FALLTHROUGH;
+        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+        CYTHON_FALLTHROUGH;
+        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+        CYTHON_FALLTHROUGH;
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      kw_args = PyDict_Size(__pyx_kwds);
+      switch (pos_args) {
+        case  0:
+        if (likely((values[0] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_self)) != 0)) kw_args--;
+        else goto __pyx_L5_argtuple_error;
+        CYTHON_FALLTHROUGH;
+        case  1:
+        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_board)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("toremove", 1, 3, 3, 1); __PYX_ERR(0, 387, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  2:
+        if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_enemy)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("toremove", 1, 3, 3, 2); __PYX_ERR(0, 387, __pyx_L3_error)
+        }
+      }
+      if (unlikely(kw_args > 0)) {
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "toremove") < 0)) __PYX_ERR(0, 387, __pyx_L3_error)
+      }
+    } else if (PyTuple_GET_SIZE(__pyx_args) != 3) {
+      goto __pyx_L5_argtuple_error;
+    } else {
+      values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+      values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+      values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+    }
+    __pyx_v_self = values[0];
+    __pyx_v_board = values[1];
+    __pyx_v_enemy = values[2];
+  }
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("toremove", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 387, __pyx_L3_error)
+  __pyx_L3_error:;
+  __Pyx_AddTraceback("ai_minimax_alpha_beta.Morris.toremove", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  __pyx_r = __pyx_pf_21ai_minimax_alpha_beta_6Morris_16toremove(__pyx_self, __pyx_v_self, __pyx_v_board, __pyx_v_enemy);
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_21ai_minimax_alpha_beta_6Morris_16toremove(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_board, PyObject *__pyx_v_enemy) {
+  PyObject *__pyx_v_enemies = NULL;
+  PyObject *__pyx_v_scores = NULL;
+  PyObject *__pyx_v_ring = NULL;
+  PyObject *__pyx_v_stelle = NULL;
+  PyObject *__pyx_v_evil_score = NULL;
+  PyObject *__pyx_v_max_score = NULL;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  long __pyx_t_2;
+  long __pyx_t_3;
+  int __pyx_t_4;
+  PyObject *__pyx_t_5 = NULL;
+  int __pyx_t_6;
+  PyObject *__pyx_t_7 = NULL;
+  int __pyx_t_8;
+  PyObject *__pyx_t_9 = NULL;
+  int __pyx_t_10;
+  int __pyx_t_11;
+  Py_ssize_t __pyx_t_12;
+  __Pyx_RefNannySetupContext("toremove", 0);
+
+  /* "ai_minimax_alpha_beta.py":388
+ *     # Determines which man is most beneficial to be removed
+ *     def toremove(self, board, enemy):
+ *         enemies = []             # <<<<<<<<<<<<<<
+ *         scores = []
+ *         for ring in range(3):
+ */
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 388, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_v_enemies = ((PyObject*)__pyx_t_1);
+  __pyx_t_1 = 0;
+
+  /* "ai_minimax_alpha_beta.py":389
+ *     def toremove(self, board, enemy):
+ *         enemies = []
+ *         scores = []             # <<<<<<<<<<<<<<
+ *         for ring in range(3):
+ *             for stelle in range(8):
+ */
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 389, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_v_scores = ((PyObject*)__pyx_t_1);
+  __pyx_t_1 = 0;
+
+  /* "ai_minimax_alpha_beta.py":390
+ *         enemies = []
+ *         scores = []
+ *         for ring in range(3):             # <<<<<<<<<<<<<<
+ *             for stelle in range(8):
+ *                 # For each enemy man who is not in a mill
+ */
+  for (__pyx_t_2 = 0; __pyx_t_2 < 3; __pyx_t_2+=1) {
+    __pyx_t_1 = __Pyx_PyInt_From_long(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 390, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_XDECREF_SET(__pyx_v_ring, __pyx_t_1);
+    __pyx_t_1 = 0;
+
+    /* "ai_minimax_alpha_beta.py":391
+ *         scores = []
+ *         for ring in range(3):
+ *             for stelle in range(8):             # <<<<<<<<<<<<<<
+ *                 # For each enemy man who is not in a mill
+ *                 if board[ring][stelle] == enemy and not self.checkmuhle(ring, stelle, board, enemy):
+ */
+    for (__pyx_t_3 = 0; __pyx_t_3 < 8; __pyx_t_3+=1) {
+      __pyx_t_1 = __Pyx_PyInt_From_long(__pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 391, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_1);
+      __Pyx_XDECREF_SET(__pyx_v_stelle, __pyx_t_1);
+      __pyx_t_1 = 0;
+
+      /* "ai_minimax_alpha_beta.py":393
+ *             for stelle in range(8):
+ *                 # For each enemy man who is not in a mill
+ *                 if board[ring][stelle] == enemy and not self.checkmuhle(ring, stelle, board, enemy):             # <<<<<<<<<<<<<<
+ *                     # Generate "evil" score for the enemy man
+ *                     evil_score = 0
+ */
+      __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_v_board, __pyx_v_ring); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 393, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_1);
+      __pyx_t_5 = __Pyx_PyObject_GetItem(__pyx_t_1, __pyx_v_stelle); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 393, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_5);
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+      __pyx_t_1 = PyObject_RichCompare(__pyx_t_5, __pyx_v_enemy, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 393, __pyx_L1_error)
+      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+      __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 393, __pyx_L1_error)
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+      if (__pyx_t_6) {
+      } else {
+        __pyx_t_4 = __pyx_t_6;
+        goto __pyx_L8_bool_binop_done;
+      }
+      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_checkmuhle); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 393, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_5);
+      __pyx_t_7 = NULL;
+      __pyx_t_8 = 0;
+      if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_5))) {
+        __pyx_t_7 = PyMethod_GET_SELF(__pyx_t_5);
+        if (likely(__pyx_t_7)) {
+          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_5);
+          __Pyx_INCREF(__pyx_t_7);
+          __Pyx_INCREF(function);
+          __Pyx_DECREF_SET(__pyx_t_5, function);
+          __pyx_t_8 = 1;
+        }
+      }
+      #if CYTHON_FAST_PYCALL
+      if (PyFunction_Check(__pyx_t_5)) {
+        PyObject *__pyx_temp[5] = {__pyx_t_7, __pyx_v_ring, __pyx_v_stelle, __pyx_v_board, __pyx_v_enemy};
+        __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_8, 4+__pyx_t_8); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 393, __pyx_L1_error)
+        __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
+        __Pyx_GOTREF(__pyx_t_1);
+      } else
+      #endif
+      #if CYTHON_FAST_PYCCALL
+      if (__Pyx_PyFastCFunction_Check(__pyx_t_5)) {
+        PyObject *__pyx_temp[5] = {__pyx_t_7, __pyx_v_ring, __pyx_v_stelle, __pyx_v_board, __pyx_v_enemy};
+        __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_8, 4+__pyx_t_8); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 393, __pyx_L1_error)
+        __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
+        __Pyx_GOTREF(__pyx_t_1);
+      } else
+      #endif
+      {
+        __pyx_t_9 = PyTuple_New(4+__pyx_t_8); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 393, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_9);
+        if (__pyx_t_7) {
+          __Pyx_GIVEREF(__pyx_t_7); PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_7); __pyx_t_7 = NULL;
+        }
+        __Pyx_INCREF(__pyx_v_ring);
+        __Pyx_GIVEREF(__pyx_v_ring);
+        PyTuple_SET_ITEM(__pyx_t_9, 0+__pyx_t_8, __pyx_v_ring);
+        __Pyx_INCREF(__pyx_v_stelle);
+        __Pyx_GIVEREF(__pyx_v_stelle);
+        PyTuple_SET_ITEM(__pyx_t_9, 1+__pyx_t_8, __pyx_v_stelle);
+        __Pyx_INCREF(__pyx_v_board);
+        __Pyx_GIVEREF(__pyx_v_board);
+        PyTuple_SET_ITEM(__pyx_t_9, 2+__pyx_t_8, __pyx_v_board);
+        __Pyx_INCREF(__pyx_v_enemy);
+        __Pyx_GIVEREF(__pyx_v_enemy);
+        PyTuple_SET_ITEM(__pyx_t_9, 3+__pyx_t_8, __pyx_v_enemy);
+        __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_9, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 393, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_1);
+        __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+      }
+      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+      __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 393, __pyx_L1_error)
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+      __pyx_t_10 = ((!__pyx_t_6) != 0);
+      __pyx_t_4 = __pyx_t_10;
+      __pyx_L8_bool_binop_done:;
+      if (__pyx_t_4) {
+
+        /* "ai_minimax_alpha_beta.py":395
+ *                 if board[ring][stelle] == enemy and not self.checkmuhle(ring, stelle, board, enemy):
+ *                     # Generate "evil" score for the enemy man
+ *                     evil_score = 0             # <<<<<<<<<<<<<<
+ * 
+ *                     # If two men are in one line and can make a mill next move
+ */
+        __Pyx_INCREF(__pyx_int_0);
+        __Pyx_XDECREF_SET(__pyx_v_evil_score, __pyx_int_0);
+
+        /* "ai_minimax_alpha_beta.py":398
+ * 
+ *                     # If two men are in one line and can make a mill next move
+ *                     if stelle % 2 == 0:  # Edge case             # <<<<<<<<<<<<<<
+ *                         if board[ring][((stelle + 1) % 8)] == enemy:
+ *                             evil_score += 1
+ */
+        __pyx_t_1 = __Pyx_PyInt_RemainderObjC(__pyx_v_stelle, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 398, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_1);
+        __pyx_t_5 = __Pyx_PyInt_EqObjC(__pyx_t_1, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 398, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_5);
+        __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+        __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 398, __pyx_L1_error)
+        __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+        if (__pyx_t_4) {
+
+          /* "ai_minimax_alpha_beta.py":399
+ *                     # If two men are in one line and can make a mill next move
+ *                     if stelle % 2 == 0:  # Edge case
+ *                         if board[ring][((stelle + 1) % 8)] == enemy:             # <<<<<<<<<<<<<<
+ *                             evil_score += 1
+ *                         if board[ring][(stelle - 1) % 8] == enemy:
+ */
+          __pyx_t_5 = __Pyx_PyObject_GetItem(__pyx_v_board, __pyx_v_ring); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 399, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_5);
+          __pyx_t_1 = __Pyx_PyInt_AddObjC(__pyx_v_stelle, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 399, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_1);
+          __pyx_t_9 = __Pyx_PyInt_RemainderObjC(__pyx_t_1, __pyx_int_8, 8, 0, 0); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 399, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_9);
+          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_t_5, __pyx_t_9); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 399, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_1);
+          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+          __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+          __pyx_t_9 = PyObject_RichCompare(__pyx_t_1, __pyx_v_enemy, Py_EQ); __Pyx_XGOTREF(__pyx_t_9); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 399, __pyx_L1_error)
+          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_9); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 399, __pyx_L1_error)
+          __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+          if (__pyx_t_4) {
+
+            /* "ai_minimax_alpha_beta.py":400
+ *                     if stelle % 2 == 0:  # Edge case
+ *                         if board[ring][((stelle + 1) % 8)] == enemy:
+ *                             evil_score += 1             # <<<<<<<<<<<<<<
+ *                         if board[ring][(stelle - 1) % 8] == enemy:
+ *                             evil_score += 1
+ */
+            __pyx_t_9 = __Pyx_PyInt_AddObjC(__pyx_v_evil_score, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 400, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_9);
+            __Pyx_DECREF_SET(__pyx_v_evil_score, __pyx_t_9);
+            __pyx_t_9 = 0;
+
+            /* "ai_minimax_alpha_beta.py":399
+ *                     # If two men are in one line and can make a mill next move
+ *                     if stelle % 2 == 0:  # Edge case
+ *                         if board[ring][((stelle + 1) % 8)] == enemy:             # <<<<<<<<<<<<<<
+ *                             evil_score += 1
+ *                         if board[ring][(stelle - 1) % 8] == enemy:
+ */
+          }
+
+          /* "ai_minimax_alpha_beta.py":401
+ *                         if board[ring][((stelle + 1) % 8)] == enemy:
+ *                             evil_score += 1
+ *                         if board[ring][(stelle - 1) % 8] == enemy:             # <<<<<<<<<<<<<<
+ *                             evil_score += 1
+ *                         # Really bad situation, man has to be removed because two mills are possible
+ */
+          __pyx_t_9 = __Pyx_PyObject_GetItem(__pyx_v_board, __pyx_v_ring); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 401, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_9);
+          __pyx_t_1 = __Pyx_PyInt_SubtractObjC(__pyx_v_stelle, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 401, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_1);
+          __pyx_t_5 = __Pyx_PyInt_RemainderObjC(__pyx_t_1, __pyx_int_8, 8, 0, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 401, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_5);
+          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_t_9, __pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 401, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_1);
+          __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+          __pyx_t_5 = PyObject_RichCompare(__pyx_t_1, __pyx_v_enemy, Py_EQ); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 401, __pyx_L1_error)
+          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 401, __pyx_L1_error)
+          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+          if (__pyx_t_4) {
+
+            /* "ai_minimax_alpha_beta.py":402
+ *                             evil_score += 1
+ *                         if board[ring][(stelle - 1) % 8] == enemy:
+ *                             evil_score += 1             # <<<<<<<<<<<<<<
+ *                         # Really bad situation, man has to be removed because two mills are possible
+ *                         if board[ring][(stelle - 1) % 8] == enemy and board[ring][((stelle + 1) % 8)] == enemy:
+ */
+            __pyx_t_5 = __Pyx_PyInt_AddObjC(__pyx_v_evil_score, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 402, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_5);
+            __Pyx_DECREF_SET(__pyx_v_evil_score, __pyx_t_5);
+            __pyx_t_5 = 0;
+
+            /* "ai_minimax_alpha_beta.py":401
+ *                         if board[ring][((stelle + 1) % 8)] == enemy:
+ *                             evil_score += 1
+ *                         if board[ring][(stelle - 1) % 8] == enemy:             # <<<<<<<<<<<<<<
+ *                             evil_score += 1
+ *                         # Really bad situation, man has to be removed because two mills are possible
+ */
+          }
+
+          /* "ai_minimax_alpha_beta.py":404
+ *                             evil_score += 1
+ *                         # Really bad situation, man has to be removed because two mills are possible
+ *                         if board[ring][(stelle - 1) % 8] == enemy and board[ring][((stelle + 1) % 8)] == enemy:             # <<<<<<<<<<<<<<
+ *                             evil_score += 100
+ * 
+ */
+          __pyx_t_5 = __Pyx_PyObject_GetItem(__pyx_v_board, __pyx_v_ring); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 404, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_5);
+          __pyx_t_1 = __Pyx_PyInt_SubtractObjC(__pyx_v_stelle, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 404, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_1);
+          __pyx_t_9 = __Pyx_PyInt_RemainderObjC(__pyx_t_1, __pyx_int_8, 8, 0, 0); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 404, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_9);
+          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_t_5, __pyx_t_9); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 404, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_1);
+          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+          __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+          __pyx_t_9 = PyObject_RichCompare(__pyx_t_1, __pyx_v_enemy, Py_EQ); __Pyx_XGOTREF(__pyx_t_9); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 404, __pyx_L1_error)
+          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          __pyx_t_10 = __Pyx_PyObject_IsTrue(__pyx_t_9); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 404, __pyx_L1_error)
+          __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+          if (__pyx_t_10) {
+          } else {
+            __pyx_t_4 = __pyx_t_10;
+            goto __pyx_L14_bool_binop_done;
+          }
+          __pyx_t_9 = __Pyx_PyObject_GetItem(__pyx_v_board, __pyx_v_ring); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 404, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_9);
+          __pyx_t_1 = __Pyx_PyInt_AddObjC(__pyx_v_stelle, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 404, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_1);
+          __pyx_t_5 = __Pyx_PyInt_RemainderObjC(__pyx_t_1, __pyx_int_8, 8, 0, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 404, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_5);
+          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_t_9, __pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 404, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_1);
+          __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+          __pyx_t_5 = PyObject_RichCompare(__pyx_t_1, __pyx_v_enemy, Py_EQ); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 404, __pyx_L1_error)
+          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          __pyx_t_10 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 404, __pyx_L1_error)
+          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+          __pyx_t_4 = __pyx_t_10;
+          __pyx_L14_bool_binop_done:;
+          if (__pyx_t_4) {
+
+            /* "ai_minimax_alpha_beta.py":405
+ *                         # Really bad situation, man has to be removed because two mills are possible
+ *                         if board[ring][(stelle - 1) % 8] == enemy and board[ring][((stelle + 1) % 8)] == enemy:
+ *                             evil_score += 100             # <<<<<<<<<<<<<<
+ * 
+ *                     elif stelle % 2 != 0:  # Center case
+ */
+            __pyx_t_5 = __Pyx_PyInt_AddObjC(__pyx_v_evil_score, __pyx_int_100, 0x64, 1, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 405, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_5);
+            __Pyx_DECREF_SET(__pyx_v_evil_score, __pyx_t_5);
+            __pyx_t_5 = 0;
+
+            /* "ai_minimax_alpha_beta.py":404
+ *                             evil_score += 1
+ *                         # Really bad situation, man has to be removed because two mills are possible
+ *                         if board[ring][(stelle - 1) % 8] == enemy and board[ring][((stelle + 1) % 8)] == enemy:             # <<<<<<<<<<<<<<
+ *                             evil_score += 100
+ * 
+ */
+          }
+
+          /* "ai_minimax_alpha_beta.py":398
+ * 
+ *                     # If two men are in one line and can make a mill next move
+ *                     if stelle % 2 == 0:  # Edge case             # <<<<<<<<<<<<<<
+ *                         if board[ring][((stelle + 1) % 8)] == enemy:
+ *                             evil_score += 1
+ */
+          goto __pyx_L10;
+        }
+
+        /* "ai_minimax_alpha_beta.py":407
+ *                             evil_score += 100
+ * 
+ *                     elif stelle % 2 != 0:  # Center case             # <<<<<<<<<<<<<<
+ *                         if board[(ring + 1) % 3][stelle] == enemy:
+ *                             evil_score += 1
+ */
+        __pyx_t_5 = __Pyx_PyInt_RemainderObjC(__pyx_v_stelle, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 407, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_5);
+        __pyx_t_1 = __Pyx_PyInt_NeObjC(__pyx_t_5, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 407, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_1);
+        __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+        __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 407, __pyx_L1_error)
+        __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+        if (__pyx_t_4) {
+
+          /* "ai_minimax_alpha_beta.py":408
+ * 
+ *                     elif stelle % 2 != 0:  # Center case
+ *                         if board[(ring + 1) % 3][stelle] == enemy:             # <<<<<<<<<<<<<<
+ *                             evil_score += 1
+ *                         if board[(ring + 2) % 3][stelle] == enemy:
+ */
+          __pyx_t_1 = __Pyx_PyInt_AddObjC(__pyx_v_ring, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 408, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_1);
+          __pyx_t_5 = __Pyx_PyInt_RemainderObjC(__pyx_t_1, __pyx_int_3, 3, 0, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 408, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_5);
+          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_v_board, __pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 408, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_1);
+          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+          __pyx_t_5 = __Pyx_PyObject_GetItem(__pyx_t_1, __pyx_v_stelle); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 408, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_5);
+          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          __pyx_t_1 = PyObject_RichCompare(__pyx_t_5, __pyx_v_enemy, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 408, __pyx_L1_error)
+          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+          __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 408, __pyx_L1_error)
+          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          if (__pyx_t_4) {
+
+            /* "ai_minimax_alpha_beta.py":409
+ *                     elif stelle % 2 != 0:  # Center case
+ *                         if board[(ring + 1) % 3][stelle] == enemy:
+ *                             evil_score += 1             # <<<<<<<<<<<<<<
+ *                         if board[(ring + 2) % 3][stelle] == enemy:
+ *                             evil_score += 1
+ */
+            __pyx_t_1 = __Pyx_PyInt_AddObjC(__pyx_v_evil_score, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 409, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_1);
+            __Pyx_DECREF_SET(__pyx_v_evil_score, __pyx_t_1);
+            __pyx_t_1 = 0;
+
+            /* "ai_minimax_alpha_beta.py":408
+ * 
+ *                     elif stelle % 2 != 0:  # Center case
+ *                         if board[(ring + 1) % 3][stelle] == enemy:             # <<<<<<<<<<<<<<
+ *                             evil_score += 1
+ *                         if board[(ring + 2) % 3][stelle] == enemy:
+ */
+          }
+
+          /* "ai_minimax_alpha_beta.py":410
+ *                         if board[(ring + 1) % 3][stelle] == enemy:
+ *                             evil_score += 1
+ *                         if board[(ring + 2) % 3][stelle] == enemy:             # <<<<<<<<<<<<<<
+ *                             evil_score += 1
+ *                         if board[ring][(stelle + 1) % 8] == enemy:
+ */
+          __pyx_t_1 = __Pyx_PyInt_AddObjC(__pyx_v_ring, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 410, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_1);
+          __pyx_t_5 = __Pyx_PyInt_RemainderObjC(__pyx_t_1, __pyx_int_3, 3, 0, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 410, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_5);
+          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_v_board, __pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 410, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_1);
+          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+          __pyx_t_5 = __Pyx_PyObject_GetItem(__pyx_t_1, __pyx_v_stelle); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 410, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_5);
+          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          __pyx_t_1 = PyObject_RichCompare(__pyx_t_5, __pyx_v_enemy, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 410, __pyx_L1_error)
+          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+          __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 410, __pyx_L1_error)
+          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          if (__pyx_t_4) {
+
+            /* "ai_minimax_alpha_beta.py":411
+ *                             evil_score += 1
+ *                         if board[(ring + 2) % 3][stelle] == enemy:
+ *                             evil_score += 1             # <<<<<<<<<<<<<<
+ *                         if board[ring][(stelle + 1) % 8] == enemy:
+ *                             evil_score += 1
+ */
+            __pyx_t_1 = __Pyx_PyInt_AddObjC(__pyx_v_evil_score, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 411, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_1);
+            __Pyx_DECREF_SET(__pyx_v_evil_score, __pyx_t_1);
+            __pyx_t_1 = 0;
+
+            /* "ai_minimax_alpha_beta.py":410
+ *                         if board[(ring + 1) % 3][stelle] == enemy:
+ *                             evil_score += 1
+ *                         if board[(ring + 2) % 3][stelle] == enemy:             # <<<<<<<<<<<<<<
+ *                             evil_score += 1
+ *                         if board[ring][(stelle + 1) % 8] == enemy:
+ */
+          }
+
+          /* "ai_minimax_alpha_beta.py":412
+ *                         if board[(ring + 2) % 3][stelle] == enemy:
+ *                             evil_score += 1
+ *                         if board[ring][(stelle + 1) % 8] == enemy:             # <<<<<<<<<<<<<<
+ *                             evil_score += 1
+ *                         if board[ring][(stelle - 1) % 8] == enemy:
+ */
+          __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_v_board, __pyx_v_ring); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 412, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_1);
+          __pyx_t_5 = __Pyx_PyInt_AddObjC(__pyx_v_stelle, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 412, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_5);
+          __pyx_t_9 = __Pyx_PyInt_RemainderObjC(__pyx_t_5, __pyx_int_8, 8, 0, 0); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 412, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_9);
+          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+          __pyx_t_5 = __Pyx_PyObject_GetItem(__pyx_t_1, __pyx_t_9); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 412, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_5);
+          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+          __pyx_t_9 = PyObject_RichCompare(__pyx_t_5, __pyx_v_enemy, Py_EQ); __Pyx_XGOTREF(__pyx_t_9); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 412, __pyx_L1_error)
+          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+          __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_9); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 412, __pyx_L1_error)
+          __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+          if (__pyx_t_4) {
+
+            /* "ai_minimax_alpha_beta.py":413
+ *                             evil_score += 1
+ *                         if board[ring][(stelle + 1) % 8] == enemy:
+ *                             evil_score += 1             # <<<<<<<<<<<<<<
+ *                         if board[ring][(stelle - 1) % 8] == enemy:
+ *                             evil_score += 1
+ */
+            __pyx_t_9 = __Pyx_PyInt_AddObjC(__pyx_v_evil_score, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 413, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_9);
+            __Pyx_DECREF_SET(__pyx_v_evil_score, __pyx_t_9);
+            __pyx_t_9 = 0;
+
+            /* "ai_minimax_alpha_beta.py":412
+ *                         if board[(ring + 2) % 3][stelle] == enemy:
+ *                             evil_score += 1
+ *                         if board[ring][(stelle + 1) % 8] == enemy:             # <<<<<<<<<<<<<<
+ *                             evil_score += 1
+ *                         if board[ring][(stelle - 1) % 8] == enemy:
+ */
+          }
+
+          /* "ai_minimax_alpha_beta.py":414
+ *                         if board[ring][(stelle + 1) % 8] == enemy:
+ *                             evil_score += 1
+ *                         if board[ring][(stelle - 1) % 8] == enemy:             # <<<<<<<<<<<<<<
+ *                             evil_score += 1
+ *                         # Really bad situation, same as above when two mills are possible
+ */
+          __pyx_t_9 = __Pyx_PyObject_GetItem(__pyx_v_board, __pyx_v_ring); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 414, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_9);
+          __pyx_t_5 = __Pyx_PyInt_SubtractObjC(__pyx_v_stelle, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 414, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_5);
+          __pyx_t_1 = __Pyx_PyInt_RemainderObjC(__pyx_t_5, __pyx_int_8, 8, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 414, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_1);
+          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+          __pyx_t_5 = __Pyx_PyObject_GetItem(__pyx_t_9, __pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 414, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_5);
+          __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          __pyx_t_1 = PyObject_RichCompare(__pyx_t_5, __pyx_v_enemy, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 414, __pyx_L1_error)
+          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+          __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 414, __pyx_L1_error)
+          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          if (__pyx_t_4) {
+
+            /* "ai_minimax_alpha_beta.py":415
+ *                             evil_score += 1
+ *                         if board[ring][(stelle - 1) % 8] == enemy:
+ *                             evil_score += 1             # <<<<<<<<<<<<<<
+ *                         # Really bad situation, same as above when two mills are possible
+ *                         if board[(ring + 1) % 3][stelle] == enemy and (board[ring][(stelle + 1) % 8] == enemy or board[ring][(stelle - 1) % 8] == enemy):
+ */
+            __pyx_t_1 = __Pyx_PyInt_AddObjC(__pyx_v_evil_score, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 415, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_1);
+            __Pyx_DECREF_SET(__pyx_v_evil_score, __pyx_t_1);
+            __pyx_t_1 = 0;
+
+            /* "ai_minimax_alpha_beta.py":414
+ *                         if board[ring][(stelle + 1) % 8] == enemy:
+ *                             evil_score += 1
+ *                         if board[ring][(stelle - 1) % 8] == enemy:             # <<<<<<<<<<<<<<
+ *                             evil_score += 1
+ *                         # Really bad situation, same as above when two mills are possible
+ */
+          }
+
+          /* "ai_minimax_alpha_beta.py":417
+ *                             evil_score += 1
+ *                         # Really bad situation, same as above when two mills are possible
+ *                         if board[(ring + 1) % 3][stelle] == enemy and (board[ring][(stelle + 1) % 8] == enemy or board[ring][(stelle - 1) % 8] == enemy):             # <<<<<<<<<<<<<<
+ *                             evil_score += 100
+ *                         if board[(ring + 2) % 3][stelle] == enemy and (board[ring][(stelle + 1) % 8] == enemy or board[ring][(stelle - 1) % 8] == enemy):
+ */
+          __pyx_t_1 = __Pyx_PyInt_AddObjC(__pyx_v_ring, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 417, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_1);
+          __pyx_t_5 = __Pyx_PyInt_RemainderObjC(__pyx_t_1, __pyx_int_3, 3, 0, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 417, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_5);
+          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_v_board, __pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 417, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_1);
+          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+          __pyx_t_5 = __Pyx_PyObject_GetItem(__pyx_t_1, __pyx_v_stelle); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 417, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_5);
+          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          __pyx_t_1 = PyObject_RichCompare(__pyx_t_5, __pyx_v_enemy, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 417, __pyx_L1_error)
+          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+          __pyx_t_10 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 417, __pyx_L1_error)
+          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          if (__pyx_t_10) {
+          } else {
+            __pyx_t_4 = __pyx_t_10;
+            goto __pyx_L21_bool_binop_done;
+          }
+          __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_v_board, __pyx_v_ring); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 417, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_1);
+          __pyx_t_5 = __Pyx_PyInt_AddObjC(__pyx_v_stelle, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 417, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_5);
+          __pyx_t_9 = __Pyx_PyInt_RemainderObjC(__pyx_t_5, __pyx_int_8, 8, 0, 0); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 417, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_9);
+          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+          __pyx_t_5 = __Pyx_PyObject_GetItem(__pyx_t_1, __pyx_t_9); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 417, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_5);
+          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+          __pyx_t_9 = PyObject_RichCompare(__pyx_t_5, __pyx_v_enemy, Py_EQ); __Pyx_XGOTREF(__pyx_t_9); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 417, __pyx_L1_error)
+          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+          __pyx_t_10 = __Pyx_PyObject_IsTrue(__pyx_t_9); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 417, __pyx_L1_error)
+          __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+          if (!__pyx_t_10) {
+          } else {
+            __pyx_t_4 = __pyx_t_10;
+            goto __pyx_L21_bool_binop_done;
+          }
+          __pyx_t_9 = __Pyx_PyObject_GetItem(__pyx_v_board, __pyx_v_ring); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 417, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_9);
+          __pyx_t_5 = __Pyx_PyInt_SubtractObjC(__pyx_v_stelle, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 417, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_5);
+          __pyx_t_1 = __Pyx_PyInt_RemainderObjC(__pyx_t_5, __pyx_int_8, 8, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 417, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_1);
+          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+          __pyx_t_5 = __Pyx_PyObject_GetItem(__pyx_t_9, __pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 417, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_5);
+          __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          __pyx_t_1 = PyObject_RichCompare(__pyx_t_5, __pyx_v_enemy, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 417, __pyx_L1_error)
+          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+          __pyx_t_10 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 417, __pyx_L1_error)
+          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          __pyx_t_4 = __pyx_t_10;
+          __pyx_L21_bool_binop_done:;
+          if (__pyx_t_4) {
+
+            /* "ai_minimax_alpha_beta.py":418
+ *                         # Really bad situation, same as above when two mills are possible
+ *                         if board[(ring + 1) % 3][stelle] == enemy and (board[ring][(stelle + 1) % 8] == enemy or board[ring][(stelle - 1) % 8] == enemy):
+ *                             evil_score += 100             # <<<<<<<<<<<<<<
+ *                         if board[(ring + 2) % 3][stelle] == enemy and (board[ring][(stelle + 1) % 8] == enemy or board[ring][(stelle - 1) % 8] == enemy):
+ *                             evil_score += 100
+ */
+            __pyx_t_1 = __Pyx_PyInt_AddObjC(__pyx_v_evil_score, __pyx_int_100, 0x64, 1, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 418, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_1);
+            __Pyx_DECREF_SET(__pyx_v_evil_score, __pyx_t_1);
+            __pyx_t_1 = 0;
+
+            /* "ai_minimax_alpha_beta.py":417
+ *                             evil_score += 1
+ *                         # Really bad situation, same as above when two mills are possible
+ *                         if board[(ring + 1) % 3][stelle] == enemy and (board[ring][(stelle + 1) % 8] == enemy or board[ring][(stelle - 1) % 8] == enemy):             # <<<<<<<<<<<<<<
+ *                             evil_score += 100
+ *                         if board[(ring + 2) % 3][stelle] == enemy and (board[ring][(stelle + 1) % 8] == enemy or board[ring][(stelle - 1) % 8] == enemy):
+ */
+          }
+
+          /* "ai_minimax_alpha_beta.py":419
+ *                         if board[(ring + 1) % 3][stelle] == enemy and (board[ring][(stelle + 1) % 8] == enemy or board[ring][(stelle - 1) % 8] == enemy):
+ *                             evil_score += 100
+ *                         if board[(ring + 2) % 3][stelle] == enemy and (board[ring][(stelle + 1) % 8] == enemy or board[ring][(stelle - 1) % 8] == enemy):             # <<<<<<<<<<<<<<
+ *                             evil_score += 100
+ * 
+ */
+          __pyx_t_1 = __Pyx_PyInt_AddObjC(__pyx_v_ring, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 419, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_1);
+          __pyx_t_5 = __Pyx_PyInt_RemainderObjC(__pyx_t_1, __pyx_int_3, 3, 0, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 419, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_5);
+          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_v_board, __pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 419, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_1);
+          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+          __pyx_t_5 = __Pyx_PyObject_GetItem(__pyx_t_1, __pyx_v_stelle); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 419, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_5);
+          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          __pyx_t_1 = PyObject_RichCompare(__pyx_t_5, __pyx_v_enemy, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 419, __pyx_L1_error)
+          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+          __pyx_t_10 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 419, __pyx_L1_error)
+          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          if (__pyx_t_10) {
+          } else {
+            __pyx_t_4 = __pyx_t_10;
+            goto __pyx_L25_bool_binop_done;
+          }
+          __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_v_board, __pyx_v_ring); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 419, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_1);
+          __pyx_t_5 = __Pyx_PyInt_AddObjC(__pyx_v_stelle, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 419, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_5);
+          __pyx_t_9 = __Pyx_PyInt_RemainderObjC(__pyx_t_5, __pyx_int_8, 8, 0, 0); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 419, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_9);
+          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+          __pyx_t_5 = __Pyx_PyObject_GetItem(__pyx_t_1, __pyx_t_9); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 419, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_5);
+          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+          __pyx_t_9 = PyObject_RichCompare(__pyx_t_5, __pyx_v_enemy, Py_EQ); __Pyx_XGOTREF(__pyx_t_9); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 419, __pyx_L1_error)
+          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+          __pyx_t_10 = __Pyx_PyObject_IsTrue(__pyx_t_9); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 419, __pyx_L1_error)
+          __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+          if (!__pyx_t_10) {
+          } else {
+            __pyx_t_4 = __pyx_t_10;
+            goto __pyx_L25_bool_binop_done;
+          }
+          __pyx_t_9 = __Pyx_PyObject_GetItem(__pyx_v_board, __pyx_v_ring); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 419, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_9);
+          __pyx_t_5 = __Pyx_PyInt_SubtractObjC(__pyx_v_stelle, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 419, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_5);
+          __pyx_t_1 = __Pyx_PyInt_RemainderObjC(__pyx_t_5, __pyx_int_8, 8, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 419, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_1);
+          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+          __pyx_t_5 = __Pyx_PyObject_GetItem(__pyx_t_9, __pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 419, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_5);
+          __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          __pyx_t_1 = PyObject_RichCompare(__pyx_t_5, __pyx_v_enemy, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 419, __pyx_L1_error)
+          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+          __pyx_t_10 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 419, __pyx_L1_error)
+          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          __pyx_t_4 = __pyx_t_10;
+          __pyx_L25_bool_binop_done:;
+          if (__pyx_t_4) {
+
+            /* "ai_minimax_alpha_beta.py":420
+ *                             evil_score += 100
+ *                         if board[(ring + 2) % 3][stelle] == enemy and (board[ring][(stelle + 1) % 8] == enemy or board[ring][(stelle - 1) % 8] == enemy):
+ *                             evil_score += 100             # <<<<<<<<<<<<<<
+ * 
+ *                     scores.append(evil_score)
+ */
+            __pyx_t_1 = __Pyx_PyInt_AddObjC(__pyx_v_evil_score, __pyx_int_100, 0x64, 1, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 420, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_1);
+            __Pyx_DECREF_SET(__pyx_v_evil_score, __pyx_t_1);
+            __pyx_t_1 = 0;
+
+            /* "ai_minimax_alpha_beta.py":419
+ *                         if board[(ring + 1) % 3][stelle] == enemy and (board[ring][(stelle + 1) % 8] == enemy or board[ring][(stelle - 1) % 8] == enemy):
+ *                             evil_score += 100
+ *                         if board[(ring + 2) % 3][stelle] == enemy and (board[ring][(stelle + 1) % 8] == enemy or board[ring][(stelle - 1) % 8] == enemy):             # <<<<<<<<<<<<<<
+ *                             evil_score += 100
+ * 
+ */
+          }
+
+          /* "ai_minimax_alpha_beta.py":407
+ *                             evil_score += 100
+ * 
+ *                     elif stelle % 2 != 0:  # Center case             # <<<<<<<<<<<<<<
+ *                         if board[(ring + 1) % 3][stelle] == enemy:
+ *                             evil_score += 1
+ */
+        }
+        __pyx_L10:;
+
+        /* "ai_minimax_alpha_beta.py":422
+ *                             evil_score += 100
+ * 
+ *                     scores.append(evil_score)             # <<<<<<<<<<<<<<
+ *                     enemies.append((ring, stelle))
+ *         if len(scores) == 0:
+ */
+        __pyx_t_11 = __Pyx_PyList_Append(__pyx_v_scores, __pyx_v_evil_score); if (unlikely(__pyx_t_11 == ((int)-1))) __PYX_ERR(0, 422, __pyx_L1_error)
+
+        /* "ai_minimax_alpha_beta.py":423
+ * 
+ *                     scores.append(evil_score)
+ *                     enemies.append((ring, stelle))             # <<<<<<<<<<<<<<
+ *         if len(scores) == 0:
+ *             # Uh oh, there is only mills left
+ */
+        __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 423, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_1);
+        __Pyx_INCREF(__pyx_v_ring);
+        __Pyx_GIVEREF(__pyx_v_ring);
+        PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_v_ring);
+        __Pyx_INCREF(__pyx_v_stelle);
+        __Pyx_GIVEREF(__pyx_v_stelle);
+        PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_v_stelle);
+        __pyx_t_11 = __Pyx_PyList_Append(__pyx_v_enemies, __pyx_t_1); if (unlikely(__pyx_t_11 == ((int)-1))) __PYX_ERR(0, 423, __pyx_L1_error)
+        __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+        /* "ai_minimax_alpha_beta.py":393
+ *             for stelle in range(8):
+ *                 # For each enemy man who is not in a mill
+ *                 if board[ring][stelle] == enemy and not self.checkmuhle(ring, stelle, board, enemy):             # <<<<<<<<<<<<<<
+ *                     # Generate "evil" score for the enemy man
+ *                     evil_score = 0
+ */
+      }
+    }
+  }
+
+  /* "ai_minimax_alpha_beta.py":424
+ *                     scores.append(evil_score)
+ *                     enemies.append((ring, stelle))
+ *         if len(scores) == 0:             # <<<<<<<<<<<<<<
+ *             # Uh oh, there is only mills left
+ *             # We can just remove men out of mills now
+ */
+  __pyx_t_12 = PyList_GET_SIZE(__pyx_v_scores); if (unlikely(__pyx_t_12 == ((Py_ssize_t)-1))) __PYX_ERR(0, 424, __pyx_L1_error)
+  __pyx_t_4 = ((__pyx_t_12 == 0) != 0);
+  if (__pyx_t_4) {
+
+    /* "ai_minimax_alpha_beta.py":427
+ *             # Uh oh, there is only mills left
+ *             # We can just remove men out of mills now
+ *             for ring in range(3):             # <<<<<<<<<<<<<<
+ *                 for stelle in range(8):
+ *                     # For each enemy man
+ */
+    for (__pyx_t_2 = 0; __pyx_t_2 < 3; __pyx_t_2+=1) {
+      __pyx_t_1 = __Pyx_PyInt_From_long(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 427, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_1);
+      __Pyx_XDECREF_SET(__pyx_v_ring, __pyx_t_1);
+      __pyx_t_1 = 0;
+
+      /* "ai_minimax_alpha_beta.py":428
+ *             # We can just remove men out of mills now
+ *             for ring in range(3):
+ *                 for stelle in range(8):             # <<<<<<<<<<<<<<
+ *                     # For each enemy man
+ *                     if board[ring][stelle] == enemy:
+ */
+      for (__pyx_t_3 = 0; __pyx_t_3 < 8; __pyx_t_3+=1) {
+        __pyx_t_1 = __Pyx_PyInt_From_long(__pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 428, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_1);
+        __Pyx_XDECREF_SET(__pyx_v_stelle, __pyx_t_1);
+        __pyx_t_1 = 0;
+
+        /* "ai_minimax_alpha_beta.py":430
+ *                 for stelle in range(8):
+ *                     # For each enemy man
+ *                     if board[ring][stelle] == enemy:             # <<<<<<<<<<<<<<
+ *                         scores.append(1)
+ *                         enemies.append((ring, stelle))
+ */
+        __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_v_board, __pyx_v_ring); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 430, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_1);
+        __pyx_t_5 = __Pyx_PyObject_GetItem(__pyx_t_1, __pyx_v_stelle); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 430, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_5);
+        __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+        __pyx_t_1 = PyObject_RichCompare(__pyx_t_5, __pyx_v_enemy, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 430, __pyx_L1_error)
+        __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+        __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 430, __pyx_L1_error)
+        __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+        if (__pyx_t_4) {
+
+          /* "ai_minimax_alpha_beta.py":431
+ *                     # For each enemy man
+ *                     if board[ring][stelle] == enemy:
+ *                         scores.append(1)             # <<<<<<<<<<<<<<
+ *                         enemies.append((ring, stelle))
+ *                         max_score = scores[0]
+ */
+          __pyx_t_11 = __Pyx_PyList_Append(__pyx_v_scores, __pyx_int_1); if (unlikely(__pyx_t_11 == ((int)-1))) __PYX_ERR(0, 431, __pyx_L1_error)
+
+          /* "ai_minimax_alpha_beta.py":432
+ *                     if board[ring][stelle] == enemy:
+ *                         scores.append(1)
+ *                         enemies.append((ring, stelle))             # <<<<<<<<<<<<<<
+ *                         max_score = scores[0]
+ *         else:
+ */
+          __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 432, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_1);
+          __Pyx_INCREF(__pyx_v_ring);
+          __Pyx_GIVEREF(__pyx_v_ring);
+          PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_v_ring);
+          __Pyx_INCREF(__pyx_v_stelle);
+          __Pyx_GIVEREF(__pyx_v_stelle);
+          PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_v_stelle);
+          __pyx_t_11 = __Pyx_PyList_Append(__pyx_v_enemies, __pyx_t_1); if (unlikely(__pyx_t_11 == ((int)-1))) __PYX_ERR(0, 432, __pyx_L1_error)
+          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+          /* "ai_minimax_alpha_beta.py":433
+ *                         scores.append(1)
+ *                         enemies.append((ring, stelle))
+ *                         max_score = scores[0]             # <<<<<<<<<<<<<<
+ *         else:
+ *             max_score = max(scores)
+ */
+          __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_scores, 0, long, 1, __Pyx_PyInt_From_long, 1, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 433, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_1);
+          __Pyx_XDECREF_SET(__pyx_v_max_score, __pyx_t_1);
+          __pyx_t_1 = 0;
+
+          /* "ai_minimax_alpha_beta.py":430
+ *                 for stelle in range(8):
+ *                     # For each enemy man
+ *                     if board[ring][stelle] == enemy:             # <<<<<<<<<<<<<<
+ *                         scores.append(1)
+ *                         enemies.append((ring, stelle))
+ */
+        }
+      }
+    }
+
+    /* "ai_minimax_alpha_beta.py":424
+ *                     scores.append(evil_score)
+ *                     enemies.append((ring, stelle))
+ *         if len(scores) == 0:             # <<<<<<<<<<<<<<
+ *             # Uh oh, there is only mills left
+ *             # We can just remove men out of mills now
+ */
+    goto __pyx_L28;
+  }
+
+  /* "ai_minimax_alpha_beta.py":435
+ *                         max_score = scores[0]
+ *         else:
+ *             max_score = max(scores)             # <<<<<<<<<<<<<<
+ * 
+ *         return enemies[scores.index(max_score)]
+ */
+  /*else*/ {
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_builtin_max, __pyx_v_scores); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 435, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __pyx_v_max_score = __pyx_t_1;
+    __pyx_t_1 = 0;
+  }
+  __pyx_L28:;
+
+  /* "ai_minimax_alpha_beta.py":437
+ *             max_score = max(scores)
+ * 
+ *         return enemies[scores.index(max_score)]             # <<<<<<<<<<<<<<
+ */
+  __Pyx_XDECREF(__pyx_r);
+  if (unlikely(!__pyx_v_max_score)) { __Pyx_RaiseUnboundLocalError("max_score"); __PYX_ERR(0, 437, __pyx_L1_error) }
+  __pyx_t_1 = __Pyx_CallUnboundCMethod1(&__pyx_umethod_PyList_Type_index, __pyx_v_scores, __pyx_v_max_score); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 437, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_5 = __Pyx_PyObject_GetItem(__pyx_v_enemies, __pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 437, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_r = __pyx_t_5;
+  __pyx_t_5 = 0;
+  goto __pyx_L0;
+
+  /* "ai_minimax_alpha_beta.py":387
+ * 
+ *     # Determines which man is most beneficial to be removed
+ *     def toremove(self, board, enemy):             # <<<<<<<<<<<<<<
+ *         enemies = []
+ *         scores = []
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_5);
+  __Pyx_XDECREF(__pyx_t_7);
+  __Pyx_XDECREF(__pyx_t_9);
+  __Pyx_AddTraceback("ai_minimax_alpha_beta.Morris.toremove", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XDECREF(__pyx_v_enemies);
+  __Pyx_XDECREF(__pyx_v_scores);
+  __Pyx_XDECREF(__pyx_v_ring);
+  __Pyx_XDECREF(__pyx_v_stelle);
+  __Pyx_XDECREF(__pyx_v_evil_score);
+  __Pyx_XDECREF(__pyx_v_max_score);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
@@ -11206,17 +11855,16 @@ static struct PyModuleDef __pyx_moduledef = {
 static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_s_AI_time_s_sec, __pyx_k_AI_time_s_sec, sizeof(__pyx_k_AI_time_s_sec), 0, 0, 1, 0},
   {&__pyx_n_s_ERROR, __pyx_k_ERROR, sizeof(__pyx_k_ERROR), 0, 0, 1, 1},
-  {&__pyx_n_s_MAX, __pyx_k_MAX, sizeof(__pyx_k_MAX), 0, 0, 1, 1},
-  {&__pyx_n_s_MIN, __pyx_k_MIN, sizeof(__pyx_k_MIN), 0, 0, 1, 1},
   {&__pyx_n_s_Morris, __pyx_k_Morris, sizeof(__pyx_k_Morris), 0, 0, 1, 1},
   {&__pyx_n_s_Morris___init, __pyx_k_Morris___init, sizeof(__pyx_k_Morris___init), 0, 0, 1, 1},
   {&__pyx_n_s_Morris_checkmuhle, __pyx_k_Morris_checkmuhle, sizeof(__pyx_k_Morris_checkmuhle), 0, 0, 1, 1},
   {&__pyx_n_s_Morris_clearmuhlen, __pyx_k_Morris_clearmuhlen, sizeof(__pyx_k_Morris_clearmuhlen), 0, 0, 1, 1},
   {&__pyx_n_s_Morris_make_score, __pyx_k_Morris_make_score, sizeof(__pyx_k_Morris_make_score), 0, 0, 1, 1},
   {&__pyx_n_s_Morris_minimax, __pyx_k_Morris_minimax, sizeof(__pyx_k_Morris_minimax), 0, 0, 1, 1},
-  {&__pyx_n_s_Morris_minimax_2, __pyx_k_Morris_minimax_2, sizeof(__pyx_k_Morris_minimax_2), 0, 0, 1, 1},
   {&__pyx_n_s_Morris_number_possible_moves, __pyx_k_Morris_number_possible_moves, sizeof(__pyx_k_Morris_number_possible_moves), 0, 0, 1, 1},
   {&__pyx_n_s_Morris_possiblemoves, __pyx_k_Morris_possiblemoves, sizeof(__pyx_k_Morris_possiblemoves), 0, 0, 1, 1},
+  {&__pyx_n_s_Morris_toremove, __pyx_k_Morris_toremove, sizeof(__pyx_k_Morris_toremove), 0, 0, 1, 1},
+  {&__pyx_n_s_Morris_update_board_muhlen, __pyx_k_Morris_update_board_muhlen, sizeof(__pyx_k_Morris_update_board_muhlen), 0, 0, 1, 1},
   {&__pyx_n_s_ai_minimax_alpha_beta, __pyx_k_ai_minimax_alpha_beta, sizeof(__pyx_k_ai_minimax_alpha_beta), 0, 0, 1, 1},
   {&__pyx_kp_s_ai_minimax_alpha_beta_py, __pyx_k_ai_minimax_alpha_beta_py, sizeof(__pyx_k_ai_minimax_alpha_beta_py), 0, 0, 1, 0},
   {&__pyx_n_s_alpha, __pyx_k_alpha, sizeof(__pyx_k_alpha), 0, 0, 1, 1},
@@ -11227,37 +11875,41 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_board_2, __pyx_k_board_2, sizeof(__pyx_k_board_2), 0, 0, 1, 1},
   {&__pyx_n_s_board_continue, __pyx_k_board_continue, sizeof(__pyx_k_board_continue), 0, 0, 1, 1},
   {&__pyx_n_s_board_muhlen, __pyx_k_board_muhlen, sizeof(__pyx_k_board_muhlen), 0, 0, 1, 1},
-  {&__pyx_n_s_board_new, __pyx_k_board_new, sizeof(__pyx_k_board_new), 0, 0, 1, 1},
-  {&__pyx_n_s_board_new_muhlen, __pyx_k_board_new_muhlen, sizeof(__pyx_k_board_new_muhlen), 0, 0, 1, 1},
+  {&__pyx_n_s_board_muhlen_new, __pyx_k_board_muhlen_new, sizeof(__pyx_k_board_muhlen_new), 0, 0, 1, 1},
+  {&__pyx_n_s_board_muhlen_old, __pyx_k_board_muhlen_old, sizeof(__pyx_k_board_muhlen_old), 0, 0, 1, 1},
   {&__pyx_n_s_checkmuhle, __pyx_k_checkmuhle, sizeof(__pyx_k_checkmuhle), 0, 0, 1, 1},
   {&__pyx_n_s_clearmuhlen, __pyx_k_clearmuhlen, sizeof(__pyx_k_clearmuhlen), 0, 0, 1, 1},
   {&__pyx_n_s_cline_in_traceback, __pyx_k_cline_in_traceback, sizeof(__pyx_k_cline_in_traceback), 0, 0, 1, 1},
   {&__pyx_n_s_copy, __pyx_k_copy, sizeof(__pyx_k_copy), 0, 0, 1, 1},
-  {&__pyx_n_s_ctypes, __pyx_k_ctypes, sizeof(__pyx_k_ctypes), 0, 0, 1, 1},
   {&__pyx_n_s_deepcopy, __pyx_k_deepcopy, sizeof(__pyx_k_deepcopy), 0, 0, 1, 1},
   {&__pyx_n_s_depth, __pyx_k_depth, sizeof(__pyx_k_depth), 0, 0, 1, 1},
   {&__pyx_n_s_doc, __pyx_k_doc, sizeof(__pyx_k_doc), 0, 0, 1, 1},
   {&__pyx_n_s_end, __pyx_k_end, sizeof(__pyx_k_end), 0, 0, 1, 1},
+  {&__pyx_n_s_enemies, __pyx_k_enemies, sizeof(__pyx_k_enemies), 0, 0, 1, 1},
+  {&__pyx_n_s_enemy, __pyx_k_enemy, sizeof(__pyx_k_enemy), 0, 0, 1, 1},
   {&__pyx_n_s_evaluation, __pyx_k_evaluation, sizeof(__pyx_k_evaluation), 0, 0, 1, 1},
+  {&__pyx_n_s_evil_score, __pyx_k_evil_score, sizeof(__pyx_k_evil_score), 0, 0, 1, 1},
   {&__pyx_n_s_file, __pyx_k_file, sizeof(__pyx_k_file), 0, 0, 1, 1},
   {&__pyx_n_s_gameutil, __pyx_k_gameutil, sizeof(__pyx_k_gameutil), 0, 0, 1, 1},
   {&__pyx_n_s_i, __pyx_k_i, sizeof(__pyx_k_i), 0, 0, 1, 1},
   {&__pyx_n_s_import, __pyx_k_import, sizeof(__pyx_k_import), 0, 0, 1, 1},
+  {&__pyx_n_s_index, __pyx_k_index, sizeof(__pyx_k_index), 0, 0, 1, 1},
   {&__pyx_n_s_init, __pyx_k_init, sizeof(__pyx_k_init), 0, 0, 1, 1},
   {&__pyx_n_s_j, __pyx_k_j, sizeof(__pyx_k_j), 0, 0, 1, 1},
   {&__pyx_n_s_main, __pyx_k_main, sizeof(__pyx_k_main), 0, 0, 1, 1},
   {&__pyx_n_s_make_score, __pyx_k_make_score, sizeof(__pyx_k_make_score), 0, 0, 1, 1},
   {&__pyx_n_s_mancolor, __pyx_k_mancolor, sizeof(__pyx_k_mancolor), 0, 0, 1, 1},
+  {&__pyx_n_s_max, __pyx_k_max, sizeof(__pyx_k_max), 0, 0, 1, 1},
   {&__pyx_n_s_maxEval, __pyx_k_maxEval, sizeof(__pyx_k_maxEval), 0, 0, 1, 1},
+  {&__pyx_n_s_max_depth, __pyx_k_max_depth, sizeof(__pyx_k_max_depth), 0, 0, 1, 1},
+  {&__pyx_n_s_max_score, __pyx_k_max_score, sizeof(__pyx_k_max_score), 0, 0, 1, 1},
   {&__pyx_n_s_metaclass, __pyx_k_metaclass, sizeof(__pyx_k_metaclass), 0, 0, 1, 1},
-  {&__pyx_n_s_minEval, __pyx_k_minEval, sizeof(__pyx_k_minEval), 0, 0, 1, 1},
   {&__pyx_n_s_minimax, __pyx_k_minimax, sizeof(__pyx_k_minimax), 0, 0, 1, 1},
-  {&__pyx_n_s_minimax_2, __pyx_k_minimax_2, sizeof(__pyx_k_minimax_2), 0, 0, 1, 1},
   {&__pyx_n_s_module, __pyx_k_module, sizeof(__pyx_k_module), 0, 0, 1, 1},
   {&__pyx_n_s_move, __pyx_k_move, sizeof(__pyx_k_move), 0, 0, 1, 1},
   {&__pyx_n_s_muhlen, __pyx_k_muhlen, sizeof(__pyx_k_muhlen), 0, 0, 1, 1},
-  {&__pyx_n_s_multiprocessing, __pyx_k_multiprocessing, sizeof(__pyx_k_multiprocessing), 0, 0, 1, 1},
   {&__pyx_n_s_mymen, __pyx_k_mymen, sizeof(__pyx_k_mymen), 0, 0, 1, 1},
+  {&__pyx_kp_s_myscript_run, __pyx_k_myscript_run, sizeof(__pyx_k_myscript_run), 0, 0, 1, 0},
   {&__pyx_n_s_n, __pyx_k_n, sizeof(__pyx_k_n), 0, 0, 1, 1},
   {&__pyx_n_s_name, __pyx_k_name, sizeof(__pyx_k_name), 0, 0, 1, 1},
   {&__pyx_n_s_number_possible_moves, __pyx_k_number_possible_moves, sizeof(__pyx_k_number_possible_moves), 0, 0, 1, 1},
@@ -11267,36 +11919,37 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_possiblemoves, __pyx_k_possiblemoves, sizeof(__pyx_k_possiblemoves), 0, 0, 1, 1},
   {&__pyx_n_s_prepare, __pyx_k_prepare, sizeof(__pyx_k_prepare), 0, 0, 1, 1},
   {&__pyx_n_s_print, __pyx_k_print, sizeof(__pyx_k_print), 0, 0, 1, 1},
-  {&__pyx_n_s_procs, __pyx_k_procs, sizeof(__pyx_k_procs), 0, 0, 1, 1},
   {&__pyx_n_s_qualname, __pyx_k_qualname, sizeof(__pyx_k_qualname), 0, 0, 1, 1},
   {&__pyx_n_s_range, __pyx_k_range, sizeof(__pyx_k_range), 0, 0, 1, 1},
   {&__pyx_n_s_real_player, __pyx_k_real_player, sizeof(__pyx_k_real_player), 0, 0, 1, 1},
   {&__pyx_n_s_remaining_set, __pyx_k_remaining_set, sizeof(__pyx_k_remaining_set), 0, 0, 1, 1},
   {&__pyx_n_s_ring, __pyx_k_ring, sizeof(__pyx_k_ring), 0, 0, 1, 1},
   {&__pyx_n_s_ringPos, __pyx_k_ringPos, sizeof(__pyx_k_ringPos), 0, 0, 1, 1},
-  {&__pyx_n_s_ring_2, __pyx_k_ring_2, sizeof(__pyx_k_ring_2), 0, 0, 1, 1},
   {&__pyx_n_s_ringpos, __pyx_k_ringpos, sizeof(__pyx_k_ringpos), 0, 0, 1, 1},
   {&__pyx_n_s_score, __pyx_k_score, sizeof(__pyx_k_score), 0, 0, 1, 1},
   {&__pyx_n_s_score_add, __pyx_k_score_add, sizeof(__pyx_k_score_add), 0, 0, 1, 1},
   {&__pyx_n_s_score_addition, __pyx_k_score_addition, sizeof(__pyx_k_score_addition), 0, 0, 1, 1},
   {&__pyx_n_s_score_opponent, __pyx_k_score_opponent, sizeof(__pyx_k_score_opponent), 0, 0, 1, 1},
   {&__pyx_n_s_score_player, __pyx_k_score_player, sizeof(__pyx_k_score_player), 0, 0, 1, 1},
+  {&__pyx_n_s_scores, __pyx_k_scores, sizeof(__pyx_k_scores), 0, 0, 1, 1},
   {&__pyx_n_s_self, __pyx_k_self, sizeof(__pyx_k_self), 0, 0, 1, 1},
   {&__pyx_n_s_spielfeld, __pyx_k_spielfeld, sizeof(__pyx_k_spielfeld), 0, 0, 1, 1},
-  {&__pyx_n_s_static_evaluation, __pyx_k_static_evaluation, sizeof(__pyx_k_static_evaluation), 0, 0, 1, 1},
   {&__pyx_n_s_stelle, __pyx_k_stelle, sizeof(__pyx_k_stelle), 0, 0, 1, 1},
   {&__pyx_n_s_stellePos, __pyx_k_stellePos, sizeof(__pyx_k_stellePos), 0, 0, 1, 1},
-  {&__pyx_n_s_stelle_2, __pyx_k_stelle_2, sizeof(__pyx_k_stelle_2), 0, 0, 1, 1},
   {&__pyx_n_s_stellepos, __pyx_k_stellepos, sizeof(__pyx_k_stellepos), 0, 0, 1, 1},
   {&__pyx_n_s_t, __pyx_k_t, sizeof(__pyx_k_t), 0, 0, 1, 1},
   {&__pyx_n_s_test, __pyx_k_test, sizeof(__pyx_k_test), 0, 0, 1, 1},
   {&__pyx_n_s_theirmen, __pyx_k_theirmen, sizeof(__pyx_k_theirmen), 0, 0, 1, 1},
   {&__pyx_n_s_time, __pyx_k_time, sizeof(__pyx_k_time), 0, 0, 1, 1},
+  {&__pyx_n_s_to_remove, __pyx_k_to_remove, sizeof(__pyx_k_to_remove), 0, 0, 1, 1},
   {&__pyx_n_s_tobecleared, __pyx_k_tobecleared, sizeof(__pyx_k_tobecleared), 0, 0, 1, 1},
+  {&__pyx_n_s_toremove, __pyx_k_toremove, sizeof(__pyx_k_toremove), 0, 0, 1, 1},
+  {&__pyx_n_s_update_board_muhlen, __pyx_k_update_board_muhlen, sizeof(__pyx_k_update_board_muhlen), 0, 0, 1, 1},
   {0, 0, 0, 0, 0, 0, 0}
 };
 static CYTHON_SMALL_CODE int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 23, __pyx_L1_error)
+  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 24, __pyx_L1_error)
+  __pyx_builtin_max = __Pyx_GetBuiltinName(__pyx_n_s_max); if (!__pyx_builtin_max) __PYX_ERR(0, 435, __pyx_L1_error)
   return 0;
   __pyx_L1_error:;
   return -1;
@@ -11318,89 +11971,101 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple_);
   __pyx_codeobj__2 = (PyObject*)__Pyx_PyCode_New(5, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple_, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_ai_minimax_alpha_beta_py, __pyx_n_s_init, 4, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__2)) __PYX_ERR(0, 4, __pyx_L1_error)
 
-  /* "ai_minimax_alpha_beta.py":17
+  /* "ai_minimax_alpha_beta.py":19
  *     # First function being called, remembers moves to return them
  *     ###
  *     def make_score(self, board, board_muhlen, player, alpha, beta):             # <<<<<<<<<<<<<<
- *         procs = []
  *         maxEval = alpha
+ *         best_move = False
  */
-  __pyx_tuple__3 = PyTuple_Pack(18, __pyx_n_s_self, __pyx_n_s_board, __pyx_n_s_board_muhlen, __pyx_n_s_player, __pyx_n_s_alpha, __pyx_n_s_beta, __pyx_n_s_procs, __pyx_n_s_maxEval, __pyx_n_s_best_move, __pyx_n_s_ring, __pyx_n_s_stelle, __pyx_n_s_move, __pyx_n_s_board_continue, __pyx_n_s_evaluation, __pyx_n_s_possiblemoves, __pyx_n_s_board_2, __pyx_n_s_muhlen, __pyx_n_s_score_add); if (unlikely(!__pyx_tuple__3)) __PYX_ERR(0, 17, __pyx_L1_error)
+  __pyx_tuple__3 = PyTuple_Pack(17, __pyx_n_s_self, __pyx_n_s_board, __pyx_n_s_board_muhlen, __pyx_n_s_player, __pyx_n_s_alpha, __pyx_n_s_beta, __pyx_n_s_maxEval, __pyx_n_s_best_move, __pyx_n_s_ring, __pyx_n_s_stelle, __pyx_n_s_move, __pyx_n_s_board_continue, __pyx_n_s_score_add, __pyx_n_s_evaluation, __pyx_n_s_possiblemoves, __pyx_n_s_board_2, __pyx_n_s_muhlen); if (unlikely(!__pyx_tuple__3)) __PYX_ERR(0, 19, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__3);
   __Pyx_GIVEREF(__pyx_tuple__3);
-  __pyx_codeobj__4 = (PyObject*)__Pyx_PyCode_New(6, 0, 18, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__3, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_ai_minimax_alpha_beta_py, __pyx_n_s_make_score, 17, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__4)) __PYX_ERR(0, 17, __pyx_L1_error)
+  __pyx_codeobj__4 = (PyObject*)__Pyx_PyCode_New(6, 0, 17, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__3, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_ai_minimax_alpha_beta_py, __pyx_n_s_make_score, 19, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__4)) __PYX_ERR(0, 19, __pyx_L1_error)
 
-  /* "ai_minimax_alpha_beta.py":75
+  /* "ai_minimax_alpha_beta.py":83
  *     # Minimax function is simpler and only remembers and returns scores of the decision tree without the moves
  *     ###
  *     def minimax(self, board, board_muhlen, player, alpha, beta, remaining_set, depth):             # <<<<<<<<<<<<<<
  *         if depth <= 1:
  *             # Static evaluation for gamemode 1
  */
-  __pyx_tuple__5 = PyTuple_Pack(26, __pyx_n_s_self, __pyx_n_s_board, __pyx_n_s_board_muhlen, __pyx_n_s_player, __pyx_n_s_alpha, __pyx_n_s_beta, __pyx_n_s_remaining_set, __pyx_n_s_depth, __pyx_n_s_score_player, __pyx_n_s_score_opponent, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_score, __pyx_n_s_best_score, __pyx_n_s_ring, __pyx_n_s_stelle, __pyx_n_s_board_2, __pyx_n_s_muhlen, __pyx_n_s_ring_2, __pyx_n_s_stelle_2, __pyx_n_s_evaluation, __pyx_n_s_mymen, __pyx_n_s_theirmen, __pyx_n_s_possiblemoves, __pyx_n_s_move, __pyx_n_s_score_addition); if (unlikely(!__pyx_tuple__5)) __PYX_ERR(0, 75, __pyx_L1_error)
+  __pyx_tuple__5 = PyTuple_Pack(25, __pyx_n_s_self, __pyx_n_s_board, __pyx_n_s_board_muhlen, __pyx_n_s_player, __pyx_n_s_alpha, __pyx_n_s_beta, __pyx_n_s_remaining_set, __pyx_n_s_depth, __pyx_n_s_score_player, __pyx_n_s_score_opponent, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_score, __pyx_n_s_best_score, __pyx_n_s_ring, __pyx_n_s_stelle, __pyx_n_s_board_2, __pyx_n_s_muhlen, __pyx_n_s_to_remove, __pyx_n_s_evaluation, __pyx_n_s_mymen, __pyx_n_s_theirmen, __pyx_n_s_possiblemoves, __pyx_n_s_move, __pyx_n_s_score_addition); if (unlikely(!__pyx_tuple__5)) __PYX_ERR(0, 83, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__5);
   __Pyx_GIVEREF(__pyx_tuple__5);
-  __pyx_codeobj__6 = (PyObject*)__Pyx_PyCode_New(8, 0, 26, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__5, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_ai_minimax_alpha_beta_py, __pyx_n_s_minimax, 75, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__6)) __PYX_ERR(0, 75, __pyx_L1_error)
+  __pyx_codeobj__6 = (PyObject*)__Pyx_PyCode_New(8, 0, 25, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__5, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_ai_minimax_alpha_beta_py, __pyx_n_s_minimax, 83, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__6)) __PYX_ERR(0, 83, __pyx_L1_error)
 
-  /* "ai_minimax_alpha_beta.py":308
- * 
- *     # Not working, new version found above ^
- *     def minimax_(self, board, board_muhlen, player, alpha, beta, depth):             # <<<<<<<<<<<<<<
- *         # Static evaluation
- *         if depth < 1:
- */
-  __pyx_tuple__7 = PyTuple_Pack(20, __pyx_n_s_self, __pyx_n_s_board, __pyx_n_s_board_muhlen, __pyx_n_s_player, __pyx_n_s_alpha, __pyx_n_s_beta, __pyx_n_s_depth, __pyx_n_s_score_player, __pyx_n_s_score_opponent, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_score, __pyx_n_s_static_evaluation, __pyx_n_s_maxEval, __pyx_n_s_minEval, __pyx_n_s_ring, __pyx_n_s_stelle, __pyx_n_s_board_new, __pyx_n_s_board_new_muhlen, __pyx_n_s_evaluation); if (unlikely(!__pyx_tuple__7)) __PYX_ERR(0, 308, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__7);
-  __Pyx_GIVEREF(__pyx_tuple__7);
-  __pyx_codeobj__8 = (PyObject*)__Pyx_PyCode_New(7, 0, 20, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__7, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_ai_minimax_alpha_beta_py, __pyx_n_s_minimax_2, 308, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__8)) __PYX_ERR(0, 308, __pyx_L1_error)
-
-  /* "ai_minimax_alpha_beta.py":372
+  /* "ai_minimax_alpha_beta.py":297
  *     ###
  * 
  *     def number_possible_moves(self, board, player):             # <<<<<<<<<<<<<<
  *         n = 0
  *         for i in range(3):
  */
-  __pyx_tuple__9 = PyTuple_Pack(6, __pyx_n_s_self, __pyx_n_s_board, __pyx_n_s_player, __pyx_n_s_n, __pyx_n_s_i, __pyx_n_s_j); if (unlikely(!__pyx_tuple__9)) __PYX_ERR(0, 372, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__9);
-  __Pyx_GIVEREF(__pyx_tuple__9);
-  __pyx_codeobj__10 = (PyObject*)__Pyx_PyCode_New(3, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__9, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_ai_minimax_alpha_beta_py, __pyx_n_s_number_possible_moves, 372, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__10)) __PYX_ERR(0, 372, __pyx_L1_error)
+  __pyx_tuple__7 = PyTuple_Pack(6, __pyx_n_s_self, __pyx_n_s_board, __pyx_n_s_player, __pyx_n_s_n, __pyx_n_s_i, __pyx_n_s_j); if (unlikely(!__pyx_tuple__7)) __PYX_ERR(0, 297, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__7);
+  __Pyx_GIVEREF(__pyx_tuple__7);
+  __pyx_codeobj__8 = (PyObject*)__Pyx_PyCode_New(3, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__7, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_ai_minimax_alpha_beta_py, __pyx_n_s_number_possible_moves, 297, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__8)) __PYX_ERR(0, 297, __pyx_L1_error)
 
-  /* "ai_minimax_alpha_beta.py":394
+  /* "ai_minimax_alpha_beta.py":319
  *         return n
  * 
  *     def possiblemoves(self, ringpos, stellepos, spielfeld):             # <<<<<<<<<<<<<<
  *         possiblemoves = []
  *         if stellepos % 2 == 0:  # Men on the edges
  */
-  __pyx_tuple__11 = PyTuple_Pack(5, __pyx_n_s_self, __pyx_n_s_ringpos, __pyx_n_s_stellepos, __pyx_n_s_spielfeld, __pyx_n_s_possiblemoves); if (unlikely(!__pyx_tuple__11)) __PYX_ERR(0, 394, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__11);
-  __Pyx_GIVEREF(__pyx_tuple__11);
-  __pyx_codeobj__12 = (PyObject*)__Pyx_PyCode_New(4, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__11, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_ai_minimax_alpha_beta_py, __pyx_n_s_possiblemoves, 394, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__12)) __PYX_ERR(0, 394, __pyx_L1_error)
+  __pyx_tuple__9 = PyTuple_Pack(5, __pyx_n_s_self, __pyx_n_s_ringpos, __pyx_n_s_stellepos, __pyx_n_s_spielfeld, __pyx_n_s_possiblemoves); if (unlikely(!__pyx_tuple__9)) __PYX_ERR(0, 319, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__9);
+  __Pyx_GIVEREF(__pyx_tuple__9);
+  __pyx_codeobj__10 = (PyObject*)__Pyx_PyCode_New(4, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__9, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_ai_minimax_alpha_beta_py, __pyx_n_s_possiblemoves, 319, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__10)) __PYX_ERR(0, 319, __pyx_L1_error)
 
-  /* "ai_minimax_alpha_beta.py":421
+  /* "ai_minimax_alpha_beta.py":346
  *         return possiblemoves
  * 
  *     def checkmuhle(self, ringPos, stellePos, spielfeld, mancolor):             # <<<<<<<<<<<<<<
  *         if stellePos % 2 == 0:  # Men on the edge
  *             if spielfeld[ringPos][(stellePos + 1) % 8] == mancolor and spielfeld[ringPos][
  */
-  __pyx_tuple__13 = PyTuple_Pack(5, __pyx_n_s_self, __pyx_n_s_ringPos, __pyx_n_s_stellePos, __pyx_n_s_spielfeld, __pyx_n_s_mancolor); if (unlikely(!__pyx_tuple__13)) __PYX_ERR(0, 421, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__13);
-  __Pyx_GIVEREF(__pyx_tuple__13);
-  __pyx_codeobj__14 = (PyObject*)__Pyx_PyCode_New(5, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__13, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_ai_minimax_alpha_beta_py, __pyx_n_s_checkmuhle, 421, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__14)) __PYX_ERR(0, 421, __pyx_L1_error)
+  __pyx_tuple__11 = PyTuple_Pack(5, __pyx_n_s_self, __pyx_n_s_ringPos, __pyx_n_s_stellePos, __pyx_n_s_spielfeld, __pyx_n_s_mancolor); if (unlikely(!__pyx_tuple__11)) __PYX_ERR(0, 346, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__11);
+  __Pyx_GIVEREF(__pyx_tuple__11);
+  __pyx_codeobj__12 = (PyObject*)__Pyx_PyCode_New(5, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__11, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_ai_minimax_alpha_beta_py, __pyx_n_s_checkmuhle, 346, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__12)) __PYX_ERR(0, 346, __pyx_L1_error)
 
-  /* "ai_minimax_alpha_beta.py":438
+  /* "ai_minimax_alpha_beta.py":363
  *         return False
  * 
  *     def clearmuhlen(self, board, board_muhlen):             # <<<<<<<<<<<<<<
  *         tobecleared = []
  *         for ring in range(3):
  */
-  __pyx_tuple__15 = PyTuple_Pack(6, __pyx_n_s_self, __pyx_n_s_board, __pyx_n_s_board_muhlen, __pyx_n_s_tobecleared, __pyx_n_s_ring, __pyx_n_s_stelle); if (unlikely(!__pyx_tuple__15)) __PYX_ERR(0, 438, __pyx_L1_error)
+  __pyx_tuple__13 = PyTuple_Pack(6, __pyx_n_s_self, __pyx_n_s_board, __pyx_n_s_board_muhlen, __pyx_n_s_tobecleared, __pyx_n_s_ring, __pyx_n_s_stelle); if (unlikely(!__pyx_tuple__13)) __PYX_ERR(0, 363, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__13);
+  __Pyx_GIVEREF(__pyx_tuple__13);
+  __pyx_codeobj__14 = (PyObject*)__Pyx_PyCode_New(3, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__13, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_ai_minimax_alpha_beta_py, __pyx_n_s_clearmuhlen, 363, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__14)) __PYX_ERR(0, 363, __pyx_L1_error)
+
+  /* "ai_minimax_alpha_beta.py":375
+ * 
+ * 
+ *     def update_board_muhlen(self, board, board_muhlen_old):             # <<<<<<<<<<<<<<
+ *         board_muhlen_new = copy.deepcopy(board_muhlen_old)
+ *         for ring in range(3):
+ */
+  __pyx_tuple__15 = PyTuple_Pack(6, __pyx_n_s_self, __pyx_n_s_board, __pyx_n_s_board_muhlen_old, __pyx_n_s_board_muhlen_new, __pyx_n_s_ring, __pyx_n_s_stelle); if (unlikely(!__pyx_tuple__15)) __PYX_ERR(0, 375, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__15);
   __Pyx_GIVEREF(__pyx_tuple__15);
-  __pyx_codeobj__16 = (PyObject*)__Pyx_PyCode_New(3, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__15, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_ai_minimax_alpha_beta_py, __pyx_n_s_clearmuhlen, 438, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__16)) __PYX_ERR(0, 438, __pyx_L1_error)
+  __pyx_codeobj__16 = (PyObject*)__Pyx_PyCode_New(3, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__15, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_ai_minimax_alpha_beta_py, __pyx_n_s_update_board_muhlen, 375, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__16)) __PYX_ERR(0, 375, __pyx_L1_error)
+
+  /* "ai_minimax_alpha_beta.py":387
+ * 
+ *     # Determines which man is most beneficial to be removed
+ *     def toremove(self, board, enemy):             # <<<<<<<<<<<<<<
+ *         enemies = []
+ *         scores = []
+ */
+  __pyx_tuple__17 = PyTuple_Pack(9, __pyx_n_s_self, __pyx_n_s_board, __pyx_n_s_enemy, __pyx_n_s_enemies, __pyx_n_s_scores, __pyx_n_s_ring, __pyx_n_s_stelle, __pyx_n_s_evil_score, __pyx_n_s_max_score); if (unlikely(!__pyx_tuple__17)) __PYX_ERR(0, 387, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__17);
+  __Pyx_GIVEREF(__pyx_tuple__17);
+  __pyx_codeobj__18 = (PyObject*)__Pyx_PyCode_New(3, 0, 9, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__17, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_ai_minimax_alpha_beta_py, __pyx_n_s_toremove, 387, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__18)) __PYX_ERR(0, 387, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -11409,6 +12074,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
 }
 
 static CYTHON_SMALL_CODE int __Pyx_InitGlobals(void) {
+  __pyx_umethod_PyList_Type_index.type = (PyObject*)&PyList_Type;
   if (__Pyx_InitStrings(__pyx_string_tab) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
   __pyx_int_0 = PyInt_FromLong(0); if (unlikely(!__pyx_int_0)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_int_1 = PyInt_FromLong(1); if (unlikely(!__pyx_int_1)) __PYX_ERR(0, 1, __pyx_L1_error)
@@ -11417,10 +12083,9 @@ static CYTHON_SMALL_CODE int __Pyx_InitGlobals(void) {
   __pyx_int_5 = PyInt_FromLong(5); if (unlikely(!__pyx_int_5)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_int_8 = PyInt_FromLong(8); if (unlikely(!__pyx_int_8)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_int_10 = PyInt_FromLong(10); if (unlikely(!__pyx_int_10)) __PYX_ERR(0, 1, __pyx_L1_error)
-  __pyx_int_20 = PyInt_FromLong(20); if (unlikely(!__pyx_int_20)) __PYX_ERR(0, 1, __pyx_L1_error)
-  __pyx_int_60 = PyInt_FromLong(60); if (unlikely(!__pyx_int_60)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_int_100 = PyInt_FromLong(100); if (unlikely(!__pyx_int_100)) __PYX_ERR(0, 1, __pyx_L1_error)
-  __pyx_int_110 = PyInt_FromLong(110); if (unlikely(!__pyx_int_110)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __pyx_int_500 = PyInt_FromLong(500); if (unlikely(!__pyx_int_500)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __pyx_int_1000 = PyInt_FromLong(1000); if (unlikely(!__pyx_int_1000)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_int_100000000000000 = PyInt_FromString((char *)"100000000000000", 0, 0); if (unlikely(!__pyx_int_100000000000000)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_int_neg_1000000000000000 = PyInt_FromString((char *)"-1000000000000000", 0, 0); if (unlikely(!__pyx_int_neg_1000000000000000)) __PYX_ERR(0, 1, __pyx_L1_error)
   return 0;
@@ -11691,7 +12356,7 @@ if (!__Pyx_RefNanny) {
   #endif
 
   /* "ai_minimax_alpha_beta.py":1
- * import copy, gameutil, multiprocessing, ctypes, time             # <<<<<<<<<<<<<<
+ * import copy, gameutil, time             # <<<<<<<<<<<<<<
  * 
  * class Morris:
  */
@@ -11703,21 +12368,13 @@ if (!__Pyx_RefNanny) {
   __Pyx_GOTREF(__pyx_t_1);
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_gameutil, __pyx_t_1) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_Import(__pyx_n_s_multiprocessing, 0, -1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_multiprocessing, __pyx_t_1) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_Import(__pyx_n_s_ctypes, 0, -1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_ctypes, __pyx_t_1) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_1 = __Pyx_Import(__pyx_n_s_time, 0, -1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_time, __pyx_t_1) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "ai_minimax_alpha_beta.py":3
- * import copy, gameutil, multiprocessing, ctypes, time
+ * import copy, gameutil, time
  * 
  * class Morris:             # <<<<<<<<<<<<<<
  *     def __init__(self, board, board_muhlen, real_player, remaining_set):
@@ -11738,92 +12395,104 @@ if (!__Pyx_RefNanny) {
   if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_init, __pyx_t_2) < 0) __PYX_ERR(0, 4, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "ai_minimax_alpha_beta.py":17
+  /* "ai_minimax_alpha_beta.py":19
  *     # First function being called, remembers moves to return them
  *     ###
  *     def make_score(self, board, board_muhlen, player, alpha, beta):             # <<<<<<<<<<<<<<
- *         procs = []
  *         maxEval = alpha
+ *         best_move = False
  */
-  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_21ai_minimax_alpha_beta_6Morris_3make_score, 0, __pyx_n_s_Morris_make_score, NULL, __pyx_n_s_ai_minimax_alpha_beta, __pyx_d, ((PyObject *)__pyx_codeobj__4)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 17, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_21ai_minimax_alpha_beta_6Morris_3make_score, 0, __pyx_n_s_Morris_make_score, NULL, __pyx_n_s_ai_minimax_alpha_beta, __pyx_d, ((PyObject *)__pyx_codeobj__4)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 19, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_make_score, __pyx_t_2) < 0) __PYX_ERR(0, 17, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_make_score, __pyx_t_2) < 0) __PYX_ERR(0, 19, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "ai_minimax_alpha_beta.py":75
+  /* "ai_minimax_alpha_beta.py":83
  *     # Minimax function is simpler and only remembers and returns scores of the decision tree without the moves
  *     ###
  *     def minimax(self, board, board_muhlen, player, alpha, beta, remaining_set, depth):             # <<<<<<<<<<<<<<
  *         if depth <= 1:
  *             # Static evaluation for gamemode 1
  */
-  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_21ai_minimax_alpha_beta_6Morris_5minimax, 0, __pyx_n_s_Morris_minimax, NULL, __pyx_n_s_ai_minimax_alpha_beta, __pyx_d, ((PyObject *)__pyx_codeobj__6)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 75, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_21ai_minimax_alpha_beta_6Morris_5minimax, 0, __pyx_n_s_Morris_minimax, NULL, __pyx_n_s_ai_minimax_alpha_beta, __pyx_d, ((PyObject *)__pyx_codeobj__6)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 83, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_minimax, __pyx_t_2) < 0) __PYX_ERR(0, 75, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_minimax, __pyx_t_2) < 0) __PYX_ERR(0, 83, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "ai_minimax_alpha_beta.py":308
- * 
- *     # Not working, new version found above ^
- *     def minimax_(self, board, board_muhlen, player, alpha, beta, depth):             # <<<<<<<<<<<<<<
- *         # Static evaluation
- *         if depth < 1:
- */
-  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_21ai_minimax_alpha_beta_6Morris_7minimax_, 0, __pyx_n_s_Morris_minimax_2, NULL, __pyx_n_s_ai_minimax_alpha_beta, __pyx_d, ((PyObject *)__pyx_codeobj__8)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 308, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_minimax_2, __pyx_t_2) < 0) __PYX_ERR(0, 308, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-
-  /* "ai_minimax_alpha_beta.py":372
+  /* "ai_minimax_alpha_beta.py":297
  *     ###
  * 
  *     def number_possible_moves(self, board, player):             # <<<<<<<<<<<<<<
  *         n = 0
  *         for i in range(3):
  */
-  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_21ai_minimax_alpha_beta_6Morris_9number_possible_moves, 0, __pyx_n_s_Morris_number_possible_moves, NULL, __pyx_n_s_ai_minimax_alpha_beta, __pyx_d, ((PyObject *)__pyx_codeobj__10)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 372, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_21ai_minimax_alpha_beta_6Morris_7number_possible_moves, 0, __pyx_n_s_Morris_number_possible_moves, NULL, __pyx_n_s_ai_minimax_alpha_beta, __pyx_d, ((PyObject *)__pyx_codeobj__8)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 297, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_number_possible_moves, __pyx_t_2) < 0) __PYX_ERR(0, 372, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_number_possible_moves, __pyx_t_2) < 0) __PYX_ERR(0, 297, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "ai_minimax_alpha_beta.py":394
+  /* "ai_minimax_alpha_beta.py":319
  *         return n
  * 
  *     def possiblemoves(self, ringpos, stellepos, spielfeld):             # <<<<<<<<<<<<<<
  *         possiblemoves = []
  *         if stellepos % 2 == 0:  # Men on the edges
  */
-  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_21ai_minimax_alpha_beta_6Morris_11possiblemoves, 0, __pyx_n_s_Morris_possiblemoves, NULL, __pyx_n_s_ai_minimax_alpha_beta, __pyx_d, ((PyObject *)__pyx_codeobj__12)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 394, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_21ai_minimax_alpha_beta_6Morris_9possiblemoves, 0, __pyx_n_s_Morris_possiblemoves, NULL, __pyx_n_s_ai_minimax_alpha_beta, __pyx_d, ((PyObject *)__pyx_codeobj__10)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 319, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_possiblemoves, __pyx_t_2) < 0) __PYX_ERR(0, 394, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_possiblemoves, __pyx_t_2) < 0) __PYX_ERR(0, 319, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "ai_minimax_alpha_beta.py":421
+  /* "ai_minimax_alpha_beta.py":346
  *         return possiblemoves
  * 
  *     def checkmuhle(self, ringPos, stellePos, spielfeld, mancolor):             # <<<<<<<<<<<<<<
  *         if stellePos % 2 == 0:  # Men on the edge
  *             if spielfeld[ringPos][(stellePos + 1) % 8] == mancolor and spielfeld[ringPos][
  */
-  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_21ai_minimax_alpha_beta_6Morris_13checkmuhle, 0, __pyx_n_s_Morris_checkmuhle, NULL, __pyx_n_s_ai_minimax_alpha_beta, __pyx_d, ((PyObject *)__pyx_codeobj__14)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 421, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_21ai_minimax_alpha_beta_6Morris_11checkmuhle, 0, __pyx_n_s_Morris_checkmuhle, NULL, __pyx_n_s_ai_minimax_alpha_beta, __pyx_d, ((PyObject *)__pyx_codeobj__12)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 346, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_checkmuhle, __pyx_t_2) < 0) __PYX_ERR(0, 421, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_checkmuhle, __pyx_t_2) < 0) __PYX_ERR(0, 346, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "ai_minimax_alpha_beta.py":438
+  /* "ai_minimax_alpha_beta.py":363
  *         return False
  * 
  *     def clearmuhlen(self, board, board_muhlen):             # <<<<<<<<<<<<<<
  *         tobecleared = []
  *         for ring in range(3):
  */
-  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_21ai_minimax_alpha_beta_6Morris_15clearmuhlen, 0, __pyx_n_s_Morris_clearmuhlen, NULL, __pyx_n_s_ai_minimax_alpha_beta, __pyx_d, ((PyObject *)__pyx_codeobj__16)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 438, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_21ai_minimax_alpha_beta_6Morris_13clearmuhlen, 0, __pyx_n_s_Morris_clearmuhlen, NULL, __pyx_n_s_ai_minimax_alpha_beta, __pyx_d, ((PyObject *)__pyx_codeobj__14)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 363, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_clearmuhlen, __pyx_t_2) < 0) __PYX_ERR(0, 438, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_clearmuhlen, __pyx_t_2) < 0) __PYX_ERR(0, 363, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+  /* "ai_minimax_alpha_beta.py":375
+ * 
+ * 
+ *     def update_board_muhlen(self, board, board_muhlen_old):             # <<<<<<<<<<<<<<
+ *         board_muhlen_new = copy.deepcopy(board_muhlen_old)
+ *         for ring in range(3):
+ */
+  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_21ai_minimax_alpha_beta_6Morris_15update_board_muhlen, 0, __pyx_n_s_Morris_update_board_muhlen, NULL, __pyx_n_s_ai_minimax_alpha_beta, __pyx_d, ((PyObject *)__pyx_codeobj__16)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 375, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_update_board_muhlen, __pyx_t_2) < 0) __PYX_ERR(0, 375, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+  /* "ai_minimax_alpha_beta.py":387
+ * 
+ *     # Determines which man is most beneficial to be removed
+ *     def toremove(self, board, enemy):             # <<<<<<<<<<<<<<
+ *         enemies = []
+ *         scores = []
+ */
+  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_21ai_minimax_alpha_beta_6Morris_17toremove, 0, __pyx_n_s_Morris_toremove, NULL, __pyx_n_s_ai_minimax_alpha_beta, __pyx_d, ((PyObject *)__pyx_codeobj__18)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 387, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_toremove, __pyx_t_2) < 0) __PYX_ERR(0, 387, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "ai_minimax_alpha_beta.py":3
- * import copy, gameutil, multiprocessing, ctypes, time
+ * import copy, gameutil, time
  * 
  * class Morris:             # <<<<<<<<<<<<<<
  *     def __init__(self, board, board_muhlen, real_player, remaining_set):
@@ -11836,7 +12505,7 @@ if (!__Pyx_RefNanny) {
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "ai_minimax_alpha_beta.py":1
- * import copy, gameutil, multiprocessing, ctypes, time             # <<<<<<<<<<<<<<
+ * import copy, gameutil, time             # <<<<<<<<<<<<<<
  * 
  * class Morris:
  */
@@ -12609,6 +13278,130 @@ static CYTHON_INLINE int __Pyx_SetItemInt_Fast(PyObject *o, Py_ssize_t i, PyObje
     return __Pyx_SetItemInt_Generic(o, PyInt_FromSsize_t(i), v);
 }
 
+/* PyIntBinop */
+#if !CYTHON_COMPILING_IN_PYPY
+static PyObject* __Pyx_PyInt_AddObjC(PyObject *op1, PyObject *op2, CYTHON_UNUSED long intval, int inplace, int zerodivision_check) {
+    (void)inplace;
+    (void)zerodivision_check;
+    #if PY_MAJOR_VERSION < 3
+    if (likely(PyInt_CheckExact(op1))) {
+        const long b = intval;
+        long x;
+        long a = PyInt_AS_LONG(op1);
+            x = (long)((unsigned long)a + b);
+            if (likely((x^a) >= 0 || (x^b) >= 0))
+                return PyInt_FromLong(x);
+            return PyLong_Type.tp_as_number->nb_add(op1, op2);
+    }
+    #endif
+    #if CYTHON_USE_PYLONG_INTERNALS
+    if (likely(PyLong_CheckExact(op1))) {
+        const long b = intval;
+        long a, x;
+#ifdef HAVE_LONG_LONG
+        const PY_LONG_LONG llb = intval;
+        PY_LONG_LONG lla, llx;
+#endif
+        const digit* digits = ((PyLongObject*)op1)->ob_digit;
+        const Py_ssize_t size = Py_SIZE(op1);
+        if (likely(__Pyx_sst_abs(size) <= 1)) {
+            a = likely(size) ? digits[0] : 0;
+            if (size == -1) a = -a;
+        } else {
+            switch (size) {
+                case -2:
+                    if (8 * sizeof(long) - 1 > 2 * PyLong_SHIFT) {
+                        a = -(long) (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0]));
+                        break;
+#ifdef HAVE_LONG_LONG
+                    } else if (8 * sizeof(PY_LONG_LONG) - 1 > 2 * PyLong_SHIFT) {
+                        lla = -(PY_LONG_LONG) (((((unsigned PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[0]));
+                        goto long_long;
+#endif
+                    }
+                    CYTHON_FALLTHROUGH;
+                case 2:
+                    if (8 * sizeof(long) - 1 > 2 * PyLong_SHIFT) {
+                        a = (long) (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0]));
+                        break;
+#ifdef HAVE_LONG_LONG
+                    } else if (8 * sizeof(PY_LONG_LONG) - 1 > 2 * PyLong_SHIFT) {
+                        lla = (PY_LONG_LONG) (((((unsigned PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[0]));
+                        goto long_long;
+#endif
+                    }
+                    CYTHON_FALLTHROUGH;
+                case -3:
+                    if (8 * sizeof(long) - 1 > 3 * PyLong_SHIFT) {
+                        a = -(long) (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0]));
+                        break;
+#ifdef HAVE_LONG_LONG
+                    } else if (8 * sizeof(PY_LONG_LONG) - 1 > 3 * PyLong_SHIFT) {
+                        lla = -(PY_LONG_LONG) (((((((unsigned PY_LONG_LONG)digits[2]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[0]));
+                        goto long_long;
+#endif
+                    }
+                    CYTHON_FALLTHROUGH;
+                case 3:
+                    if (8 * sizeof(long) - 1 > 3 * PyLong_SHIFT) {
+                        a = (long) (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0]));
+                        break;
+#ifdef HAVE_LONG_LONG
+                    } else if (8 * sizeof(PY_LONG_LONG) - 1 > 3 * PyLong_SHIFT) {
+                        lla = (PY_LONG_LONG) (((((((unsigned PY_LONG_LONG)digits[2]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[0]));
+                        goto long_long;
+#endif
+                    }
+                    CYTHON_FALLTHROUGH;
+                case -4:
+                    if (8 * sizeof(long) - 1 > 4 * PyLong_SHIFT) {
+                        a = -(long) (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0]));
+                        break;
+#ifdef HAVE_LONG_LONG
+                    } else if (8 * sizeof(PY_LONG_LONG) - 1 > 4 * PyLong_SHIFT) {
+                        lla = -(PY_LONG_LONG) (((((((((unsigned PY_LONG_LONG)digits[3]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[2]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[0]));
+                        goto long_long;
+#endif
+                    }
+                    CYTHON_FALLTHROUGH;
+                case 4:
+                    if (8 * sizeof(long) - 1 > 4 * PyLong_SHIFT) {
+                        a = (long) (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0]));
+                        break;
+#ifdef HAVE_LONG_LONG
+                    } else if (8 * sizeof(PY_LONG_LONG) - 1 > 4 * PyLong_SHIFT) {
+                        lla = (PY_LONG_LONG) (((((((((unsigned PY_LONG_LONG)digits[3]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[2]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[0]));
+                        goto long_long;
+#endif
+                    }
+                    CYTHON_FALLTHROUGH;
+                default: return PyLong_Type.tp_as_number->nb_add(op1, op2);
+            }
+        }
+                x = a + b;
+            return PyLong_FromLong(x);
+#ifdef HAVE_LONG_LONG
+        long_long:
+                llx = lla + llb;
+            return PyLong_FromLongLong(llx);
+#endif
+        
+        
+    }
+    #endif
+    if (PyFloat_CheckExact(op1)) {
+        const long b = intval;
+        double a = PyFloat_AS_DOUBLE(op1);
+            double result;
+            PyFPE_START_PROTECT("add", return NULL)
+            result = ((double)a) + (double)b;
+            PyFPE_END_PROTECT(result)
+            return PyFloat_FromDouble(result);
+    }
+    return (inplace ? PyNumber_InPlaceAdd : PyNumber_Add)(op1, op2);
+}
+#endif
+
 /* ObjectGetItem */
 #if CYTHON_USE_TYPE_SLOTS
 static PyObject *__Pyx_PyObject_GetIndex(PyObject *obj, PyObject* index) {
@@ -12767,130 +13560,6 @@ bad:
     Py_XDECREF(local_tb);
     return -1;
 }
-
-/* PyIntBinop */
-#if !CYTHON_COMPILING_IN_PYPY
-static PyObject* __Pyx_PyInt_AddObjC(PyObject *op1, PyObject *op2, CYTHON_UNUSED long intval, int inplace, int zerodivision_check) {
-    (void)inplace;
-    (void)zerodivision_check;
-    #if PY_MAJOR_VERSION < 3
-    if (likely(PyInt_CheckExact(op1))) {
-        const long b = intval;
-        long x;
-        long a = PyInt_AS_LONG(op1);
-            x = (long)((unsigned long)a + b);
-            if (likely((x^a) >= 0 || (x^b) >= 0))
-                return PyInt_FromLong(x);
-            return PyLong_Type.tp_as_number->nb_add(op1, op2);
-    }
-    #endif
-    #if CYTHON_USE_PYLONG_INTERNALS
-    if (likely(PyLong_CheckExact(op1))) {
-        const long b = intval;
-        long a, x;
-#ifdef HAVE_LONG_LONG
-        const PY_LONG_LONG llb = intval;
-        PY_LONG_LONG lla, llx;
-#endif
-        const digit* digits = ((PyLongObject*)op1)->ob_digit;
-        const Py_ssize_t size = Py_SIZE(op1);
-        if (likely(__Pyx_sst_abs(size) <= 1)) {
-            a = likely(size) ? digits[0] : 0;
-            if (size == -1) a = -a;
-        } else {
-            switch (size) {
-                case -2:
-                    if (8 * sizeof(long) - 1 > 2 * PyLong_SHIFT) {
-                        a = -(long) (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0]));
-                        break;
-#ifdef HAVE_LONG_LONG
-                    } else if (8 * sizeof(PY_LONG_LONG) - 1 > 2 * PyLong_SHIFT) {
-                        lla = -(PY_LONG_LONG) (((((unsigned PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[0]));
-                        goto long_long;
-#endif
-                    }
-                    CYTHON_FALLTHROUGH;
-                case 2:
-                    if (8 * sizeof(long) - 1 > 2 * PyLong_SHIFT) {
-                        a = (long) (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0]));
-                        break;
-#ifdef HAVE_LONG_LONG
-                    } else if (8 * sizeof(PY_LONG_LONG) - 1 > 2 * PyLong_SHIFT) {
-                        lla = (PY_LONG_LONG) (((((unsigned PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[0]));
-                        goto long_long;
-#endif
-                    }
-                    CYTHON_FALLTHROUGH;
-                case -3:
-                    if (8 * sizeof(long) - 1 > 3 * PyLong_SHIFT) {
-                        a = -(long) (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0]));
-                        break;
-#ifdef HAVE_LONG_LONG
-                    } else if (8 * sizeof(PY_LONG_LONG) - 1 > 3 * PyLong_SHIFT) {
-                        lla = -(PY_LONG_LONG) (((((((unsigned PY_LONG_LONG)digits[2]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[0]));
-                        goto long_long;
-#endif
-                    }
-                    CYTHON_FALLTHROUGH;
-                case 3:
-                    if (8 * sizeof(long) - 1 > 3 * PyLong_SHIFT) {
-                        a = (long) (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0]));
-                        break;
-#ifdef HAVE_LONG_LONG
-                    } else if (8 * sizeof(PY_LONG_LONG) - 1 > 3 * PyLong_SHIFT) {
-                        lla = (PY_LONG_LONG) (((((((unsigned PY_LONG_LONG)digits[2]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[0]));
-                        goto long_long;
-#endif
-                    }
-                    CYTHON_FALLTHROUGH;
-                case -4:
-                    if (8 * sizeof(long) - 1 > 4 * PyLong_SHIFT) {
-                        a = -(long) (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0]));
-                        break;
-#ifdef HAVE_LONG_LONG
-                    } else if (8 * sizeof(PY_LONG_LONG) - 1 > 4 * PyLong_SHIFT) {
-                        lla = -(PY_LONG_LONG) (((((((((unsigned PY_LONG_LONG)digits[3]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[2]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[0]));
-                        goto long_long;
-#endif
-                    }
-                    CYTHON_FALLTHROUGH;
-                case 4:
-                    if (8 * sizeof(long) - 1 > 4 * PyLong_SHIFT) {
-                        a = (long) (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0]));
-                        break;
-#ifdef HAVE_LONG_LONG
-                    } else if (8 * sizeof(PY_LONG_LONG) - 1 > 4 * PyLong_SHIFT) {
-                        lla = (PY_LONG_LONG) (((((((((unsigned PY_LONG_LONG)digits[3]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[2]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[1]) << PyLong_SHIFT) | (unsigned PY_LONG_LONG)digits[0]));
-                        goto long_long;
-#endif
-                    }
-                    CYTHON_FALLTHROUGH;
-                default: return PyLong_Type.tp_as_number->nb_add(op1, op2);
-            }
-        }
-                x = a + b;
-            return PyLong_FromLong(x);
-#ifdef HAVE_LONG_LONG
-        long_long:
-                llx = lla + llb;
-            return PyLong_FromLongLong(llx);
-#endif
-        
-        
-    }
-    #endif
-    if (PyFloat_CheckExact(op1)) {
-        const long b = intval;
-        double a = PyFloat_AS_DOUBLE(op1);
-            double result;
-            PyFPE_START_PROTECT("add", return NULL)
-            result = ((double)a) + (double)b;
-            PyFPE_END_PROTECT(result)
-            return PyFloat_FromDouble(result);
-    }
-    return (inplace ? PyNumber_InPlaceAdd : PyNumber_Add)(op1, op2);
-}
-#endif
 
 /* PyIntBinop */
 #if !CYTHON_COMPILING_IN_PYPY
@@ -13206,6 +13875,83 @@ static CYTHON_INLINE PyObject* __Pyx_PyInt_NeObjC(PyObject *op1, PyObject *op2, 
     }
     return (
         PyObject_RichCompare(op1, op2, Py_NE));
+}
+
+/* None */
+static CYTHON_INLINE void __Pyx_RaiseUnboundLocalError(const char *varname) {
+    PyErr_Format(PyExc_UnboundLocalError, "local variable '%s' referenced before assignment", varname);
+}
+
+/* UnpackUnboundCMethod */
+static int __Pyx_TryUnpackUnboundCMethod(__Pyx_CachedCFunction* target) {
+    PyObject *method;
+    method = __Pyx_PyObject_GetAttrStr(target->type, *target->method_name);
+    if (unlikely(!method))
+        return -1;
+    target->method = method;
+#if CYTHON_COMPILING_IN_CPYTHON
+    #if PY_MAJOR_VERSION >= 3
+    if (likely(__Pyx_TypeCheck(method, &PyMethodDescr_Type)))
+    #endif
+    {
+        PyMethodDescrObject *descr = (PyMethodDescrObject*) method;
+        target->func = descr->d_method->ml_meth;
+        target->flag = descr->d_method->ml_flags & ~(METH_CLASS | METH_STATIC | METH_COEXIST | METH_STACKLESS);
+    }
+#endif
+    return 0;
+}
+
+/* CallUnboundCMethod1 */
+#if CYTHON_COMPILING_IN_CPYTHON
+static CYTHON_INLINE PyObject* __Pyx_CallUnboundCMethod1(__Pyx_CachedCFunction* cfunc, PyObject* self, PyObject* arg) {
+    if (likely(cfunc->func)) {
+        int flag = cfunc->flag;
+        if (flag == METH_O) {
+            return (*(cfunc->func))(self, arg);
+        } else if (PY_VERSION_HEX >= 0x030600B1 && flag == METH_FASTCALL) {
+            if (PY_VERSION_HEX >= 0x030700A0) {
+                return (*(__Pyx_PyCFunctionFast)(void*)(PyCFunction)cfunc->func)(self, &arg, 1);
+            } else {
+                return (*(__Pyx_PyCFunctionFastWithKeywords)(void*)(PyCFunction)cfunc->func)(self, &arg, 1, NULL);
+            }
+        } else if (PY_VERSION_HEX >= 0x030700A0 && flag == (METH_FASTCALL | METH_KEYWORDS)) {
+            return (*(__Pyx_PyCFunctionFastWithKeywords)(void*)(PyCFunction)cfunc->func)(self, &arg, 1, NULL);
+        }
+    }
+    return __Pyx__CallUnboundCMethod1(cfunc, self, arg);
+}
+#endif
+static PyObject* __Pyx__CallUnboundCMethod1(__Pyx_CachedCFunction* cfunc, PyObject* self, PyObject* arg){
+    PyObject *args, *result = NULL;
+    if (unlikely(!cfunc->func && !cfunc->method) && unlikely(__Pyx_TryUnpackUnboundCMethod(cfunc) < 0)) return NULL;
+#if CYTHON_COMPILING_IN_CPYTHON
+    if (cfunc->func && (cfunc->flag & METH_VARARGS)) {
+        args = PyTuple_New(1);
+        if (unlikely(!args)) goto bad;
+        Py_INCREF(arg);
+        PyTuple_SET_ITEM(args, 0, arg);
+        if (cfunc->flag & METH_KEYWORDS)
+            result = (*(PyCFunctionWithKeywords)(void*)(PyCFunction)cfunc->func)(self, args, NULL);
+        else
+            result = (*cfunc->func)(self, args);
+    } else {
+        args = PyTuple_New(2);
+        if (unlikely(!args)) goto bad;
+        Py_INCREF(self);
+        PyTuple_SET_ITEM(args, 0, self);
+        Py_INCREF(arg);
+        PyTuple_SET_ITEM(args, 1, arg);
+        result = __Pyx_PyObject_Call(cfunc->method, args, NULL);
+    }
+#else
+    args = PyTuple_Pack(2, self, arg);
+    if (unlikely(!args)) goto bad;
+    result = __Pyx_PyObject_Call(cfunc->method, args, NULL);
+#endif
+bad:
+    Py_XDECREF(args);
+    return result;
 }
 
 /* Import */
