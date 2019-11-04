@@ -364,6 +364,7 @@ class Morris:
                 return True
         return False
 
+
     def clearmuhlen(self, board, board_muhlen):
         tobecleared = []
         for ring in range(3):

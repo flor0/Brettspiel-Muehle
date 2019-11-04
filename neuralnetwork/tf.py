@@ -51,9 +51,9 @@ print(labels)
 #######################################################################################################################
 # Model stuff
 model = tf.keras.Sequential([
-  tf.keras.layers.Dense(30, activation=tf.nn.relu, input_shape=(1, 28)),  # input shape required
-  tf.keras.layers.Dense(20, activation=tf.nn.relu),
-  tf.keras.layers.Dense(10, activation=tf.nn.relu),
+  tf.keras.layers.Dense(100, activation=tf.nn.relu, input_shape=(1, 28)),  # input shape required
+  tf.keras.layers.Dense(100, activation=tf.nn.relu),
+  tf.keras.layers.Dense(100, activation=tf.nn.relu),
   tf.keras.layers.Dense(12719)
 ])
 
@@ -64,7 +64,7 @@ print("Prediction: {}".format(tf.argmax(predictions, axis=1)))
 print("    Labels: {}".format(labels))
 
 loss_object = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
-optimizer = tf.keras.optimizers.Adam(learning_rate=0.01)
+optimizer = tf.keras.optimizers.Adam(learning_rate=0.0001)
 
 
 loss_value, grads = grad(model, features, labels)
@@ -79,9 +79,13 @@ print("Step: {},         Loss: {}".format(optimizer.iterations.numpy(),
 print("####################### START TRAINING #######################")
 train_loss_results = []
 train_accuracy_results = []
-num_epochs = 201
+num_epochs = 1500
+
+model.load_weights("weights.tf")
+
 
 for epoch in range(num_epochs):
+    t = time.time()
     epoch_loss_avg = tf.keras.metrics.Mean()
     epoch_accuracy = tf.keras.metrics.SparseCategoricalAccuracy()
 
@@ -101,6 +105,11 @@ for epoch in range(num_epochs):
     if epoch % 10 == 0:
         print("Epoch {:03d}: Loss: {:.3f}, Accuracy: {:.3%}".format(epoch, epoch_loss_avg.result(),
                                                                     epoch_accuracy.result()))
+        secs = (num_epochs - epoch) * (time.time() - t)
+        mins = secs // 60
+        hrs = mins / 60
+        print("Estimated time remaining: {} hrs {} min {} sec".format(hrs, mins, secs))
+        model.save_weights("weights.tf")
 
 
 # visualize
@@ -115,3 +124,4 @@ axes[1].set_ylabel("Accuracy", fontsize=14)
 axes[1].set_xlabel("Epoch", fontsize=14)
 axes[1].plot(train_accuracy_results)
 plt.show()
+

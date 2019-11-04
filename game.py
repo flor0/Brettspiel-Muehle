@@ -1,10 +1,95 @@
-import gameutil, copy, ai_minimax_alpha_beta
+import gameutil, copy, ai_minimax_alpha_beta, random
 import numpy as np
 
 
 #
 # Define game functions
 #
+
+
+def checkmuhle(ringPos, stellePos, spielfeld, mancolor):
+    if stellePos % 2 == 0:  # Men on the edge
+        if spielfeld[ringPos][(stellePos + 1) % 8] == mancolor and spielfeld[ringPos][
+            (stellePos + 2) % 8] == mancolor:
+            return True
+        if spielfeld[ringPos][(stellePos - 1) % 8] == mancolor and spielfeld[ringPos][
+            (stellePos - 2) % 8] == mancolor:
+            return True
+    else:  # Men in the centre lines
+        if spielfeld[(ringPos + 1) % 3][stellePos] == mancolor and spielfeld[(ringPos + 2) % 3][
+            stellePos] == mancolor:
+            return True
+        if spielfeld[ringPos][(stellePos + 1) % 8] == mancolor and spielfeld[ringPos][
+            (stellePos - 1) % 8] == mancolor:
+            return True
+    return False
+
+
+def update_board_muhlen(self, board, board_muhlen_old):
+    board_muhlen_new = copy.deepcopy(board_muhlen_old)
+    for ring in range(3):
+        for stelle in range(8):
+            if self.checkmuhle(ring, stelle, board, board[ring][stelle]):
+                board_muhlen_new[ring][stelle] = 1
+            else:
+                board_muhlen_new[ring][stelle] = 0
+    return board_muhlen_new
+
+
+def toremove(self, board, enemy):
+    enemies = []
+    scores = []
+    for ring in range(3):
+        for stelle in range(8):
+            # For each enemy man who is not in a mill
+            if board[ring][stelle] == enemy and not self.checkmuhle(ring, stelle, board, enemy):
+                # Generate "evil" score for the enemy man
+                evil_score = 0
+
+                # If two men are in one line and can make a mill next move
+                if stelle % 2 == 0:  # Edge case
+                    if board[ring][((stelle + 1) % 8)] == enemy:
+                        evil_score += 1
+                    if board[ring][(stelle - 1) % 8] == enemy:
+                        evil_score += 1
+                    # Really bad situation, man has to be removed because two mills are possible
+                    if board[ring][(stelle - 1) % 8] == enemy and board[ring][((stelle + 1) % 8)] == enemy:
+                        evil_score += 100
+
+                elif stelle % 2 != 0:  # Center case
+                    if board[(ring + 1) % 3][stelle] == enemy:
+                        evil_score += 1
+                    if board[(ring + 2) % 3][stelle] == enemy:
+                        evil_score += 1
+                    if board[ring][(stelle + 1) % 8] == enemy:
+                        evil_score += 1
+                    if board[ring][(stelle - 1) % 8] == enemy:
+                        evil_score += 1
+                    # Really bad situation, same as above when two mills are possible
+                    if board[(ring + 1) % 3][stelle] == enemy and (
+                            board[ring][(stelle + 1) % 8] == enemy or board[ring][(stelle - 1) % 8] == enemy):
+                        evil_score += 100
+                    if board[(ring + 2) % 3][stelle] == enemy and (
+                            board[ring][(stelle + 1) % 8] == enemy or board[ring][(stelle - 1) % 8] == enemy):
+                        evil_score += 100
+
+                scores.append(evil_score)
+                enemies.append((ring, stelle))
+    if len(scores) == 0:
+        # Uh oh, there is only mills left
+        # We can just remove men out of mills now
+        for ring in range(3):
+            for stelle in range(8):
+                # For each enemy man
+                if board[ring][stelle] == enemy:
+                    scores.append(1)
+                    enemies.append((ring, stelle))
+                    max_score = scores[0]
+    else:
+        max_score = max(scores)
+
+    return enemies[scores.index(max_score)]
+
 
 def canmove(ringpos, stellepos):
     if stellepos % 2 == 0:  # Men on the edges
@@ -38,13 +123,16 @@ def canmoveatall(player):
 # Initialize game variables
 #
 
-set_remaining = 18  # Remaining men to place on the board
-remaining = {1:9, 2:9}  # Remaining men from each player
+hand_remaining = {1:9, 2:9}  # Remaining men to place on the board
+board_remaining = {1:9, 2:9}  # Remaining men from each player
 player_colors = {1:"White", 2:"Black"}  # Converting integer to string representation of player
 board = [[0 for j in range(8)] for i in range(3)]   # Initialise board at zero-state
 turn = False # White begins
 turn_to_player = {False:1, True:2}
 done = False
+to = (0, 0)
+_from = (0, 0)
+remove = (0, 0)
 
 # Arbitrary color choice
 player_human = 1
@@ -53,18 +141,32 @@ player_ai = 2
 while not done:
     # AI's turn
     if turn:
-        if set_remaining > 0:   # Game phase 1, placing
-            set_remaining -= 1
+        if hand_remaining[player_ai] > 0:   # Game phase 1, placing
+            hand_remaining[player_ai] -= 1
             # Call AI
-            drivers.place(AI_CHOICE)
+            ai.move = ai.make_move()    # generate move
+            if board[ai.move[0]][ai.move[1]] == 0:  # If the man can be placed on the empty spot
+                to = ai.move
+                drivers.place(ai.move)
+            else:   # If the move is invalid make a random valid move
+                possible_moves = []
+                for ring in range(3):
+                    for pos in range(8):
+                        if board[ring][pos] == 0:
+                            possible_moves.append((ring, pos))  # Add possible move to list
+                to = random.choice(possible_moves)
+                drivers.place(to)    # Select random move and execute with drivers
 
         else:   # Game phase 2, moving
             pass
 
+        # Check for mills
+        if checkmuhle(to[0], to[1], board, )
+
     # Human's turn
     else:
-        if set_remaining > 0:   # Game phase 1, placing
-            set_remaining -= 1
+        if hand_remaining[player_human] > 0:   # Game phase 1, placing
+            hand_remaining[player_human] -= 1
             drivers.await_changes()
             if board[HUMAN_PLACED[0]][HUMAN_PLACED[1]] == 0:
                 board[HUMAN_PLACED[0]][HUMAN_PLACED[1]] = player_human
@@ -75,7 +177,7 @@ while not done:
     #
 
     # Victory by no men left
-    if remaining[1] < 3:    # If Black wins
+    if board_remaining[1] < 3:    # If Black wins
         print("Black won!")
         done = True
     elif remaining[2] < 3:  # If White wins
