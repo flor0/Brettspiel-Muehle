@@ -52,9 +52,11 @@ print("Eager execution: {}".format(tf.executing_eagerly()))
 #######################################################################################################################
 # Model stuff
 model = tf.keras.Sequential([
-  tf.keras.layers.Dense(100, activation=tf.nn.relu, input_shape=(1, 28)),  # input shape required
-  tf.keras.layers.Dense(100, activation=tf.nn.relu),
-  tf.keras.layers.Dense(100, activation=tf.nn.relu),
+  tf.keras.layers.Dense(500, activation=tf.nn.relu, input_shape=(1, 28)),  # input shape required
+  tf.keras.layers.Dense(500, activation=tf.nn.relu),
+  tf.keras.layers.Dense(500, activation=tf.nn.relu),
+  tf.keras.layers.Dense(500, activation=tf.nn.relu),
+  tf.keras.layers.Dense(500, activation=tf.nn.relu),
   tf.keras.layers.Dense(12719)
 ])
 model.load_weights("weights.tf")

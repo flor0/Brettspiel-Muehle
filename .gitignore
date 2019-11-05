@@ -102,3 +102,6 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+neuralnetwork/weights.tf.data-00000-of-00002
+neuralnetwork/weights.tf.data-00001-of-00002
+neuralnetwork/weights.tf.index

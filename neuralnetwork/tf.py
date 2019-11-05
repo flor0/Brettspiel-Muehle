@@ -4,6 +4,8 @@ import tensorflow as tf
 import datahandler
 import time
 
+tf.debugging.set_log_device_placement(True)
+
 
 def pack_features_vector(features, labels):
     """Pack the features into a single array."""
@@ -26,7 +28,7 @@ print("TensorFlow version: {}".format(tf.__version__))
 print("Eager execution: {}".format(tf.executing_eagerly()))
 #######################################################################################################################
 # Data stuff
-batch_size = 30
+batch_size = 512
 _column_names = ['b00','b01','b02','b03','b04','b05','b06','b07','b10','b11','b12','b13','b14','b15','b16','b17','b20','b21','b22','b23','b24','b25','b26','b27','hand_me','hand_enemy','board_me','board_enemy','solution']
 _label_name = 'solution'
 print("Making dataset...")
@@ -51,9 +53,9 @@ print(labels)
 #######################################################################################################################
 # Model stuff
 model = tf.keras.Sequential([
-  tf.keras.layers.Dense(100, activation=tf.nn.relu, input_shape=(1, 28)),  # input shape required
-  tf.keras.layers.Dense(100, activation=tf.nn.relu),
-  tf.keras.layers.Dense(100, activation=tf.nn.relu),
+  tf.keras.layers.Dense(5000, activation=tf.nn.relu, input_shape=(1, 28)),  # input shape required
+  tf.keras.layers.Dense(5000, activation=tf.nn.relu),
+  tf.keras.layers.Dense(5000, activation=tf.nn.relu),
   tf.keras.layers.Dense(12719)
 ])
 
@@ -64,7 +66,7 @@ print("Prediction: {}".format(tf.argmax(predictions, axis=1)))
 print("    Labels: {}".format(labels))
 
 loss_object = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
-optimizer = tf.keras.optimizers.Adam(learning_rate=0.001)
+optimizer = tf.keras.optimizers.Adam(learning_rate=0.0005)
 
 
 loss_value, grads = grad(model, features, labels)
@@ -98,6 +100,7 @@ for epoch in range(num_epochs):
         # track progress
         epoch_loss_avg(loss_value)  # Add current batch's loss
         epoch_accuracy(y, model(x)) # Compare prediction to actual label
+
     # End epoch
     train_loss_results.append(epoch_loss_avg.result())
     train_accuracy_results.append(epoch_accuracy.result())
@@ -107,6 +110,8 @@ for epoch in range(num_epochs):
     secs = (num_epochs - epoch) * (time.time() - t)
     mins = secs // 60
     hrs = mins / 60
+    mins = mins - hrs*60
+    secs = secs - mins*60 - hrs*60*60
     print("Estimated time remaining: {} hrs {} min {} sec".format(hrs, mins, secs))
     model.save_weights("weights.tf")
 
@@ -123,4 +128,3 @@ axes[1].set_ylabel("Accuracy", fontsize=14)
 axes[1].set_xlabel("Epoch", fontsize=14)
 axes[1].plot(train_accuracy_results)
 plt.show()
-
