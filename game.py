@@ -161,7 +161,8 @@ while not done:
             pass
 
         # Check for mills
-        if checkmuhle(to[0], to[1], board, )
+        if checkmuhle(to[0], to[1], board, player_ai):
+            drivers.remove(toremove())
 
     # Human's turn
     else:

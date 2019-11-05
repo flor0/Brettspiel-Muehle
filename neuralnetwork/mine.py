@@ -37,7 +37,7 @@ def tupletostring(a):
     return "{}{}".format(a[0], a[1])
 
 
-datafile = open("DATASET.complete.txt", "r")
+datafile = open("DATASET.expanded.txt", "r")
 datafile_lines = datafile.readlines()
 
 board_states = [line[:24] for line in datafile_lines]
@@ -49,7 +49,9 @@ answers = [line[29:] for line in datafile_lines]
 
 mydataset = open("mydata.txt", "w")
 mydataset.write("b00,b01,b02,b03,b04,b05,b06,b07,b10,b11,b12,b13,b14,b15,b16,b17,b20,b21,b22,b23,b24,b25,b26,b27,hand_me,hand_enemy,board_me,board_enemy,solution\n")
-for i in range(10000):
+for i in range(len(datafile_lines)):
+    if i % 10000 == 0:
+        print(str(i)+"/"+str(len(datafile_lines)))
     if len(answers[i]) > 3:
         temp_array = []
         temp_array.append(moveconverter(answers[i][:2]))

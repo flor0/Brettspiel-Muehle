@@ -64,7 +64,7 @@ print("Prediction: {}".format(tf.argmax(predictions, axis=1)))
 print("    Labels: {}".format(labels))
 
 loss_object = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
-optimizer = tf.keras.optimizers.Adam(learning_rate=0.0001)
+optimizer = tf.keras.optimizers.Adam(learning_rate=0.001)
 
 
 loss_value, grads = grad(model, features, labels)
@@ -81,7 +81,7 @@ train_loss_results = []
 train_accuracy_results = []
 num_epochs = 1500
 
-model.load_weights("weights.tf")
+#model.load_weights("weights.tf")
 
 
 for epoch in range(num_epochs):
@@ -102,14 +102,13 @@ for epoch in range(num_epochs):
     train_loss_results.append(epoch_loss_avg.result())
     train_accuracy_results.append(epoch_accuracy.result())
 
-    if epoch % 10 == 0:
-        print("Epoch {:03d}: Loss: {:.3f}, Accuracy: {:.3%}".format(epoch, epoch_loss_avg.result(),
-                                                                    epoch_accuracy.result()))
-        secs = (num_epochs - epoch) * (time.time() - t)
-        mins = secs // 60
-        hrs = mins / 60
-        print("Estimated time remaining: {} hrs {} min {} sec".format(hrs, mins, secs))
-        model.save_weights("weights.tf")
+    print("Epoch {:03d}: Loss: {:.3f}, Accuracy: {:.3%}".format(epoch, epoch_loss_avg.result(),
+                                                                epoch_accuracy.result()))
+    secs = (num_epochs - epoch) * (time.time() - t)
+    mins = secs // 60
+    hrs = mins / 60
+    print("Estimated time remaining: {} hrs {} min {} sec".format(hrs, mins, secs))
+    model.save_weights("weights.tf")
 
 
 # visualize

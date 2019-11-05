@@ -33,13 +33,13 @@ def makemove(board, hand_human, hand_ai, board_human, board_ai):
     ai_input.append(board_ai)
     ai_input.append(board_human)
     ai_input = [ai_input]
+    print("AI INPUT: ", ai_input)
 
     predictions = model(tf.convert_to_tensor(ai_input))
 
     for i, logits in enumerate(predictions):
         class_idx = tf.argmax(logits).numpy()
         p = tf.nn.softmax(logits)[class_idx]
-        print("Move INT: {}".format(class_idx))
         output_move = datahandler.get_position(class_idx)
         print("Move Position: {}".format(output_move))
         return output_move
