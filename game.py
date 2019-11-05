@@ -6,6 +6,33 @@ import numpy as np
 # Define game functions
 #
 
+def possiblemoves(ringpos, stellepos, spielfeld):
+    possiblemoves = []
+    if stellepos % 2 == 0:  # Men on the edges
+        if spielfeld[ringpos][(stellepos + 1) % 8] == 0:  # Sideways
+            possiblemoves.append((ringpos, (stellepos + 1) % 8))
+        if spielfeld[ringpos][(stellepos - 1) % 8] == 0:
+            possiblemoves.append((ringpos, (stellepos - 1) % 8))
+    else:  # Men on the center fields
+        if spielfeld[ringpos][(stellepos + 1) % 8] == 0:
+            possiblemoves.append((ringpos, stellepos + 1 % 8))
+        if spielfeld[ringpos][(stellepos - 1) % 8] == 0:  # Sideways
+            possiblemoves.append((ringpos, stellepos - 1 % 8))
+        if ringpos == 0:  # Outer ring
+            if spielfeld[1][stellepos] == 0:
+                possiblemoves.append((1, stellepos))
+        if ringpos == 1:  # Center ring
+            if spielfeld[0][stellepos] == 0:
+                possiblemoves.append((0, stellepos))
+            if spielfeld[2][stellepos] == 0:
+                possiblemoves.append((2, stellepos))
+        if ringpos == 2:  # Inner ring
+            if spielfeld[1][stellepos] == 0:
+                possiblemoves.append((1, stellepos))
+    if len(possiblemoves) == 0:
+        return False
+    return possiblemoves
+
 
 def checkmuhle(ringPos, stellePos, spielfeld, mancolor):
     if stellePos % 2 == 0:  # Men on the edge
@@ -36,7 +63,7 @@ def update_board_muhlen(self, board, board_muhlen_old):
     return board_muhlen_new
 
 
-def toremove(self, board, enemy):
+def toremove(board, enemy):
     enemies = []
     scores = []
     for ring in range(3):
@@ -158,21 +185,47 @@ while not done:
                 drivers.place(to)    # Select random move and execute with drivers
 
         else:   # Game phase 2, moving
-            pass
+            # Call AI
+            ai_move_to, ai_move_from = ai.make_move()
+            if (ai_move_to not in possiblemoves(ai_move_from[0], ai_move_from[1], board)) and not (board_remaining[player_ai] == 3):    # Illegal move
+                print("Uh, oh. AI made a mistake!")
+            else:
+                board[ai_move_to[0]][ai_move_to[1]] = player_ai
+                board[ai_move_from[0]][ai_move_from[1]] = 0
+
 
         # Check for mills
-        if checkmuhle(to[0], to[1], board, player_ai):
-            drivers.remove(toremove())
+        if checkmuhle(ai_move_to[0],ai_move_to[1], board, player_ai):
+            drivers.remove(toremove(board, player_human))
+            board_remaining[player_human] -= 1
 
     # Human's turn
     else:
         if hand_remaining[player_human] > 0:   # Game phase 1, placing
             hand_remaining[player_human] -= 1
             drivers.await_changes()
-            if board[HUMAN_PLACED[0]][HUMAN_PLACED[1]] == 0:
-                board[HUMAN_PLACED[0]][HUMAN_PLACED[1]] = player_human
+            move_human = drivers.get_move()
+            if board[move_human[0]][move_human[1]] == 0:
+                board[move_human[0]][move_human[1]] = player_human
         else:   # Game phase 2, moving
-            pass
+            drivers.await_changes()
+            move_human = drivers.get_move()
+            if len(move_human) != 2:    # Has to include a position to and from
+                print("Invalid move, silly human!")
+            else:
+                # Check move for legality
+                if board[move_human[0][0]][move_human[0][1]] != 0 or board[move_human[1][0]][move_human[1][1]] != player_human:  # Never legal
+                    print("Illegal move, human!")
+                elif (not board[move_human[0][0]][move_human[0][1]] in possiblemoves(move_human[1][0], move_human[1][1], board)) and board_remaining[player_human] > 3: # If player cant jump
+                    print("Illegal move, human!")
+                else:   # Legal move
+                    board[move_human[0][0]][move_human[0][1]] = player_human
+                    board[move_human[1][0]][move_human[1][1]] = 0
+
+        # Check for mills
+        if checkmuhle(move_human[0][0], move_human[0][1], board, player_human):
+            drivers.remove(toremove(board, player_ai))
+            board_remaining[player_ai] -= 1
     #
     # Check victory conditions
     #
