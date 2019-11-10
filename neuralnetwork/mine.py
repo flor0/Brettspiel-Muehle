@@ -1,8 +1,8 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
+#from __future__ import absolute_import, division, print_function, unicode_literals
 import functools, datahandler
 
-import numpy as np
-import tensorflow as tf
+#import numpy as np
+#import tensorflow as tf
 
 def moveconverter(a):
     converts = {
@@ -47,11 +47,13 @@ remaining_board_me = [int(line[26]) for line in datafile_lines]
 remaining_board_enemy = [int(line[27]) for line in datafile_lines]
 answers = [line[29:] for line in datafile_lines]
 
-mydataset = open("mydata.txt", "w")
-mydataset.write("b00,b01,b02,b03,b04,b05,b06,b07,b10,b11,b12,b13,b14,b15,b16,b17,b20,b21,b22,b23,b24,b25,b26,b27,hand_me,hand_enemy,board_me,board_enemy,solution\n")
+mydataset = open("mydata_to.txt", "w")
+#mydataset.write("b00,b01,b02,b03,b04,b05,b06,b07,b10,b11,b12,b13,b14,b15,b16,b17,b20,b21,b22,b23,b24,b25,b26,b27,hand_me,hand_enemy,board_me,board_enemy,solution\n")
+mydataset.write("b00,b01,b02,b03,b04,b05,b06,b07,b10,b11,b12,b13,b14,b15,b16,b17,b20,b21,b22,b23,b24,b25,b26,b27,hand_me,hand_enemy,board_me,board_enemy,to\n")
 for i in range(len(datafile_lines)):
     if i % 10000 == 0:
         print(str(i)+"/"+str(len(datafile_lines)))
+    """
     if len(answers[i]) > 3:
         temp_array = []
         temp_array.append(moveconverter(answers[i][:2]))
@@ -59,10 +61,13 @@ for i in range(len(datafile_lines)):
         solution = datahandler.get_int(temp_array)
     else:
         solution = datahandler.get_int(moveconverter(answers[i][:2]))
+    """
+    to_string = False
+    from_string = False
+    remove_string = False
 
-    mydataset.write(board_states[i].replace("M", "1,").replace("E", "2,").replace("O", "0,")+str(remaining_hand_me[i])+","+str(remaining_hand_enemy[i])+","+str(remaining_board_me[i])+","+str(remaining_board_enemy[i])+","+str(solution)+"\n")
+    to_string = answers[i][:2]
+    to = datahandler.get_int(moveconverter(to_string))
+
+    mydataset.write(board_states[i].replace("M", "1,").replace("E", "2,").replace("O", "0,")+str(remaining_hand_me[i])+","+str(remaining_hand_enemy[i])+","+str(remaining_board_me[i])+","+str(remaining_board_enemy[i])+","+str(to)+"\n")
 mydataset.close()
-
-
-
-

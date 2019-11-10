@@ -105,3 +105,12 @@ venv.bak/
 neuralnetwork/weights.tf.data-00000-of-00002
 neuralnetwork/weights.tf.data-00001-of-00002
 neuralnetwork/weights.tf.index
+neuralnetwork/weights.tf_temp_cd4168bf9dd94b1f8db1b28a7dafbd92/part-00000-of-00002.data-00000-of-00001
+neuralnetwork/weights.tf.index
+neuralnetwork/weights.tf_temp_cd4168bf9dd94b1f8db1b28a7dafbd92/part-00000-of-00002.index
+neuralnetwork/weights.tf_temp_cd4168bf9dd94b1f8db1b28a7dafbd92/part-00001-of-00002.data-00000-of-00001
+neuralnetwork/weights.tf_temp_cd4168bf9dd94b1f8db1b28a7dafbd92/part-00001-of-00002.index
+neuralnetwork/weights_to.tf.data-00000-of-00002
+neuralnetwork/weights_to.tf.data-00001-of-00002
+neuralnetwork/weights_to.tf.index
+neuralnetwork/weights.tf.index

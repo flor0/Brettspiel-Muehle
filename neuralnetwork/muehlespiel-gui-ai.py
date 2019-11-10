@@ -196,6 +196,23 @@ def drawremove():
     screen.blit(textscreen, (0, 500-40))
     pygame.display.flip()
 
+def checkmuhle_nochange(ringPos, stellePos, spielfeld, mancolor):
+    if stellePos % 2 == 0:  # Men on the edge
+        if spielfeld[ringPos][(stellePos + 1) % 8] == mancolor and spielfeld[ringPos][
+                                (stellePos + 2) % 8] == mancolor:
+            return True
+        if spielfeld[ringPos][(stellePos - 1) % 8] == mancolor and spielfeld[ringPos][
+            (stellePos - 2) % 8] == mancolor:
+            return True
+    else:  # Men in the centre lines
+        if spielfeld[(ringPos + 1) % 3][stellePos] == mancolor and spielfeld[(ringPos + 2) % 3][
+                                stellePos] == mancolor:
+            return True
+        if spielfeld[ringPos][(stellePos + 1) % 8] == mancolor and spielfeld[ringPos][
+                                (stellePos - 1) % 8] == mancolor:
+            return True
+    return False
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 

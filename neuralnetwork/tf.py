@@ -28,7 +28,7 @@ print("TensorFlow version: {}".format(tf.__version__))
 print("Eager execution: {}".format(tf.executing_eagerly()))
 #######################################################################################################################
 # Data stuff
-batch_size = 512
+batch_size = 1
 _column_names = ['b00','b01','b02','b03','b04','b05','b06','b07','b10','b11','b12','b13','b14','b15','b16','b17','b20','b21','b22','b23','b24','b25','b26','b27','hand_me','hand_enemy','board_me','board_enemy','solution']
 _label_name = 'solution'
 print("Making dataset...")
@@ -41,6 +41,17 @@ train_dataset = tf.data.experimental.make_csv_dataset(
     header=True,
     shuffle=True,
     num_epochs=1)
+
+
+test_dataset = tf.data.experimental.make_csv_dataset(
+    'mydata_test.txt',
+    1,
+    column_names=_column_names,
+    label_name=_label_name,
+    header=True,
+    shuffle=True,
+    num_epochs=1)
+
 print("Dataset finished!")
 
 train_dataset = train_dataset.map(pack_features_vector)
@@ -66,7 +77,19 @@ print("Prediction: {}".format(tf.argmax(predictions, axis=1)))
 print("    Labels: {}".format(labels))
 
 loss_object = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
-optimizer = tf.keras.optimizers.Adam(learning_rate=0.0005)
+optimizer = tf.keras.optimizers.Adam(learning_rate=0.00005)
+
+
+
+
+########################################################################################################################
+# Training loop
+print("####################### START TRAINING #######################")
+train_loss_results = []
+train_accuracy_results = []
+num_epochs = 10
+
+model.load_weights("weights.tf")
 
 
 loss_value, grads = grad(model, features, labels)
@@ -75,35 +98,37 @@ print("Step: {}, Initial Loss: {}".format(optimizer.iterations.numpy(),
 optimizer.apply_gradients(zip(grads, model.trainable_variables))
 print("Step: {},         Loss: {}".format(optimizer.iterations.numpy(),
                                           loss(model, features, labels).numpy()))
-
-########################################################################################################################
-# Training loop
-print("####################### START TRAINING #######################")
-train_loss_results = []
-train_accuracy_results = []
-num_epochs = 1500
-
-#model.load_weights("weights.tf")
-
-
+"""
+test_accuracy = tf.keras.metrics.SparseCategoricalAccuracy()
+for x, y in test_dataset:
+    test_accuracy(y, model(x))
+print("Initial accuracy: {:.3%}".format(test_accuracy.result()))
+"""
+epoch_time = time.time()
 for epoch in range(num_epochs):
     t = time.time()
     epoch_loss_avg = tf.keras.metrics.Mean()
     epoch_accuracy = tf.keras.metrics.SparseCategoricalAccuracy()
 
+    n = 0
     # training loop
     for x, y in train_dataset:
+
+        n += 1
+        if n % 10000 == 0:
+            # track progress
+            print("Epoch progress: {}/1'600'000 thats {} %".format(n, 100*n/1600000/batch_size))
+            print("Results: Accuracy {:.3%} %".format(epoch_accuracy.result()))
+            print("Estimated time remaining: {} secs".format((time.time()-epoch_time)/n * (1600000-n)))
+            model.save_weights("weights.tf")
+
+
         # Model optimization
         loss_value, gradients = grad(model, x, y)
         optimizer.apply_gradients(zip(gradients, model.trainable_variables))
 
-        # track progress
-        epoch_loss_avg(loss_value)  # Add current batch's loss
         epoch_accuracy(y, model(x)) # Compare prediction to actual label
-
-    # End epoch
-    train_loss_results.append(epoch_loss_avg.result())
-    train_accuracy_results.append(epoch_accuracy.result())
+        epoch_loss_avg(loss_value)  # Add current batch's loss
 
     print("Epoch {:03d}: Loss: {:.3f}, Accuracy: {:.3%}".format(epoch, epoch_loss_avg.result(),
                                                                 epoch_accuracy.result()))
@@ -112,19 +137,8 @@ for epoch in range(num_epochs):
     hrs = mins / 60
     mins = mins - hrs*60
     secs = secs - mins*60 - hrs*60*60
+
+    print("Completed epoch after: {} mins and {} secs".format(mins, secs))
     print("Estimated time remaining: {} hrs {} min {} sec".format(hrs, mins, secs))
+    print("------------------------------------------------------")
     model.save_weights("weights.tf")
-
-
-# visualize
-
-fig, axes = plt.subplots(2, figsize=(12, 8))
-fig.suptitle('Training Metrics')
-
-axes[0].set_ylabel("Loss", fontsize=14)
-axes[0].plot(train_loss_results)
-
-axes[1].set_ylabel("Accuracy", fontsize=14)
-axes[1].set_xlabel("Epoch", fontsize=14)
-axes[1].plot(train_accuracy_results)
-plt.show()
