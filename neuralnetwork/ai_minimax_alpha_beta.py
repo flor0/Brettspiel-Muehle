@@ -7,7 +7,7 @@ class Morris:
         self.player = real_player
         self.opponent = 1 if self.player == 2 else 2
         self.remaining_set = remaining_set
-        self.max_depth = 5
+        self.max_depth = 3
         t = time.time()
         self.out = self.make_score(board, board_muhlen, real_player, -1000000000000000,
                                                              100000000000000)
