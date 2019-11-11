@@ -1,7 +1,4 @@
 import copy, gameutil, time
-from multiprocessing.pool import ThreadPool
-import multiprocessing
-pool = multiprocessing.Pool(multiprocessing.cpu_count())
 
 class Morris:
     def __init__(self, board, board_muhlen, real_player, remaining_set):
@@ -12,7 +9,6 @@ class Morris:
         self.remaining_set = remaining_set
         self.max_depth = 5
         t = time.time()
-        print("myscript run")
         self.out = self.make_score(board, board_muhlen, real_player, -1000000000000000,
                                                              100000000000000)
         print("AI time: %s sec" % str(time.time() - t))
@@ -34,9 +30,9 @@ class Morris:
                         score_add = 0
                         if self.checkmuhle(move[0], move[1], board_continue, self.player):
                             score_add += 100
-                        async_result = pool.apply_async(self.minimax, (board_continue, copy.deepcopy(board_muhlen), 1 if player == 2 else 2
-                                                  , maxEval, beta, self.remaining_set, self.max_depth))
-                        evaluation = async_result.get()
+
+                        evaluation = self.minimax(board_continue, copy.deepcopy(board_muhlen), 1 if player == 2 else 2
+                                                  , maxEval, beta, self.remaining_set, self.max_depth)
                         evaluation += score_add
 
                         if evaluation > maxEval:
@@ -66,8 +62,7 @@ class Morris:
                                 score_add = 0
                                 if self.checkmuhle(move[0], move[1], board_, self.player):
                                     score_add += 100
-                                async_result = pool.apply_async(self.minimax, (board_, muhlen_, 1 if player == 2 else 2, maxEval, beta, self.remaining_set, self.max_depth))  # tuple of args for foo
-                                evaluation = async_result.get()
+                                evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, maxEval, beta, self.remaining_set, self.max_depth)
                                 evaluation += score_add
 
                                 if evaluation > maxEval:
