@@ -1,5 +1,5 @@
 if __name__ == "__main__":
-    import gameutil, copy, random, neural_ai, ai_minimax_alpha_beta
+    import gameutil, copy, random, neural_ai, ai_minimax_alpha_beta, drivers
     #
     # Define game functions
     #
@@ -347,8 +347,7 @@ if __name__ == "__main__":
                 #ai_move_to = ai_minimax_alpha_beta.Morris(board, generate_board_muhlen(board), player_ai, hand_remaining[player_ai]+hand_remaining[player_human]).out
                 ai_move_to = generate_move(board, player_ai, hand_remaining[player_human], hand_remaining[player_ai], board_remaining[player_human], board_remaining[player_ai])    # generate move
                 if move_is_legal(board, ai_move_to, player_ai, board_remaining[player_ai], hand_remaining[player_ai]): # Check is move is legal
-                    #drivers.place(to)    # Select random move and execute with drivers
-                    print(ai_move_to)
+                    drivers.move_to(to)
 
             else:   # Game phase 2, moving
                 # Call AI
@@ -358,6 +357,7 @@ if __name__ == "__main__":
                 else:
                     board[ai_move_to[0]][ai_move_to[1]] = player_ai
                     board[ai_move_from[0]][ai_move_from[1]] = 0
+                    drivers.move_from_to([ai_move_to, ai_move_from])
 
 
             # Check for mills
@@ -371,37 +371,37 @@ if __name__ == "__main__":
                 waiting = True
                 while waiting:
                     drivers.await_changes()
-                    move_human = drivers.get_move()
+                    move_human = drivers.human_move()
                     if move_is_legal(board, move_human, player_human, board_remaining[player_human], hand_remaining[player_human]):
                         board[move_human[0]][move_human[1]] = player_human
                         hand_remaining[player_human] -= 1
                         waiting = False
                     else:
-                        print("Move illegal, silly human!")
+                        print("Move illegal, silly human!1")
             else:   # Game phase 2, moving
                 waiting = True
                 while waiting:
                     drivers.await_changes()
-                    move_human = drivers.get_move()
+                    move_human = drivers.human_move()
                     if move_is_legal(board, move_human, player_human, board_remaining[player_human], hand_remaining[player_human]):
                         board[move_human[0][0]][move_human[0][1]] = player_human
                         board[move_human[1][0]][move_human[1][1]] = 0
                         waiting = False
                     else:
-                        print("Illegal move, silly human!")
+                        print("Illegal move, silly human!2")
 
             # Check for mills
             if checkmuhle(move_human[0][0], move_human[0][1], board, player_human):
                 waiting = True
                 while waiting:
                     drivers.await_changes()
-                    remove_human = drivers.get_move()
+                    remove_human = drivers.human_move()
                     if board[remove_human[0]][remove_human[1]] == player_ai:
                         drivers.remove(remove_human)
                         board_remaining[player_ai] -= 1
                         waiting = False
                     else:
-                        print("False remove, silly human!")
+                        print("False remove, silly human!3")
         #
         # Check victory conditions
         #
@@ -421,7 +421,3 @@ if __name__ == "__main__":
         if not canmoveatall(2, board):  # If Black can't move, White wins
             print("White won!")
             done = True
-
-
-
-
