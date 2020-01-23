@@ -1,8 +1,10 @@
 import pygame
 import numpy as np
 import sys
-import ai_minimax_alpha_beta
 import copy
+import datahandler
+import neural_ai
+import math
 
 
 # Variables for the game
@@ -194,6 +196,23 @@ def drawremove():
     screen.blit(textscreen, (0, 500-40))
     pygame.display.flip()
 
+def checkmuhle_nochange(ringPos, stellePos, spielfeld, mancolor):
+    if stellePos % 2 == 0:  # Men on the edge
+        if spielfeld[ringPos][(stellePos + 1) % 8] == mancolor and spielfeld[ringPos][
+                                (stellePos + 2) % 8] == mancolor:
+            return True
+        if spielfeld[ringPos][(stellePos - 1) % 8] == mancolor and spielfeld[ringPos][
+            (stellePos - 2) % 8] == mancolor:
+            return True
+    else:  # Men in the centre lines
+        if spielfeld[(ringPos + 1) % 3][stellePos] == mancolor and spielfeld[(ringPos + 2) % 3][
+                                stellePos] == mancolor:
+            return True
+        if spielfeld[ringPos][(stellePos + 1) % 8] == mancolor and spielfeld[ringPos][
+                                (stellePos - 1) % 8] == mancolor:
+            return True
+    return False
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -220,14 +239,25 @@ while not done:
     while phase1_remaining and not done:
         if not turn:
             clearmuhlen()
-            print("denke...")
-            print("DEBUG")
-            print("END DEBUG")
-            ki = ai_minimax_alpha_beta.Morris(copy.deepcopy(spielfeld), copy.deepcopy(spielfeld_muhlen), 2, phase1_remaining)
-            ai_move = ki.out
-            print("denken fertig")
-            print("AI MOVE: "+str(ai_move))
-            spielfeld[ai_move[0]][ai_move[1]] = 2
+            board_ai = 0
+            board_human = 0
+            for i in range(3):
+                for j in range(8):
+                    if spielfeld[i][j] == 1:
+                        board_human += 1
+                    elif spielfeld[i][j] == 2:
+                        board_ai += 1
+            print("CALLING AI...")
+            ai_move = neural_ai.makemove(spielfeld, math.ceil(phase1_remaining/2), phase1_remaining//2, board_human, board_ai)
+            print("Generated move: {}".format(ai_move))
+            if not type(ai_move) == tuple:
+                print("Uh, oh. It's retarded!")
+                ai_move = ai_move[0]
+            if spielfeld[ai_move[0]][ai_move[1]] == 0:
+                spielfeld[ai_move[0]][ai_move[1]] = 2
+            else:   # Uh, oh. The AI has made a terrible mistake!
+                print("Uh, oh. It's made a mistake!")
+
             turn = not turn
             phase1_remaining -= 1
             drawBoard()
@@ -316,16 +346,23 @@ while not done:
     while remaining[1] > 0 and remaining[2] > 0 and spielphase == 2 and not done:  # While loop phase 2
         if not turn:
             clearmuhlen()
-            print("denke...")
-            print("DEBUG")
-            print(copy.deepcopy(spielfeld))
-            print("END DEBUG")
-            ki = ai_minimax_alpha_beta.Morris(copy.deepcopy(spielfeld), copy.deepcopy(spielfeld_muhlen), 2, phase1_remaining)
-            ai_move = ki.out
-            print("denken fertig")
-            print("AI MOVE: "+str(ai_move))
-            spielfeld[ai_move[2]][ai_move[3]] = 0
-            spielfeld[ai_move[0]][ai_move[1]] = 2
+            board_ai = 0
+            board_human = 0
+            for i in range(3):
+                for j in range(8):
+                    if spielfeld[i][j] == 1:
+                        board_human += 1
+                    elif spielfeld[i][j] == 2:
+                        board_ai += 1
+            print("CALLING AI...")
+            ai_move = neural_ai.makemove(spielfeld, math.ceil(phase1_remaining / 2), phase1_remaining // 2, board_human,
+                                         board_ai)
+            print("Generated move: {}".format(ai_move))
+            if len(ai_move) < 2:
+                print("Uh, oh. It's retarded!")
+            else:
+                spielfeld[ai_move[0][0]][ai_move[0][1]] = 0
+                spielfeld[ai_move[1][0]][ai_move[1][1]] = 2
             turn = not turn
             drawBoard()
             drawState()

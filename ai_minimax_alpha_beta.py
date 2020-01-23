@@ -1,7 +1,4 @@
 import copy, gameutil, time
-from multiprocessing.pool import ThreadPool
-import multiprocessing
-pool = multiprocessing.Pool(multiprocessing.cpu_count())
 
 class Morris:
     def __init__(self, board, board_muhlen, real_player, remaining_set):
@@ -10,14 +7,13 @@ class Morris:
         self.player = real_player
         self.opponent = 1 if self.player == 2 else 2
         self.remaining_set = remaining_set
-        self.max_depth = 5
+        self.max_depth = 3  # Important, determines the depth of the algorithm
         t = time.time()
-        print("myscript run")
         self.out = self.make_score(board, board_muhlen, real_player, -1000000000000000,
                                                              100000000000000)
         print("AI time: %s sec" % str(time.time() - t))
     ###
-    # First function being called, remembers moves to return them
+    # First function being called, only remembers moves to return them
     ###
     def make_score(self, board, board_muhlen, player, alpha, beta):
         maxEval = alpha
@@ -34,9 +30,9 @@ class Morris:
                         score_add = 0
                         if self.checkmuhle(move[0], move[1], board_continue, self.player):
                             score_add += 100
-                        async_result = pool.apply_async(self.minimax, (board_continue, copy.deepcopy(board_muhlen), 1 if player == 2 else 2
-                                                  , maxEval, beta, self.remaining_set, self.max_depth))
-                        evaluation = async_result.get()
+
+                        evaluation = self.minimax(board_continue, copy.deepcopy(board_muhlen), 1 if player == 2 else 2
+                                                  , maxEval, beta, self.remaining_set, self.max_depth)
                         evaluation += score_add
 
                         if evaluation > maxEval:
@@ -50,36 +46,80 @@ class Morris:
             return best_move[0], best_move[1]
         # If phase 2
         else:
-            for ring in range(3):
-                for stelle in range(8):
-                    if board[ring][stelle] == self.player:
-                        possiblemoves = self.possiblemoves(ring, stelle, board)
-                        if possiblemoves:
-                            for move in possiblemoves:
-                                board_ = copy.deepcopy(board)
-                                muhlen_ = copy.deepcopy(board_muhlen)
-                                board_[ring][stelle] = 0
-                                try:
-                                    board_[move[0]][move[1]] = self.player
-                                except:
-                                    print("ERROR"+str(move))
-                                score_add = 0
-                                if self.checkmuhle(move[0], move[1], board_, self.player):
-                                    score_add += 100
-                                async_result = pool.apply_async(self.minimax, (board_, muhlen_, 1 if player == 2 else 2, maxEval, beta, self.remaining_set, self.max_depth))  # tuple of args for foo
-                                evaluation = async_result.get()
-                                evaluation += score_add
+            # Figure out how many pieces on board by ai
+            mypieces = 0
+            for i in range(3):
+                for j in range(8):
+                    if board[i][j] == self.player:
+                        mypieces += 1
 
-                                if evaluation > maxEval:
-                                    maxEval = evaluation
-                                    best_move = move[0], move[1], ring, stelle
-                                    if maxEval >= beta:
-                                        break
-                else:
-                    continue
-                break
-            return best_move[0], best_move[1], best_move[2], best_move[3]
+            if mypieces > 3:
+                for ring in range(3):
+                    for stelle in range(8):
+                        if board[ring][stelle] == self.player:
+                            possiblemoves = self.possiblemoves(ring, stelle, board)
+                            if possiblemoves:
+                                for move in possiblemoves:
+                                    board_ = copy.deepcopy(board)
+                                    muhlen_ = copy.deepcopy(board_muhlen)
+                                    board_[ring][stelle] = 0
+                                    try:
+                                        board_[move[0]][move[1]] = self.player
+                                    except:
+                                        print("ERROR"+str(move))
+                                    score_add = 0
+                                    if self.checkmuhle(move[0], move[1], board_, self.player):
+                                        score_add += 100
+                                    evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, maxEval, beta, self.remaining_set, self.max_depth)
+                                    evaluation += score_add
 
+                                    if evaluation > maxEval:
+                                        maxEval = evaluation
+                                        best_move = move[0], move[1], ring, stelle
+                                        if maxEval >= beta:
+                                            break
+                    else:
+                        continue
+                    break
+                return best_move[0], best_move[1], best_move[2], best_move[3]
+
+            # If jumping
+            else:
+                for ring in range(3):
+                    for stelle in range(8):
+                        if board[ring][stelle] == self.player:
+                            possiblemoves = []
+                            possiblemoves_bool = False
+                            for i in range(3):
+                                for j in range(8):
+                                    if board[i][j] == 0:
+                                        possiblemoves_bool = True
+                                        possiblemoves.append((i, j))
+                            if possiblemoves_bool:
+                                for move in possiblemoves:
+                                    board_ = copy.deepcopy(board)
+                                    muhlen_ = copy.deepcopy(board_muhlen)
+                                    board_[ring][stelle] = 0
+                                    try:
+                                        board_[move[0]][move[1]] = self.player
+                                    except:
+                                        print("ERROR" + str(move))
+                                    score_add = 0
+                                    if self.checkmuhle(move[0], move[1], board_, self.player):
+                                        score_add += 100
+                                    evaluation = self.minimax(board_, muhlen_, 1 if player == 2 else 2, maxEval, beta,
+                                                              self.remaining_set, self.max_depth)
+                                    evaluation += score_add
+
+                                    if evaluation > maxEval:
+                                        maxEval = evaluation
+                                        best_move = move[0], move[1], ring, stelle
+                                        if maxEval >= beta:
+                                            break
+                    else:
+                        continue
+                    break
+                return best_move[0], best_move[1], best_move[2], best_move[3]
 
     ###
     # Minimax function is simpler and only remembers and returns scores of the decision tree without the moves
@@ -266,7 +306,6 @@ class Morris:
                                 except:
                                     print("ERROR"+str(move))
                                 # check if new mill has been generated / zwickmuehle
-                                # TODO: kinda whack
                                 score_addition = 0
                                 if self.checkmuhle(move[0], move[1], board_, player):
                                     # New mill generated
@@ -329,9 +368,9 @@ class Morris:
                 possiblemoves.append((ringpos, (stellepos-1) % 8))
         else:  # Men on the center fields
             if spielfeld[ringpos][(stellepos+1) % 8] == 0:
-                possiblemoves.append((ringpos, stellepos+1 % 8))
+                possiblemoves.append((ringpos, (stellepos+1) % 8))
             if spielfeld[ringpos][(stellepos-1) % 8] == 0:  # Sideways
-                possiblemoves.append((ringpos, stellepos-1 % 8))
+                possiblemoves.append((ringpos, (stellepos-1) % 8))
             if ringpos == 0:  # Outer ring
                 if spielfeld[1][stellepos] == 0:
                     possiblemoves.append((1, stellepos))
